@@ -1,48 +1,19 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
+#include "OxygenRender/Window.h"
 #include "OxygenRender/Renderer.h"
 #include <iostream>
 using namespace OxyRender;
 int main()
 {
-    // 初始化 GLFW
-    if (!glfwInit())
-    {
-        std::cerr << "GLFW 初始化失败\n";
-        return -1;
-    }
-
-    // 创建窗口
-    GLFWwindow *window = glfwCreateWindow(800, 600, "OxygenStudio Test", nullptr, nullptr);
-    if (!window)
-    {
-        std::cerr << "窗口创建失败\n";
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    // 初始化 GLAD
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cerr << "GLAD 初始化失败\n";
-        return -1;
-    }
-
     RendererFactory factory;
-    auto renderer = factory.createRenderer(RendererType::OpenGL);
-
-    // 主循环
-    while (!glfwWindowShouldClose(window))
+    auto renderer = factory.createRenderer(RendererBackend::OpenGL);
+    GLFWWindow window(800, 600, "OxygenRender");
+    
+    while (!window.shouldClose())
     {
-        renderer->clear(); // 清屏
+        renderer->clear();
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window.swapBuffers();
     }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
     return 0;
 }

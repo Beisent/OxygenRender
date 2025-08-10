@@ -3,7 +3,7 @@
 namespace OxyRender
 {
 
-    enum class RendererType
+    enum class RendererBackend
     {
         OpenGL,
         Vulkan,
@@ -12,10 +12,14 @@ namespace OxyRender
 
     class IRenderer
     {
+    private:
+        RendererBackend backendType;
+
     public:
         IRenderer() = default;
         virtual ~IRenderer() = default;
         virtual void clear() = 0;
+        RendererBackend getBackendType() const { return backendType; }
     };
 
     class OpenGLRenderer : public IRenderer
@@ -29,11 +33,11 @@ namespace OxyRender
     class RendererFactory
     {
     public:
-        static std::unique_ptr<IRenderer> createRenderer(RendererType type)
+        static std::unique_ptr<IRenderer> createRenderer(RendererBackend type)
         {
             switch (type)
             {
-            case RendererType::OpenGL:
+            case RendererBackend::OpenGL:
                 return std::make_unique<OpenGLRenderer>();
             default:
                 return nullptr;

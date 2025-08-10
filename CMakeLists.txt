@@ -27,12 +27,12 @@ file(GLOB_RECURSE OXYGEN_SRC
 add_library(OxygenRender STATIC ${OXYGEN_SRC})
 
 # 5. 链接外部库 GLFW
-if (WIN32)
+if(WIN32)
     target_link_libraries(OxygenRender
         ${CMAKE_SOURCE_DIR}/libs/GLFW/lib-mingw-w64/libglfw3.a
         opengl32
     )
-elseif (APPLE)
+elseif(APPLE)
     find_package(glfw3 REQUIRED)
     target_link_libraries(OxygenRender glfw "-framework OpenGL")
 else()
