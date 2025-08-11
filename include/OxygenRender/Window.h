@@ -1,15 +1,12 @@
 #pragma once
 #include <string>
+#include "OxygenRender/GraphicsTypes.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <memory>
 namespace OxyRender
 {
-    enum class WindowBackend
-    {
-        GLFW,
-        SDL,
-        WinAPI
-    };
+
     class IWindow
     {
     protected:
@@ -25,6 +22,7 @@ namespace OxyRender
         virtual bool shouldClose() = 0;
         virtual void swapBuffers() = 0;
     };
+
     class GLFWWindow : public IWindow
     {
     private:
@@ -33,9 +31,35 @@ namespace OxyRender
     public:
         GLFWWindow(int width, int height, std::string title);
         ~GLFWWindow() override;
-        void *getWindow() const;
         void setViewport(int x, int y, int width, int height) override;
         bool shouldClose() override;
         void swapBuffers() override;
+    };
+
+    class WindowFactory
+    {
+    public:
+        static std::unique_ptr<IWindow> createWindow(int width, int height, const std::string &title)
+        {
+            switch (OXYG_CurrentWindowBackend)
+            {
+            case WindowBackend::GLFW:
+                return std::make_unique<GLFWWindow>(width, height, title);
+            default:
+                return nullptr;
+            }
+        }
+    };
+
+    class Window
+    {
+    private:
+        std::unique_ptr<IWindow> m_window;
+
+    public:
+        Window(int width, int height, std::string title);
+        void setViewport(int x, int y, int width, int height);
+        bool shouldClose();
+        void swapBuffers();
     };
 } // namespace OxyRender

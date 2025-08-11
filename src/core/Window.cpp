@@ -1,5 +1,6 @@
 #include "OxygenRender/Window.h"
 #include <iostream>
+
 namespace OxyRender
 {
     IWindow::IWindow(int width, int height, std::string title) : m_width(width), m_height(height), m_title(std::move(title))
@@ -55,6 +56,28 @@ namespace OxyRender
     {
         glfwSwapBuffers(m_window);
         glfwPollEvents(); // 暂时放这里等待后续实现事件处理再改
+    }
+
+    Window::Window(int width, int height, std::string title)
+    {
+        m_window = WindowFactory::createWindow(width, height, std::move(title));
+        if (!m_window)
+        {
+            std::cerr << "窗口创建失败\n";
+            throw std::runtime_error("Failed to create window");
+        }
+    }
+    void Window::setViewport(int x, int y, int width, int height)
+    {
+        m_window->setViewport(x, y, width, height);
+    }
+    bool Window::shouldClose()
+    {
+        return m_window->shouldClose();
+    }
+    void Window::swapBuffers()
+    {
+        m_window->swapBuffers();
     }
 
 } // namespace OxyRender

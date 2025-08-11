@@ -5,13 +5,14 @@
 using namespace OxyRender;
 int main()
 {
-    RendererFactory factory;
-    auto renderer = factory.createRenderer(RendererBackend::OpenGL);
-    GLFWWindow window(800, 600, "OxygenRender");
-    
+    // SetWindowBackend(WindowBackend::GLFW);
+    // SetRenderBackend(RendererBackend::OpenGL);
+    Renderer renderer;
+    Window window(800, 600, "OxygenRender");
+
     while (!window.shouldClose())
     {
-        renderer->clear();
+        renderer.clear();
 
         window.swapBuffers();
     }

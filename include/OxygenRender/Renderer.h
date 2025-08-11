@@ -1,25 +1,14 @@
 #pragma once
+#include "OxygenRender/GraphicsTypes.h"
 #include <memory>
 namespace OxyRender
 {
-
-    enum class RendererBackend
-    {
-        OpenGL,
-        Vulkan,
-        DirectX
-    };
-
     class IRenderer
     {
-    private:
-        RendererBackend backendType;
-
     public:
         IRenderer() = default;
         virtual ~IRenderer() = default;
         virtual void clear() = 0;
-        RendererBackend getBackendType() const { return backendType; }
     };
 
     class OpenGLRenderer : public IRenderer
@@ -33,9 +22,9 @@ namespace OxyRender
     class RendererFactory
     {
     public:
-        static std::unique_ptr<IRenderer> createRenderer(RendererBackend type)
+        static std::unique_ptr<IRenderer> createRenderer()
         {
-            switch (type)
+            switch (OXYG_CurrentBackend)
             {
             case RendererBackend::OpenGL:
                 return std::make_unique<OpenGLRenderer>();
@@ -43,5 +32,15 @@ namespace OxyRender
                 return nullptr;
             }
         }
+    };
+
+    class Renderer
+    {
+    private:
+        std::unique_ptr<IRenderer> renderer;
+
+    public:
+        Renderer();
+        void clear();
     };
 } // namespace OxyRender
