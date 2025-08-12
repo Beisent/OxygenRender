@@ -39,10 +39,6 @@ namespace OxyRender
         glfwTerminate();
     }
 
-    void *GLFWWindow::getWindow() const
-    {
-        return m_window;
-    }
     void GLFWWindow::setViewport(int x, int y, int width, int height)
     {
         glViewport(x, y, width, height);
