@@ -2,7 +2,6 @@
 #include "OxygenRender/Window.h"
 #include "OxygenRender/Renderer.h"
 #include "OxygenRender/Buffer.h"
-#include "OxygenRender/OpenGLBuffers.h"
 #include <iostream>
 
 using namespace OxyRender;
@@ -47,42 +46,28 @@ GLuint createProgram(const char *vsSrc, const char *fsSrc)
 }
 int main()
 {
+
+    // ================= 顶点数据 =================
+    float vertices[] = {
+        // 三角形 (位置 + 颜色)
+        -0.8f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -0.4f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.6f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+
+        // 正方形 (位置 + 颜色)
+        0.2f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f,
+        0.8f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        0.2f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f};
+
+    uint32_t indices[] = {
+        // 三角形
+        0, 1, 2,
+        // 正方形
+        3, 4, 5,
+        5, 6, 3};
     Renderer renderer;
     Window window(800, 600, "OxygenRender");
-
-    float triVertices[] = {
-
-        0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f};
-
-    OxyRender::VertexLayout triLayout;
-    triLayout.addAttribute("aPos", 0, OxyRender::VertexAttribType::Float3);
-    triLayout.addAttribute("aColor", 1, OxyRender::VertexAttribType::Float3);
-
-    auto triVBO = std::make_shared<GLVertexBuffer>(triVertices, sizeof(triVertices), triLayout);
-    auto triVAO = std::make_shared<GLVertexArray>();
-    triVAO->addVertexBuffer(triVBO);
-
-    float sqVertices[] = {
-        -0.75f, 0.75f, 0.0f, 1.0f, 1.0f, 0.0f,
-        -0.25f, 0.75f, 0.0f, 1.0f, 0.0f, 1.0f,
-        -0.25f, 0.25f, 0.0f, 0.0f, 1.0f, 1.0f,
-        -0.75f, 0.25f, 0.0f, 0.5f, 0.5f, 0.5f};
-
-    uint32_t sqIndices[] = {
-        0, 1, 2,
-        2, 3, 0};
-
-    OxyRender::VertexLayout sqLayout;
-    sqLayout.addAttribute("aPos", 0, OxyRender::VertexAttribType::Float3);
-    sqLayout.addAttribute("aColor", 1, OxyRender::VertexAttribType::Float3);
-
-    auto sqVAO = std::make_shared<GLVertexArray>();
-    auto sqVBO = std::make_shared<GLVertexBuffer>(sqVertices, sizeof(sqVertices), sqLayout);
-    auto sqEBO = std::make_shared<GLIndexBuffer>(sqIndices, 6);
-    sqVAO->addVertexBuffer(sqVBO);
-    sqVAO->setIndexBuffer(sqEBO);
 
     const char *vsSrc = R"(
         #version 330 core
@@ -108,18 +93,26 @@ int main()
 
     GLuint program = createProgram(vsSrc, fsSrc);
 
+    VertexArray vao;
+    Buffer vbo(BufferType::Vertex, BufferUsage::StaticDraw);
+    vbo.setData(vertices, sizeof(vertices));
+
+    Buffer ebo(BufferType::Index, BufferUsage::StaticDraw);
+    ebo.setData(indices, sizeof(indices));
+    
+    VertexLayout layout;
+    layout.addAttribute("aPos", 0, VertexAttribType::Float3);
+    layout.addAttribute("aColor", 1, VertexAttribType::Float3);
+
+    vao.setVertexBuffer(vbo, layout);
+    vao.setIndexBuffer(ebo);
     while (!window.shouldClose())
     {
         renderer.clear();
         glUseProgram(program);
-        triVAO->bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        sqVAO->bind();
-        auto ib = sqVAO->getIndexBuffer();
-        if (ib)
-        {
-            glDrawElements(GL_TRIANGLES, (GLsizei)ib->getCount(), GL_UNSIGNED_INT, nullptr);
-        }
+        vao.bind();
+        glDrawElements(GL_TRIANGLES, static_cast<uint32_t>(sizeof(indices) / sizeof(uint32_t)), GL_UNSIGNED_INT, 0);
+
         window.swapBuffers();
     }
     return 0;

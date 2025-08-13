@@ -1,0 +1,204 @@
+#include "OxygenRender/Buffer.h"
+namespace OxyRender
+{
+    OpenGLVertexBuffer::OpenGLVertexBuffer(BufferUsage usage)
+    {
+        GLenum glUsage = GL_STATIC_DRAW;
+        switch (usage)
+        {
+        case BufferUsage::StaticDraw:
+            glUsage = GL_STATIC_DRAW;
+            break;
+        case BufferUsage::DynamicDraw:
+            glUsage = GL_DYNAMIC_DRAW;
+            break;
+        case BufferUsage::StreamDraw:
+            glUsage = GL_STREAM_DRAW;
+            break;
+        }
+        m_usage = glUsage;
+        glGenBuffers(1, &m_rendererID);
+    }
+
+    OpenGLVertexBuffer::~OpenGLVertexBuffer()
+    {
+        glDeleteBuffers(1, &m_rendererID);
+    }
+
+    void OpenGLVertexBuffer::bind() const noexcept
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, m_rendererID);
+    }
+
+    void OpenGLVertexBuffer::unbind() const noexcept
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    void OpenGLVertexBuffer::setData(const void *data, size_t size, size_t offset)
+    {
+        bind();
+        if (offset == 0)
+        {
+            glBufferData(GL_ARRAY_BUFFER, size, data, m_usage);
+        }
+        else
+        {
+            glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+        }
+    }
+
+    OpenGLIndexBuffer::OpenGLIndexBuffer(BufferUsage usage)
+    {
+        GLenum glUsage = GL_STATIC_DRAW;
+        switch (usage)
+        {
+        case BufferUsage::StaticDraw:
+            glUsage = GL_STATIC_DRAW;
+            break;
+        case BufferUsage::DynamicDraw:
+            glUsage = GL_DYNAMIC_DRAW;
+            break;
+        case BufferUsage::StreamDraw:
+            glUsage = GL_STREAM_DRAW;
+            break;
+        }
+        m_usage = glUsage;
+        glGenBuffers(1, &m_rendererID);
+        m_count = 0;
+    }
+
+    OpenGLIndexBuffer::~OpenGLIndexBuffer()
+    {
+        glDeleteBuffers(1, &m_rendererID);
+    }
+
+    void OpenGLIndexBuffer::bind() const noexcept
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererID);
+    }
+
+    void OpenGLIndexBuffer::unbind() const noexcept
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    void OpenGLIndexBuffer::setData(const void *data, size_t size, size_t offset)
+    {
+        bind();
+        m_count = static_cast<uint32_t>(size / sizeof(uint32_t));
+        if (offset == 0)
+        {
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, m_usage);
+        }
+        else
+        {
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
+        }
+    }
+
+    uint32_t OpenGLIndexBuffer::getCount() const noexcept
+    {
+        return m_count;
+    }
+
+    OpenGLVertexArray::OpenGLVertexArray()
+    {
+        glGenVertexArrays(1, &m_rendererID);
+    }
+
+    OpenGLVertexArray::~OpenGLVertexArray()
+    {
+        glDeleteVertexArrays(1, &m_rendererID);
+    }
+
+    void OpenGLVertexArray::bind() const noexcept
+    {
+        glBindVertexArray(m_rendererID);
+    }
+
+    void OpenGLVertexArray::unbind() const noexcept
+    {
+        glBindVertexArray(0);
+    }
+
+    void OpenGLVertexArray::setVertexBuffer(IBuffer *vertexBuffer, const VertexLayout &layout)
+    {
+        m_vertexBuffer = vertexBuffer;
+        bind();
+        m_vertexBuffer->bind();
+
+        const auto &attribs = layout.getAttributes();
+        for (const auto &attr : attribs)
+        {
+            glEnableVertexAttribArray(attr.location);
+            glVertexAttribPointer(attr.location,
+                                  static_cast<GLint>(sizeOfAttribType(attr.type) / sizeof(float)),
+                                  GL_FLOAT,
+                                  GL_FALSE,
+                                  static_cast<GLsizei>(layout.getStride()),
+                                  reinterpret_cast<const void *>(attr.offset));
+        }
+    }
+
+    void OpenGLVertexArray::setIndexBuffer(IndexBuffer *indexBuffer)
+    {
+        m_indexBuffer = indexBuffer;
+        bind();
+        m_indexBuffer->bind();
+    }
+
+    IndexBuffer *OpenGLVertexArray::getIndexBuffer() const noexcept
+    {
+        return m_indexBuffer;
+    }
+
+    Buffer::Buffer(BufferType type, BufferUsage usage) : m_type(type)
+    {
+        m_buffer = BufferFactory::createBuffer(type, usage);
+    }
+    void Buffer::bind()
+    {
+        m_buffer->bind();
+    }
+    void Buffer::unbind()
+    {
+        m_buffer->unbind();
+    }
+    void Buffer::setData(const void *data, size_t size, size_t offset)
+    {
+        m_buffer->setData(data, size, offset);
+    }
+
+    VertexArray::VertexArray()
+    {
+        m_vao = VertexArrayFactory::create();
+    }
+    void VertexArray::bind() const
+    {
+        m_vao->bind();
+    }
+    void VertexArray::unbind() const
+    {
+        m_vao->unbind();
+    }
+    void VertexArray::setVertexBuffer(Buffer &vertexBuffer, const VertexLayout &layout)
+    {
+        if (vertexBuffer.getType() != BufferType::Vertex)
+            throw std::runtime_error("setVertexBuffer: Provided buffer is not a VertexBuffer");
+
+        m_vao->setVertexBuffer(vertexBuffer.asIBuffer(), layout);
+    }
+    void VertexArray::setIndexBuffer(Buffer &indexBuffer)
+    {
+        auto ib = indexBuffer.asIndexBuffer();
+        if (!ib)
+            throw std::runtime_error("setIndexBuffer: Provided buffer is not an IndexBuffer");
+
+        m_vao->setIndexBuffer(ib);
+    }
+    IndexBuffer *VertexArray::getIndexBuffer() const
+    {
+        return m_vao->getIndexBuffer();
+    }
+}

@@ -27,20 +27,7 @@ namespace OxyRender
     {
         OXYG_CurrentWindowBackend = backend;
     }
-
-        enum class BufferType
-    {
-        Vertex, // 顶点缓冲
-        Index   // 索引缓冲
-    };
-
-    enum class BufferUsage
-    {
-        StaticDraw,
-        DynamicDraw,
-        StreamDraw
-    };
-
+    
     using BufferHandle = uint32_t; // 对外句柄类型
 
 }
