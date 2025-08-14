@@ -1,16 +1,96 @@
 #pragma once
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include <glad/glad.h>
+#include <memory>
+#include "OxygenRender/GraphicsTypes.h"
 namespace OxyRender
 {
     class IShader
     {
-    private:
+    protected:
         std::string m_name;
         std::string m_path_vertex;
         std::string m_path_fragment;
 
     public:
         IShader(std::string name, std::string path_vertex, std::string path_fragment);
+        virtual void use() = 0;
         virtual ~IShader() = default;
+    };
+
+    class OpenGLShader : public IShader
+    {
+    private:
+        GLuint m_program_id;
+
+        static std::string loadFile(const std::string &path)
+        {
+            std::ifstream file(path);
+            if (!file.is_open())
+                throw std::runtime_error("Failed to open shader file: " + path);
+
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            return buffer.str();
+        }
+
+        static GLuint compileShader(GLenum type, const std::string &source)
+        {
+            GLuint shader = glCreateShader(type);
+            const char *src = source.c_str();
+            glShaderSource(shader, 1, &src, nullptr);
+            glCompileShader(shader);
+
+            GLint success;
+            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+            if (!success)
+            {
+                char log[512];
+                glGetShaderInfoLog(shader, 512, nullptr, log);
+                glDeleteShader(shader);
+                throw std::runtime_error(std::string("Shader compilation failed: ") + log);
+            }
+            return shader;
+        }
+
+    public:
+        OpenGLShader(std::string name, std::string path_vertex, std::string path_fragment);
+        virtual ~OpenGLShader() override;
+        virtual void use() override;
+    };
+
+    class ShaderFactory
+    {
+    public:
+        static std::unique_ptr<IShader> create(std::string name, std::string path_vertex, std::string path_fragment)
+        {
+            switch (OXYG_CurrentBackend)
+            {
+            case RendererBackend::OpenGL:
+                return std::make_unique<OpenGLShader>(name, path_vertex, path_fragment);
+            default:
+                return nullptr;
+            }
+        }
+    };
+    class Shader
+    {
+    private:
+        std::unique_ptr<IShader> m_Shader;
+
+    public:
+        Shader(std::string name, std::string path_vertex, std::string path_fragment)
+        {
+            m_Shader = ShaderFactory::create(name, path_vertex, path_fragment);
+        }
+        ~Shader() = default;
+
+        void use()
+        {
+            m_Shader->use();
+        }
     };
 };

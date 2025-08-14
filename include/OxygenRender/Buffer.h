@@ -6,7 +6,6 @@
 #include <memory>
 #include <stdexcept>
 
-// OpenGL
 #include <glad/glad.h>
 
 namespace OxyRender
