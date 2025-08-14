@@ -1,18 +1,6 @@
 #include "OxygenRender/Shader.h"
 namespace OxyRender
 {
-    std::string loadFile(const std::string &filepath)
-    {
-        std::ifstream file(filepath);
-        if (!file.is_open())
-        {
-            throw std::runtime_error("Failed to open shader file: " + filepath);
-        }
-
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        return buffer.str();
-    }
 
     IShader::IShader(std::string name, std::string path_vertex, std::string path_fragment)
         : m_name(std::move(name)),

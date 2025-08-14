@@ -4,17 +4,15 @@
 #include "OxygenRender/Buffer.h"
 #include "OxygenRender/Shader.h"
 #include <iostream>
-#include <filesystem>
 
 using namespace OxyRender;
 
 int main()
 {
-
     Renderer renderer;
     Window window(800, 600, "OxygenRender");
 
-    Shader program("my_shader", "./bin/shaders/vertex.vert", "./bin/shaders/fragment.frag");
+    Shader program("my_shader", "shaders/vertex.vert", "shaders/fragment.frag");
 
     float vertices[] = {
         -0.8f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -67,6 +65,7 @@ int main()
         renderer.clear();
 
         program.use();
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         vao.bind();
         glDrawElements(GL_TRIANGLES, static_cast<uint32_t>(sizeof(indices) / sizeof(uint32_t)), GL_UNSIGNED_INT, 0);
