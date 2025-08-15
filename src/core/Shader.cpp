@@ -33,7 +33,6 @@ namespace OxyRender
             throw std::runtime_error(std::string("Program linking failed: ") + log);
         }
 
-        // 删除临时 shader
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
     }
@@ -47,4 +46,28 @@ namespace OxyRender
     {
         glDeleteProgram(m_program_id);
     }
+    void OpenGLShader::setUniformData(const std::string &name, const void *data, size_t size)
+    {
+        GLint location = glGetUniformLocation(m_program_id, name.c_str());
+        if (location == -1)
+            throw std::runtime_error("Uniform not found: " + name);
+
+        if (size == sizeof(float) * 1)
+            glUniform1fv(location, 1, (const GLfloat *)data);
+        else if (size == sizeof(float) * 2)
+            glUniform2fv(location, 1, (const GLfloat *)data);
+        else if (size == sizeof(float) * 3)
+            glUniform3fv(location, 1, (const GLfloat *)data);
+        else if (size == sizeof(float) * 4)
+            glUniform4fv(location, 1, (const GLfloat *)data);
+        else if (size == sizeof(float) * 9)
+            glUniformMatrix3fv(location, 1, GL_FALSE, (const GLfloat *)data);
+        else if (size == sizeof(float) * 16)
+            glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)data);
+        else if (size == sizeof(int))
+            glUniform1i(location, *(const GLint *)data);
+        else
+            throw std::runtime_error("Unsupported uniform size: " + std::to_string(size));
+    }
+
 }

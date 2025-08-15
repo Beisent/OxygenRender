@@ -18,6 +18,7 @@ namespace OxyRender
     public:
         IShader(std::string name, std::string path_vertex, std::string path_fragment);
         virtual void use() = 0;
+        virtual void setUniformData(const std::string &name, const void *data, size_t size) = 0;
         virtual ~IShader() = default;
     };
 
@@ -60,6 +61,7 @@ namespace OxyRender
         OpenGLShader(std::string name, std::string path_vertex, std::string path_fragment);
         virtual ~OpenGLShader() override;
         virtual void use() override;
+        virtual void setUniformData(const std::string &name, const void *data, size_t size) override;
     };
 
     class ShaderFactory
@@ -91,6 +93,10 @@ namespace OxyRender
         void use()
         {
             m_Shader->use();
+        }
+         void setUniformData(const std::string& name, const void* data, size_t size)
+        {
+            m_Shader->setUniformData(name, data, size);
         }
     };
 };
