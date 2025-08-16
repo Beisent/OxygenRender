@@ -1,21 +1,31 @@
 #pragma once
 #include "OxygenRender/GraphicsTypes.h"
+#include "OxygenRender/Window.h"
 #include <memory>
 namespace OxyRender
 {
+    enum class RenderCapability
+    {
+        DepthTest,
+        Blend,
+        CullFace,
+        StencilTest
+    };
     class IRenderer
     {
     public:
         IRenderer() = default;
         virtual ~IRenderer() = default;
+        virtual void setCapability(RenderCapability cap, bool enable) = 0;
         virtual void clear() = 0;
     };
 
     class OpenGLRenderer : public IRenderer
     {
     public:
-        OpenGLRenderer() = default;
+        OpenGLRenderer();
         ~OpenGLRenderer() override = default;
+        void setCapability(RenderCapability cap, bool enable) override;
         void clear() override;
     };
 
@@ -38,9 +48,11 @@ namespace OxyRender
     {
     private:
         std::unique_ptr<IRenderer> renderer;
+        Window &m_Window;
 
     public:
-        Renderer();
+        explicit Renderer(Window &window);
+        void setCapability(RenderCapability cap, bool enable);
         void clear();
     };
 } // namespace OxyRender

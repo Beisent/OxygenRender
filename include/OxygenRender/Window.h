@@ -21,6 +21,8 @@ namespace OxyRender
         virtual void setViewport(int x, int y, int width, int height) = 0;
         virtual bool shouldClose() = 0;
         virtual void swapBuffers() = 0;
+        int getWidth() const;
+        int getHeight() const;
     };
 
     class GLFWWindow : public IWindow
@@ -61,5 +63,7 @@ namespace OxyRender
         void setViewport(int x, int y, int width, int height);
         bool shouldClose();
         void swapBuffers();
+        int getWidth() const;
+        int getHeight() const;
     };
 } // namespace OxyRender

@@ -1,8 +1,11 @@
-#include "OxygenRender/Window.h" 
+#include "OxygenRender/Window.h"
 #include "OxygenRender/Renderer.h"
 #include "OxygenRender/Buffer.h"
 #include "OxygenRender/Shader.h"
 #include "OxygenRender/Texture.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <cmath>
 
@@ -10,78 +13,85 @@ using namespace OxyRender;
 
 int main()
 {
-    Renderer renderer;
-    Window window(800, 600, "OxygenRender");
 
+    Window window(800, 600, "OxygenRender");
+    Renderer renderer(window);
     Shader program("my_shader", "shaders/vertex.vert", "shaders/fragment.frag");
 
-    // 三角形顶点: position + color
     float vertices[] = {
-        -0.8f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-        -0.4f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.6f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f
-    };
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
 
-    uint32_t indices[] = { 0, 1, 2 };
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
 
-    VertexLayout layout;
-    layout.addAttribute("aPos", 0, VertexAttribType::Float3);
-    layout.addAttribute("aColor", 1, VertexAttribType::Float3);
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
 
-    VertexArray vao;
-    Buffer vbo(BufferType::Vertex, BufferUsage::StaticDraw);
-    vbo.setData(vertices, sizeof(vertices));
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
 
-    Buffer ebo(BufferType::Index, BufferUsage::StaticDraw);
-    ebo.setData(indices, sizeof(indices));
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
 
-    vao.setVertexBuffer(vbo, layout);
-    vao.setIndexBuffer(ebo);
-
-    // 正方形顶点: position + color + texcoord
-    float vertices2[] = {
-        0.2f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-        0.8f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-        0.8f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.2f,  0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 1.0f
-    };
-
-    uint32_t indices2[] = { 0, 1, 2, 2, 3, 0 };
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
 
     VertexLayout layout2;
     layout2.addAttribute("aPos", 0, VertexAttribType::Float3);
-    layout2.addAttribute("aColor", 1, VertexAttribType::Float3);
-    layout2.addAttribute("aTexCoord", 2, VertexAttribType::Float2);
+    layout2.addAttribute("aTexCoord", 1, VertexAttribType::Float2);
 
     VertexArray vao2;
     Buffer vbo2(BufferType::Vertex, BufferUsage::StaticDraw);
-    vbo2.setData(vertices2, sizeof(vertices2));
-
-    Buffer ebo2(BufferType::Index, BufferUsage::StaticDraw);
-    ebo2.setData(indices2, sizeof(indices2));
+    vbo2.setData(vertices, sizeof(vertices));
 
     vao2.setVertexBuffer(vbo2, layout2);
-    vao2.setIndexBuffer(ebo2);
-
     Texture2D texture2D("resource/container.jpg");
 
     while (!window.shouldClose())
     {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
         renderer.clear();
-
         program.use();
-
-        // 三角形
-        vao.bind();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-
-        // 正方形
-        vao2.bind();
-        texture2D.bind(0);
+        program.setUniformData("model", glm::value_ptr(model), sizeof(model));
+        program.setUniformData("view", glm::value_ptr(view), sizeof(view));
+        program.setUniformData("projection", glm::value_ptr(projection), sizeof(projection));
         int textureSlot = 0;
         program.setUniformData("uTexture", &textureSlot, sizeof(textureSlot));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        vao2.bind();
+        texture2D.bind(0);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         window.swapBuffers();
     }
 

@@ -6,6 +6,14 @@ namespace OxyRender
     IWindow::IWindow(int width, int height, std::string title) : m_width(width), m_height(height), m_title(std::move(title))
     {
     }
+    int IWindow::getWidth() const
+    {
+        return m_width;
+    }
+    int IWindow::getHeight() const
+    {
+        return m_height;
+    }
     GLFWWindow::GLFWWindow(int width, int height, std::string title) : IWindow(width, height, title)
     {
         if (!glfwInit())
@@ -74,6 +82,14 @@ namespace OxyRender
     void Window::swapBuffers()
     {
         m_window->swapBuffers();
+    }
+    int Window::getWidth() const
+    {
+        return m_window->getWidth();
+    }
+    int Window::getHeight() const
+    {
+        return m_window->getHeight();
     }
 
 } // namespace OxyRender
