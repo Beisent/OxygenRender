@@ -69,7 +69,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<IShader> create(std::string name, std::string path_vertex, std::string path_fragment)
         {
-            switch (OXYG_CurrentBackend)
+            switch (Backends::OXYG_CurrentBackend)
             {
             case RendererBackend::OpenGL:
                 return std::make_unique<OpenGLShader>(name, path_vertex, path_fragment);
@@ -94,7 +94,7 @@ namespace OxyRender
         {
             m_Shader->use();
         }
-         void setUniformData(const std::string& name, const void* data, size_t size)
+        void setUniformData(const std::string &name, const void *data, size_t size)
         {
             m_Shader->setUniformData(name, data, size);
         }

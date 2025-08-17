@@ -170,7 +170,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<IBuffer> createBuffer(BufferType type, BufferUsage usage = BufferUsage::StaticDraw)
         {
-            if (OXYG_CurrentBackend == RendererBackend::OpenGL)
+            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
             {
                 if (type == BufferType::Vertex)
                 {
@@ -216,7 +216,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<IVertexArray> create()
         {
-            if (OXYG_CurrentBackend == RendererBackend::OpenGL)
+            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
             {
                 return std::make_unique<OpenGLVertexArray>();
             }
@@ -233,8 +233,8 @@ namespace OxyRender
         VertexArray();
         virtual void bind() const;
         virtual void unbind() const;
-        virtual void setVertexBuffer(Buffer& vertexBuffer, const VertexLayout &layout);
-        virtual void setIndexBuffer(Buffer& indexBuffer);
+        virtual void setVertexBuffer(Buffer &vertexBuffer, const VertexLayout &layout);
+        virtual void setIndexBuffer(Buffer &indexBuffer);
         virtual IndexBuffer *getIndexBuffer() const;
     };
 

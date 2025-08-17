@@ -34,7 +34,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<IRenderer> createRenderer()
         {
-            switch (OXYG_CurrentBackend)
+            switch ( Backends::OXYG_CurrentBackend)
             {
             case RendererBackend::OpenGL:
                 return std::make_unique<OpenGLRenderer>();

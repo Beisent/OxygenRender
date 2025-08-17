@@ -36,7 +36,7 @@ namespace OxyRender
     }
     Renderer::Renderer(Window &window) : m_Window(window)
     {
-        switch (OXYG_CurrentBackend)
+        switch ( Backends::OXYG_CurrentBackend)
         {
         case RendererBackend::OpenGL:
             renderer = RendererFactory::createRenderer();

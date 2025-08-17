@@ -47,7 +47,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<IWindow> createWindow(int width, int height, const std::string &title)
         {
-            switch (OXYG_CurrentWindowBackend)
+            switch (Backends::OXYG_CurrentWindowBackend)
             {
             case WindowBackend::GLFW:
                 return std::make_unique<GLFWWindow>(width, height, title);
