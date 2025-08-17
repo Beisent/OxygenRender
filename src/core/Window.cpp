@@ -1,8 +1,56 @@
 #include "OxygenRender/Window.h"
+#include "OxygenRender/EventSystem.h"
 #include <iostream>
 
 namespace OxyRender
 {
+    static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+    {
+        Event e;
+        if (action == GLFW_PRESS)
+        {
+            e.type = EventType::KeyPressed;
+            e.data = KeyEvent{key, scancode, mods};
+        }
+        else if (action == GLFW_RELEASE)
+        {
+            e.type = EventType::KeyReleased;
+            e.data = KeyEvent{key, scancode, mods};
+        }
+        EventSystem::pushEvent(e);
+    }
+
+    static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+    {
+        Event e;
+        if (action == GLFW_PRESS)
+        {
+            e.type = EventType::MouseButtonPressed;
+            e.data = MouseButtonEvent{button, mods};
+        }
+        else if (action == GLFW_RELEASE)
+        {
+            e.type = EventType::MouseButtonReleased;
+            e.data = MouseButtonEvent{button, mods};
+        }
+        EventSystem::pushEvent(e);
+    }
+
+    static void cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
+    {
+        Event e;
+        e.type = EventType::MouseMoved;
+        e.data = MouseMoveEvent{{(float)xpos, (float)ypos}};
+        EventSystem::pushEvent(e);
+    }
+
+    static void framebufferSizeCallback(GLFWwindow *window, int width, int height)
+    {
+        Event e;
+        e.type = EventType::WindowResized;
+        e.data = WindowResizeEvent{width, height};
+        EventSystem::pushEvent(e);
+    }
     IWindow::IWindow(int width, int height, std::string title) : m_width(width), m_height(height), m_title(std::move(title))
     {
     }
@@ -39,6 +87,11 @@ namespace OxyRender
             std::cerr << "GLAD 初始化失败\n";
             throw std::runtime_error("Failed to initialize GLAD");
         }
+
+        glfwSetKeyCallback(m_window, keyCallback);
+        glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
+        glfwSetCursorPosCallback(m_window, cursorPosCallback);
+        glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
     }
 
     GLFWWindow::~GLFWWindow()
@@ -59,7 +112,10 @@ namespace OxyRender
     void GLFWWindow::swapBuffers()
     {
         glfwSwapBuffers(m_window);
-        glfwPollEvents(); // 暂时放这里等待后续实现事件处理再改
+    }
+    void GLFWWindow::pollEvents()
+    {
+        glfwPollEvents();
     }
 
     Window::Window(int width, int height, std::string title)
@@ -83,6 +139,11 @@ namespace OxyRender
     {
         m_window->swapBuffers();
     }
+    void Window::pollEvents()
+    {
+        return m_window->pollEvents();
+    }
+
     int Window::getWidth() const
     {
         return m_window->getWidth();

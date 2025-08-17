@@ -3,6 +3,7 @@
 #include "OxygenRender/Buffer.h"
 #include "OxygenRender/Shader.h"
 #include "OxygenRender/Texture.h"
+#include "OxygenRender/EventSystem.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -74,12 +75,41 @@ int main()
 
     while (!window.shouldClose())
     {
+        Event e;
+        while (EventSystem::pollEvent(e))
+        {
+            switch (e.type)
+            {
+            case EventType::KeyPressed:
+            {
+                auto key = std::get<KeyEvent>(e.data);
+                if (key.key == GLFW_KEY_W)
+                    std::cout << "W pressed\n";
+                else if (key.key == GLFW_KEY_A)
+                    std::cout << "A pressed\n";
+                else if (key.key == GLFW_KEY_S)
+                    std::cout << "S pressed\n";
+                else if (key.key == GLFW_KEY_D)
+                    std::cout << "D pressed\n";
+            }
+            break;
+            default:
+                break;
+            }
+        }
+        if (OxyRender::EventSystem::isKeyDown(GLFW_KEY_W))
+            std::cout << "W \n";
+
+        if (OxyRender::EventSystem::isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+            std::cout << "left key\n";
+
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         glm::mat4 view = glm::mat4(1.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
         renderer.clear();
         program.use();
         program.setUniformData("model", glm::value_ptr(model), sizeof(model));
@@ -93,6 +123,7 @@ int main()
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
         window.swapBuffers();
+        window.pollEvents();
     }
 
     return 0;

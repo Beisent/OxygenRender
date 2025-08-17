@@ -21,6 +21,7 @@ namespace OxyRender
         virtual void setViewport(int x, int y, int width, int height) = 0;
         virtual bool shouldClose() = 0;
         virtual void swapBuffers() = 0;
+        virtual void pollEvents() = 0;
         int getWidth() const;
         int getHeight() const;
     };
@@ -36,6 +37,7 @@ namespace OxyRender
         void setViewport(int x, int y, int width, int height) override;
         bool shouldClose() override;
         void swapBuffers() override;
+        void pollEvents() override;
     };
 
     class WindowFactory
@@ -63,6 +65,7 @@ namespace OxyRender
         void setViewport(int x, int y, int width, int height);
         bool shouldClose();
         void swapBuffers();
+        void pollEvents();
         int getWidth() const;
         int getHeight() const;
     };
