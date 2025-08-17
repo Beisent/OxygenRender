@@ -113,6 +113,12 @@ int main()
                 }
                 break;
             }
+            case EventType::MouseScrolled:
+            {
+                auto scroll = std::get<MouseScrollEvent>(e.data);
+                camera.ProcessMouseScroll(scroll.yoffset);
+                break;
+            }
             default:
                 break;
             }

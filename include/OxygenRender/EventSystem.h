@@ -13,6 +13,7 @@ namespace OxyRender
         KeyReleased,
         MouseButtonPressed,
         MouseButtonReleased,
+        MouseScrolled,
         MouseMoved,
         WindowResized
     };
@@ -29,7 +30,11 @@ namespace OxyRender
         int button;
         int mods;
     };
-
+    struct MouseScrollEvent
+    {
+        float xoffset;
+        float yoffset;
+    };
     struct MouseMoveEvent
     {
         glm::vec2 position;
@@ -44,7 +49,7 @@ namespace OxyRender
     struct Event
     {
         EventType type = EventType::None;
-        std::variant<std::monostate, KeyEvent, MouseButtonEvent, MouseMoveEvent, WindowResizeEvent> data;
+        std::variant<std::monostate, KeyEvent, MouseButtonEvent, MouseScrollEvent, MouseMoveEvent, WindowResizeEvent> data;
     };
 
     class EventSystem

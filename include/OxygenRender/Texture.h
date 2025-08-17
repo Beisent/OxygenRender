@@ -69,7 +69,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<ITexture> createTexture2D(const std::string &path, TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat)
         {
-            if ( Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
+            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
             {
                 return std::make_unique<OpenGLTexture2D>(path, filter, wrap);
             }

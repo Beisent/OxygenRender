@@ -19,6 +19,13 @@ namespace OxyRender
         }
         EventSystem::pushEvent(e);
     }
+    static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
+    {
+        Event e;
+        e.type = EventType::MouseScrolled;
+        e.data = MouseScrollEvent{(float)xoffset, (float)yoffset};
+        EventSystem::pushEvent(e);
+    }
 
     static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
     {
@@ -92,6 +99,7 @@ namespace OxyRender
         glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
         glfwSetCursorPosCallback(m_window, cursorPosCallback);
         glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
+        glfwSetScrollCallback(m_window, scrollCallback); 
     }
 
     GLFWWindow::~GLFWWindow()
