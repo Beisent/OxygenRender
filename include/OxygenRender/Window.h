@@ -20,6 +20,7 @@ namespace OxyRender
         virtual ~IWindow() = default;
         virtual void setViewport(int x, int y, int width, int height) = 0;
         virtual bool shouldClose() = 0;
+        virtual void shutdown() = 0;
         virtual void swapBuffers() = 0;
         virtual void pollEvents() = 0;
         int getWidth() const;
@@ -36,6 +37,7 @@ namespace OxyRender
         ~GLFWWindow() override;
         void setViewport(int x, int y, int width, int height) override;
         bool shouldClose() override;
+        void shutdown() override;
         void swapBuffers() override;
         void pollEvents() override;
     };
@@ -64,6 +66,7 @@ namespace OxyRender
         Window(int width, int height, std::string title);
         void setViewport(int x, int y, int width, int height);
         bool shouldClose();
+        void shutdown();
         void swapBuffers();
         void pollEvents();
         int getWidth() const;

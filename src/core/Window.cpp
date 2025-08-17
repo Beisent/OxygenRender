@@ -109,6 +109,11 @@ namespace OxyRender
         return glfwWindowShouldClose(m_window);
     }
 
+    void GLFWWindow::shutdown()
+    {
+        glfwDestroyWindow(m_window);
+        glfwTerminate();
+    }
     void GLFWWindow::swapBuffers()
     {
         glfwSwapBuffers(m_window);
@@ -134,6 +139,10 @@ namespace OxyRender
     bool Window::shouldClose()
     {
         return m_window->shouldClose();
+    }
+    void Window::shutdown()
+    {
+        m_window->shutdown();
     }
     void Window::swapBuffers()
     {
