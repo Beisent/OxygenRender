@@ -82,9 +82,10 @@ namespace OxyRender
         std::shared_ptr<ITexture> m_texture;
 
     public:
+        Texture2D() = default;
         Texture2D(const std::string &path, TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat)
         {
-            if ( Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
+            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
             {
                 m_texture = std::make_shared<OpenGLTexture2D>(path, filter, wrap);
             }

@@ -25,6 +25,10 @@ namespace OxyRender
         virtual void pollEvents() = 0;
         int getWidth() const;
         int getHeight() const;
+
+        // Cursor
+        virtual void setCursorPos(float x, float y) = 0;
+        virtual void setCursorMode(int mode) = 0;
     };
 
     class GLFWWindow : public IWindow
@@ -40,6 +44,9 @@ namespace OxyRender
         void shutdown() override;
         void swapBuffers() override;
         void pollEvents() override;
+
+        void setCursorPos(float x, float y) override;
+        void setCursorMode(int mode) override;
     };
 
     class WindowFactory
@@ -71,5 +78,8 @@ namespace OxyRender
         void pollEvents();
         int getWidth() const;
         int getHeight() const;
+
+        void setCursorPos(float x, float y);
+        void setCursorMode(int mode);
     };
 } // namespace OxyRender

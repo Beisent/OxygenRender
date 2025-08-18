@@ -42,6 +42,10 @@ namespace OxyRender
         glUseProgram(m_program_id);
     }
 
+    GLuint OpenGLShader::getID()
+    {
+        return m_program_id;
+    }
     OpenGLShader::~OpenGLShader()
     {
         glDeleteProgram(m_program_id);

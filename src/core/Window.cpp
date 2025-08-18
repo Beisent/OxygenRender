@@ -99,7 +99,7 @@ namespace OxyRender
         glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
         glfwSetCursorPosCallback(m_window, cursorPosCallback);
         glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
-        glfwSetScrollCallback(m_window, scrollCallback); 
+        glfwSetScrollCallback(m_window, scrollCallback);
     }
 
     GLFWWindow::~GLFWWindow()
@@ -129,6 +129,14 @@ namespace OxyRender
     void GLFWWindow::pollEvents()
     {
         glfwPollEvents();
+    }
+    void GLFWWindow::setCursorPos(float x, float y)
+    {
+        glfwSetCursorPos(m_window, x, y);
+    }
+    void GLFWWindow::setCursorMode(int mode)
+    {
+        glfwSetInputMode(m_window, GLFW_CURSOR, mode);
     }
 
     Window::Window(int width, int height, std::string title)
@@ -168,6 +176,14 @@ namespace OxyRender
     int Window::getHeight() const
     {
         return m_window->getHeight();
+    }
+
+    void Window::setCursorPos(float x, float y)
+    {
+        m_window->setCursorPos(x, y);
+    }
+    void Window::setCursorMode(int mode){
+        m_window->setCursorMode(mode);
     }
 
 } // namespace OxyRender

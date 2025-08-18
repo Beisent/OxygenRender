@@ -19,6 +19,7 @@ namespace OxyRender
         IShader(std::string name, std::string path_vertex, std::string path_fragment);
         virtual void use() = 0;
         virtual void setUniformData(const std::string &name, const void *data, size_t size) = 0;
+        virtual GLuint getID() = 0;
         virtual ~IShader() = default;
     };
 
@@ -61,6 +62,7 @@ namespace OxyRender
         OpenGLShader(std::string name, std::string path_vertex, std::string path_fragment);
         virtual ~OpenGLShader() override;
         virtual void use() override;
+        virtual GLuint getID() override;
         virtual void setUniformData(const std::string &name, const void *data, size_t size) override;
     };
 
@@ -90,6 +92,10 @@ namespace OxyRender
         }
         ~Shader() = default;
 
+        GLuint getID()
+        {
+            return m_Shader->getID();
+        }
         void use()
         {
             m_Shader->use();
