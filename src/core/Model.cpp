@@ -6,6 +6,7 @@ namespace OxyRender
     Model::Model(const std::string &path, bool gamma)
         : gammaCorrection(gamma)
     {
+        stbi_set_flip_vertically_on_load(1); // flip image on the y-axis
         loadModel(path);
     }
 
