@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <glad/glad.h>
 #include <memory>
+#include <glm/glm.hpp> 
 #include "OxygenRender/GraphicsTypes.h"
 namespace OxyRender
 {
@@ -64,6 +65,15 @@ namespace OxyRender
         virtual void use() override;
         virtual GLuint getID() override;
         virtual void setUniformData(const std::string &name, const void *data, size_t size) override;
+        void setMat4(const std::string &name, const glm::mat4 &mat)
+        {
+            use();
+            GLint location = glGetUniformLocation(m_program_id, name.c_str());
+            if (location != -1)
+            {
+                glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
+            }
+        }
     };
 
     class ShaderFactory
@@ -103,6 +113,11 @@ namespace OxyRender
         void setUniformData(const std::string &name, const void *data, size_t size)
         {
             m_Shader->setUniformData(name, data, size);
+        }
+        void setMat4(const std::string &name, const glm::mat4 &mat)
+        {
+            m_Shader->use();
+            m_Shader->setUniformData(name, &mat, sizeof(glm::mat4));
         }
     };
 };

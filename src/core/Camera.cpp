@@ -82,4 +82,35 @@ namespace OxyRender
         m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
         m_Up = glm::normalize(glm::cross(m_Right, m_Front));
     }
+
+    glm::mat4 Camera::Get2DOrthoViewMatrix() const
+    {
+
+        return glm::lookAt(glm::vec3(0, 0, 10.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    }
+
+    glm::mat4 Camera::Get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const
+    {
+        float halfWidth = screenWidth / 2.0f;
+        float halfHeight = screenHeight / 2.0f;
+
+        return glm::ortho(
+            -halfWidth, halfWidth,   
+            -halfHeight, halfHeight, 
+            0.1f, 100.0f            
+        );
+    }
+    glm::mat4 Camera::GetOrthoProjectionMatrix(int screenWidth, int screenHeight)
+    {
+        return glm::ortho(0.0f, (float)screenWidth,
+                          0.0f, (float)screenHeight,
+                          -1.0f, 1.0f);
+    }
+    glm::mat4 Camera::GetPerspectiveProjectionMatrix(int screenWidth, int screenHeight)
+    {
+        return glm::perspective(glm::radians(m_Zoom),
+                                (float)screenWidth / (float)screenHeight,
+                                0.1f, 2000.0f);
+    }
+
 }

@@ -24,62 +24,24 @@ namespace OxyRender
 
     }
 
-    /**
-     * @brief 相机类，用于处理3D场景中的摄像机视角
-     *
-     * 该类实现了第一人称摄像机的功能，包括位置、方向、移动、视角控制等
-     */
     class Camera
     {
     public:
-        /**
-         * @brief 构造函数，使用向量参数初始化相机
-         * @param position 相机初始位置，默认为(0,0,0)
-         * @param up 世界上的方向，默认为(0,1,0)
-         * @param yaw 偏航角，默认为CameraConstants::YAW
-         * @param pitch 俯仰角，默认为CameraConstants::PITCH
-         */
         Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = CameraConstants::YAW, float pitch = CameraConstants::PITCH);
 
-        /**
-         * @brief 构造函数，使用浮点数参数初始化相机
-         * @param posX 相机位置X坐标
-         * @param posY 相机位置Y坐标
-         * @param posZ 相机位置Z坐标
-         * @param upX 上方向X分量
-         * @param upY 上方向Y分量
-         * @param upZ 上方向Z分量
-         * @param yaw 偏航角
-         * @param pitch 俯仰角
-         */
         Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-        /**
-         * @brief 获取视图矩阵
-         * @return glm::mat4 视图变换矩阵
-         */
         glm::mat4 GetViewMatrix();
-
-        /**
-         * @brief 处理键盘输入控制相机移动
-         * @param direction 移动方向枚举值
-         * @param deltaTime 帧间隔时间，用于平滑移动
-         */
         void ProcessKeyboard(Camera_Movement direction, float deltaTime);
-
-        /**
-         * @brief 处理鼠标移动控制相机视角
-         * @param xoffset 鼠标X轴偏移量
-         * @param yoffset 鼠标Y轴偏移量
-         * @param constrainPitch 是否限制俯仰角范围，默认为true
-         */
         void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-
-        /**
-         * @brief 处理鼠标滚轮控制视野缩放
-         * @param yoffset 滚轮Y轴偏移量
-         */
         void ProcessMouseScroll(float yoffset);
+
+        glm::mat4 GetOrthoProjectionMatrix(int screenWidth, int screenHeight);
+        glm::mat4 GetPerspectiveProjectionMatrix(int screenWidth, int screenHeight);
+
+        glm::mat4 Get2DOrthoViewMatrix() const;
+        glm::mat4 Get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
+
         glm::vec3 getPosition() const { return m_Position; }
         glm::vec3 getFront() const { return m_Front; }
         glm::vec3 getUp() const { return m_Up; }
