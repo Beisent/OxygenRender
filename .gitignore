@@ -1,3 +1,4 @@
 bin/*.exe
 build
 .vscode
+bin/resources/objects/test

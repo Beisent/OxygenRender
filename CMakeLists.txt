@@ -23,6 +23,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/include/GLFW
     ${CMAKE_SOURCE_DIR}/include/glm
     ${CMAKE_SOURCE_DIR}/include/stb
+    ${CMAKE_SOURCE_DIR}/tests
 )
 
 # 3. 源文件收集
