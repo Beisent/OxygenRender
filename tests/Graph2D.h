@@ -20,16 +20,21 @@ namespace OxyRender
                 renderer.clear();
                 graphics2D.begin();
 
-                graphics2D.drawRect(0, 0, 100, 100, glm::vec4(1, 0, 0, 1));
-                graphics2D.drawRect(0, -110, 100, 100, glm::vec4(0, 0, 1, 1));
-                graphics2D.drawRect(0, 110, 100, 100, glm::vec4(1, 1, 0, 1));
-                graphics2D.drawRect(-110, 0, 100, 100, glm::vec4(0, 1, 0, 1));
+                // graphics2D.drawRect(0, 0, 100, 100, glm::vec4(1, 0, 0, 1));
+                // graphics2D.drawRect(0, -110, 100, 100, glm::vec4(0, 0, 1, 1));
+                // graphics2D.drawRect(0, 110, 100, 100, glm::vec4(1, 1, 0, 1));
+                // graphics2D.drawRect(-110, 0, 100, 100, glm::vec4(0, 1, 0, 1));
 
-                graphics2D.drawTriangle(0, 0, 100, 0, 50, 100, glm::vec4(1, 0, 1, 1));
+                // graphics2D.drawTriangle(0, 0, 100, 0, 50, 100, glm::vec4(1, 0, 1, 1));
 
-                graphics2D.drawLine(50, 50, 200, 50, glm::vec4(1, 0, 0, 1), 1.0f);   
-                graphics2D.drawLine(50, 100, 200, 100, glm::vec4(0, 1, 0, 1), 5.0f); 
-                graphics2D.drawLine(50, 150, 200, 150, glm::vec4(0, 0, 1, 1), 10.0f);
+                // graphics2D.drawLine(50, 50, 200, 50, glm::vec4(1, 0, 0, 1), 1.0f);
+                // graphics2D.drawLine(50, 100, 200, 100, glm::vec4(0, 1, 0, 1), 5.0f);
+                // graphics2D.drawLine(50, 150, 200, 150, glm::vec4(0, 0, 1, 1), 10.0f);
+
+                graphics2D.drawCircle(100, 100, 50, {1, 0, 0, 1});                                   
+                graphics2D.drawCircleOutline(200, 100, 50, {0, 1, 0, 1}, 64, 2);                     
+                graphics2D.drawPolygon({{300, 100}, {350, 150}, {320, 180}}, {0, 0, 1, 1});          
+                graphics2D.drawPolygonOutline({{0, 0}, {100, 0}, {50, 100}}, {1, 1, 0, 1}, 2);
                 graphics2D.flush();
                 window.swapBuffers();
                 window.pollEvents();

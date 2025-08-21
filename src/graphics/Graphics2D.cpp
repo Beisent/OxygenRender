@@ -99,7 +99,83 @@ namespace OxyRender
         batch->indexCount += 2;
     }
 
+    void Graphics2D::drawCircle(float cx, float cy, float radius, glm::vec4 color, int segments)
+    {
+        if (segments < 3)
+            segments = 3;
 
+        unsigned int startIndex = (unsigned int)m_triVertices.size();
+        // 圆心
+        m_triVertices.push_back({{cx, cy, 0.0f}, color});
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
+            float x = cx + cos(angle) * radius;
+            float y = cy + sin(angle) * radius;
+            m_triVertices.push_back({{x, y, 0.0f}, color});
+        }
+
+        for (int i = 1; i <= segments; i++)
+        {
+            m_triIndices.push_back(startIndex);
+            m_triIndices.push_back(startIndex + i);
+            m_triIndices.push_back(startIndex + i + 1);
+            m_triIndexCount += 3;
+        }
+    }
+
+    void Graphics2D::drawCircleOutline(float cx, float cy, float radius, glm::vec4 color, int segments, float thickness)
+    {
+        if (segments < 3)
+            segments = 3;
+
+        float prevX = cx + radius;
+        float prevY = cy;
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
+            float x = cx + cos(angle) * radius;
+            float y = cy + sin(angle) * radius;
+
+            drawLine(prevX, prevY, x, y, color, thickness);
+
+            prevX = x;
+            prevY = y;
+        }
+    }
+
+    void Graphics2D::drawPolygon(const std::vector<glm::vec2> &points, glm::vec4 color)
+    {
+        if (points.size() < 3)
+            return;
+
+        unsigned int startIndex = (unsigned int)m_triVertices.size();
+
+        for (auto &p : points)
+            m_triVertices.push_back({{p.x, p.y, 0.0f}, color});
+
+        for (size_t i = 1; i + 1 < points.size(); i++)
+        {
+            m_triIndices.push_back(startIndex);
+            m_triIndices.push_back(startIndex + i);
+            m_triIndices.push_back(startIndex + i + 1);
+            m_triIndexCount += 3;
+        }
+    }
+
+    void Graphics2D::drawPolygonOutline(const std::vector<glm::vec2> &points, glm::vec4 color, float thickness)
+    {
+        if (points.size() < 2)
+            return;
+
+        for (size_t i = 0; i < points.size(); i++)
+        {
+            glm::vec2 p1 = points[i];
+            glm::vec2 p2 = points[(i + 1) % points.size()];
+            drawLine(p1.x, p1.y, p2.x, p2.y, color, thickness);
+        }
+    }
 
     void Graphics2D::flush()
     {

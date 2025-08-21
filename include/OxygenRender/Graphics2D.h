@@ -6,6 +6,7 @@
 #include "OxygenRender/Camera.h"
 #include <vector>
 #include <glm/glm.hpp>
+#include <cmath>
 
 namespace OxyRender
 {
@@ -18,6 +19,13 @@ namespace OxyRender
         void drawRect(float x, float y, float width, float height, glm::vec4 color = glm::vec4(1.0f));
         void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, glm::vec4 color = glm::vec4(1.0f));
         void drawLine(float x1, float y1, float x2, float y2, glm::vec4 color = glm::vec4(1.0f), float thickness = 1.0f);
+
+        
+        void drawCircle(float cx, float cy, float radius, glm::vec4 color = glm::vec4(1.0f), int segments = 36);
+        void drawCircleOutline(float cx, float cy, float radius, glm::vec4 color = glm::vec4(1.0f), int segments = 36, float thickness = 1.0f);
+        void drawPolygon(const std::vector<glm::vec2> &points, glm::vec4 color = glm::vec4(1.0f));
+        void drawPolygonOutline(const std::vector<glm::vec2> &points, glm::vec4 color = glm::vec4(1.0f), float thickness = 1.0f);
+
         void flush();
 
     private:
