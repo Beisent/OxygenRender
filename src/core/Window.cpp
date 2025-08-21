@@ -80,6 +80,7 @@ namespace OxyRender
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_SAMPLES, 8);
 
         m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (!m_window)
@@ -142,6 +143,7 @@ namespace OxyRender
     Window::Window(int width, int height, std::string title)
     {
         m_window = WindowFactory::createWindow(width, height, std::move(title));
+
         if (!m_window)
         {
             std::cerr << "窗口创建失败\n";
@@ -182,7 +184,8 @@ namespace OxyRender
     {
         m_window->setCursorPos(x, y);
     }
-    void Window::setCursorMode(int mode){
+    void Window::setCursorMode(int mode)
+    {
         m_window->setCursorMode(mode);
     }
 

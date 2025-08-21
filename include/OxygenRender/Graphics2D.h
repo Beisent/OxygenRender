@@ -20,11 +20,12 @@ namespace OxyRender
         void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, glm::vec4 color = glm::vec4(1.0f));
         void drawLine(float x1, float y1, float x2, float y2, glm::vec4 color = glm::vec4(1.0f), float thickness = 1.0f);
 
-        
         void drawCircle(float cx, float cy, float radius, glm::vec4 color = glm::vec4(1.0f), int segments = 36);
         void drawCircleOutline(float cx, float cy, float radius, glm::vec4 color = glm::vec4(1.0f), int segments = 36, float thickness = 1.0f);
         void drawPolygon(const std::vector<glm::vec2> &points, glm::vec4 color = glm::vec4(1.0f));
         void drawPolygonOutline(const std::vector<glm::vec2> &points, glm::vec4 color = glm::vec4(1.0f), float thickness = 1.0f);
+
+        void drawArcAA(float cx, float cy, float radius, float startAngle, float endAngle, glm::vec4 color, float thickness = 2.0f, int segments = 128);
 
         void flush();
 

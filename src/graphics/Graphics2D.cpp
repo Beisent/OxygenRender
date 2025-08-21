@@ -177,11 +177,60 @@ namespace OxyRender
         }
     }
 
+    void Graphics2D::drawArcAA(float cx, float cy, float radius,
+                               float startAngle, float endAngle,
+                               glm::vec4 color, float thickness, int segments)
+    {
+        if (segments < 8)
+            segments = 8;
+        if (endAngle < startAngle)
+            std::swap(startAngle, endAngle);
+
+        unsigned int startIndex = (unsigned int)m_triVertices.size();
+
+        float rInner = radius - thickness * 0.5f;
+        float rOuter = radius + thickness * 0.5f;
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float t = (float)i / segments;
+            float angle = startAngle + t * (endAngle - startAngle);
+
+            float cs = cos(angle);
+            float sn = sin(angle);
+
+            glm::vec3 pOuter = {cx + cs * rOuter, cy + sn * rOuter, 0.0f};
+            glm::vec3 pInner = {cx + cs * rInner, cy + sn * rInner, 0.0f};
+
+            m_triVertices.push_back({pOuter, color});
+            m_triVertices.push_back({pInner, color});
+        }
+
+        for (int i = 0; i < segments; i++)
+        {
+            unsigned int i0 = startIndex + i * 2;
+            unsigned int i1 = startIndex + i * 2 + 1;
+            unsigned int i2 = startIndex + i * 2 + 2;
+            unsigned int i3 = startIndex + i * 2 + 3;
+
+            m_triIndices.push_back(i0);
+            m_triIndices.push_back(i2);
+            m_triIndices.push_back(i1);
+
+            m_triIndices.push_back(i2);
+            m_triIndices.push_back(i3);
+            m_triIndices.push_back(i1);
+
+            m_triIndexCount += 6;
+        }
+    }
+
     void Graphics2D::flush()
     {
         if (m_triIndexCount == 0 && m_lineBatches.empty())
             return;
 
+        glEnable(GL_MULTISAMPLE);
         m_renderer.setCapability(RenderCapability::Blend, true);
         m_renderer.setCapability(RenderCapability::CullFace, false);
         m_renderer.setCapability(RenderCapability::DepthTest, false);
@@ -196,9 +245,10 @@ namespace OxyRender
         m_shader.setUniformData("view", &view, sizeof(glm::mat4));
         m_shader.setUniformData("projection", &projection, sizeof(glm::mat4));
 
+        
+
         m_vao.bind();
 
-        // 绘制三角形
         if (m_triIndexCount > 0)
         {
             m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
@@ -206,7 +256,6 @@ namespace OxyRender
             glDrawElements(GL_TRIANGLES, (GLsizei)m_triIndexCount, GL_UNSIGNED_INT, 0);
         }
 
-        // 绘制线段按不同厚度分别画
         for (auto &batch : m_lineBatches)
         {
             if (batch.indexCount == 0)
