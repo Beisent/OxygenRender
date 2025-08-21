@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 namespace OxyRender
 {
-    enum Camera_Movement
+    enum class CameraMovement
     {
         FORWARD,
         BACKWARD,
@@ -31,16 +31,16 @@ namespace OxyRender
 
         Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-        glm::mat4 GetViewMatrix();
-        void ProcessKeyboard(Camera_Movement direction, float deltaTime);
-        void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-        void ProcessMouseScroll(float yoffset);
+        glm::mat4 getViewMatrix();
+        void processKeyboard(CameraMovement direction, float deltaTime);
+        void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
+        void processMouseScroll(float yoffset);
 
-        glm::mat4 GetOrthoProjectionMatrix(int screenWidth, int screenHeight);
-        glm::mat4 GetPerspectiveProjectionMatrix(int screenWidth, int screenHeight);
+        glm::mat4 getOrthoProjectionMatrix(int screenWidth, int screenHeight);
+        glm::mat4 getPerspectiveProjectionMatrix(int screenWidth, int screenHeight);
 
-        glm::mat4 Get2DOrthoViewMatrix() const;
-        glm::mat4 Get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
+        glm::mat4 get2DOrthoViewMatrix() const;
+        glm::mat4 get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
 
         glm::vec3 getPosition() const { return m_Position; }
         glm::vec3 getFront() const { return m_Front; }

@@ -115,28 +115,27 @@ namespace OxyRender
                 }
 
                 if (EventSystem::isKeyDown(GLFW_KEY_W))
-                    camera.ProcessKeyboard(FORWARD, deltaTime);
+                    camera.processKeyboard(CameraMovement::FORWARD, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_S))
-                    camera.ProcessKeyboard(BACKWARD, deltaTime);
+                    camera.processKeyboard(CameraMovement::BACKWARD, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_A))
-                    camera.ProcessKeyboard(LEFT, deltaTime);
+                    camera.processKeyboard(CameraMovement::LEFT, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_D))
-                    camera.ProcessKeyboard(RIGHT, deltaTime);
+                    camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_SPACE))
-                    camera.ProcessKeyboard(UP, deltaTime);
+                    camera.processKeyboard(CameraMovement::UP, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_LEFT_SHIFT))
-                    camera.ProcessKeyboard(DOWN, deltaTime);
+                    camera.processKeyboard(CameraMovement::DOWN, deltaTime);
 
-               
                 cameraAngle += 1.0f * deltaTime;
-                float radius = 5.0f;             
+                float radius = 5.0f;
                 float lightX = sin(cameraAngle) * radius;
                 float lightZ = cos(cameraAngle) * radius;
-                glm::vec3 lightPos(lightX, 3.0f, lightZ); 
+                glm::vec3 lightPos(lightX, 3.0f, lightZ);
 
                 glm::mat4 model = glm::mat4(1.0f);
-                glm::mat4 light_model = glm::translate(glm::mat4(1.0f), lightPos); 
-                glm::mat4 view = camera.GetViewMatrix();
+                glm::mat4 light_model = glm::translate(glm::mat4(1.0f), lightPos);
+                glm::mat4 view = camera.getViewMatrix();
                 glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
 
                 glm::vec3 viewPos = camera.getPosition();

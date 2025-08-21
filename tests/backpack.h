@@ -76,7 +76,7 @@ namespace OxyRender
                     case EventType::MouseScrolled:
                     {
                         auto scroll = std::get<MouseScrollEvent>(e.data);
-                        camera.ProcessMouseScroll(scroll.yoffset);
+                        camera.processMouseScroll(scroll.yoffset);
                         break;
                     }
                     case EventType::MouseMoved:
@@ -98,7 +98,7 @@ namespace OxyRender
                             lastX = mouse.position.x;
                             lastY = mouse.position.y;
 
-                            camera.ProcessMouseMovement(xoffset, yoffset);
+                            camera.processMouseMovement(xoffset, yoffset);
                         }
                     default:
                         break;
@@ -106,19 +106,19 @@ namespace OxyRender
                 }
 
                 if (EventSystem::isKeyDown(GLFW_KEY_W))
-                    camera.ProcessKeyboard(FORWARD, deltaTime);
+                    camera.processKeyboard(CameraMovement::FORWARD, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_S))
-                    camera.ProcessKeyboard(BACKWARD, deltaTime);
+                    camera.processKeyboard(CameraMovement::BACKWARD, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_A))
-                    camera.ProcessKeyboard(LEFT, deltaTime);
+                    camera.processKeyboard(CameraMovement::LEFT, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_D))
-                    camera.ProcessKeyboard(RIGHT, deltaTime);
+                    camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_SPACE))
-                    camera.ProcessKeyboard(UP, deltaTime);
+                    camera.processKeyboard(CameraMovement::UP, deltaTime);
                 if (EventSystem::isKeyDown(GLFW_KEY_LEFT_SHIFT))
-                    camera.ProcessKeyboard(DOWN, deltaTime);
+                    camera.processKeyboard(CameraMovement::DOWN, deltaTime);
 
-                glm::mat4 view = camera.GetViewMatrix();
+                glm::mat4 view = camera.getViewMatrix();
                 glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
 
                 renderer.clear();

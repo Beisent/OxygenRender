@@ -15,7 +15,9 @@ namespace OxyRender
     public:
         Graphics2D(Window &window, Renderer &renderer);
 
+        Camera& getCamera();
         void begin();
+
         void drawRect(float x, float y, float width, float height, glm::vec4 color = glm::vec4(1.0f));
         void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, glm::vec4 color = glm::vec4(1.0f));
         void drawLine(float x1, float y1, float x2, float y2, glm::vec4 color = glm::vec4(1.0f), float thickness = 1.0f);

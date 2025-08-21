@@ -3,6 +3,7 @@
 #include "OxygenRender/Shader.h"
 #include "OxygenRender/Renderer.h"
 #include "OxygenRender/Graphics2D.h"
+#include "OxygenRender/EventSystem.h"
 
 namespace OxyRender
 {
@@ -15,8 +16,43 @@ namespace OxyRender
             Renderer renderer(window);
 
             Graphics2D graphics2D(window, renderer);
+            auto &camera = graphics2D.getCamera();
+            camera.setMovementSpeed(100.0f);
+            float deltaTime = 0.0f;
+            float lastFrame = 0.0f;
             while (!window.shouldClose())
             {
+                float currentFrame = glfwGetTime();
+                deltaTime = currentFrame - lastFrame;
+                lastFrame = currentFrame;
+                Event e;
+                while (EventSystem::pollEvent(e))
+                {
+                    switch (e.type)
+                    {
+                    case EventType::KeyPressed:
+                    {
+                        auto key = std::get<KeyEvent>(e.data);
+                        if (key.key == GLFW_KEY_ESCAPE)
+                        {
+                            window.shutdown();
+                            return;
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                }
+                if (EventSystem::isKeyDown(GLFW_KEY_A))
+                    camera.processKeyboard(CameraMovement::LEFT, deltaTime);
+                if (EventSystem::isKeyDown(GLFW_KEY_D))
+                    camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
+                if (EventSystem::isKeyDown(GLFW_KEY_W))
+                    camera.processKeyboard(CameraMovement::UP, deltaTime);
+                if (EventSystem::isKeyDown(GLFW_KEY_S))
+                    camera.processKeyboard(CameraMovement::DOWN, deltaTime);
+
                 renderer.clear();
                 graphics2D.begin();
 

@@ -1,5 +1,4 @@
 #include "OxygenRender/Graphics2D.h"
-
 namespace OxyRender
 {
     Graphics2D::Graphics2D(Window &window, Renderer &renderer)
@@ -17,7 +16,10 @@ namespace OxyRender
         m_vao.setVertexBuffer(m_vbo, layout);
         m_vao.setIndexBuffer(m_ebo);
     }
-
+    Camera &Graphics2D::getCamera()
+    {
+        return m_camera;
+    }
     void Graphics2D::begin()
     {
         m_triVertices.clear();
@@ -238,10 +240,9 @@ namespace OxyRender
         m_shader.use();
         m_camera.setZoom(1.0);
         // m_camera.setPosition(glm::vec3(100.0f, 100.0f, 0.0f));
-        
         glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(m_camera.getZoom(), m_camera.getZoom(), 1.0f));
-        glm::mat4 view = m_camera.Get2DOrthoViewMatrix();
-        glm::mat4 projection = m_camera.Get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
+        glm::mat4 projection = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
 
         m_shader.setUniformData("model", &model, sizeof(glm::mat4));
         m_shader.setUniformData("view", &view, sizeof(glm::mat4));

@@ -21,29 +21,29 @@ namespace OxyRender
         updateCameraVectors();
     }
 
-    glm::mat4 Camera::GetViewMatrix()
+    glm::mat4 Camera::getViewMatrix()
     {
         return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
     }
 
-    void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
+    void Camera::processKeyboard(CameraMovement direction, float deltaTime)
     {
         float velocity = m_MovementSpeed * deltaTime;
-        if (direction == FORWARD)
+        if (direction == CameraMovement::FORWARD)
             m_Position += m_Front * velocity;
-        if (direction == BACKWARD)
+        if (direction == CameraMovement::BACKWARD)
             m_Position -= m_Front * velocity;
-        if (direction == LEFT)
+        if (direction == CameraMovement::LEFT)
             m_Position -= m_Right * velocity;
-        if (direction == RIGHT)
+        if (direction == CameraMovement::RIGHT)
             m_Position += m_Right * velocity;
-        if (direction == UP)
+        if (direction == CameraMovement::UP)
             m_Position += m_Up * velocity;
-        if (direction == DOWN)
+        if (direction == CameraMovement::DOWN)
             m_Position -= m_Up * velocity;
     }
 
-    void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainm_Pitch)
+    void Camera::processMouseMovement(float xoffset, float yoffset, GLboolean constrainm_Pitch)
     {
         xoffset *= m_MouseSensitivity;
         yoffset *= m_MouseSensitivity;
@@ -62,7 +62,7 @@ namespace OxyRender
         updateCameraVectors();
     }
 
-    void Camera::ProcessMouseScroll(float yoffset)
+    void Camera::processMouseScroll(float yoffset)
     {
         m_Zoom -= (float)yoffset;
         if (m_Zoom < 1.0f)
@@ -83,13 +83,13 @@ namespace OxyRender
         m_Up = glm::normalize(glm::cross(m_Right, m_Front));
     }
 
-    glm::mat4 Camera::Get2DOrthoViewMatrix() const
+    glm::mat4 Camera::get2DOrthoViewMatrix() const
     {
 
         return glm::lookAt(glm::vec3(m_Position.x, m_Position.y, 1), glm::vec3(m_Position.x, m_Position.y, 0), glm::vec3(0, 1, 0));
     }
 
-    glm::mat4 Camera::Get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const
+    glm::mat4 Camera::get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const
     {
         float halfWidth = screenWidth / 2.0f;
         float halfHeight = screenHeight / 2.0f;
@@ -99,13 +99,13 @@ namespace OxyRender
             -halfHeight, halfHeight,
             0.1f, 100.0f);
     }
-    glm::mat4 Camera::GetOrthoProjectionMatrix(int screenWidth, int screenHeight)
+    glm::mat4 Camera::getOrthoProjectionMatrix(int screenWidth, int screenHeight)
     {
         return glm::ortho(0.0f, (float)screenWidth,
                           0.0f, (float)screenHeight,
                           -1.0f, 1.0f);
     }
-    glm::mat4 Camera::GetPerspectiveProjectionMatrix(int screenWidth, int screenHeight)
+    glm::mat4 Camera::getPerspectiveProjectionMatrix(int screenWidth, int screenHeight)
     {
         return glm::perspective(glm::radians(m_Zoom),
                                 (float)screenWidth / (float)screenHeight,
