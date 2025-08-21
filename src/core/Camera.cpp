@@ -86,7 +86,7 @@ namespace OxyRender
     glm::mat4 Camera::Get2DOrthoViewMatrix() const
     {
 
-        return glm::lookAt(glm::vec3(0, 0, 10.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        return glm::lookAt(glm::vec3(m_Position.x, m_Position.y, 1), glm::vec3(m_Position.x, m_Position.y, 0), glm::vec3(0, 1, 0));
     }
 
     glm::mat4 Camera::Get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const
@@ -95,10 +95,9 @@ namespace OxyRender
         float halfHeight = screenHeight / 2.0f;
 
         return glm::ortho(
-            -halfWidth, halfWidth,   
-            -halfHeight, halfHeight, 
-            0.1f, 100.0f            
-        );
+            -halfWidth, halfWidth,
+            -halfHeight, halfHeight,
+            0.1f, 100.0f);
     }
     glm::mat4 Camera::GetOrthoProjectionMatrix(int screenWidth, int screenHeight)
     {

@@ -232,20 +232,20 @@ namespace OxyRender
 
         glEnable(GL_MULTISAMPLE);
         m_renderer.setCapability(RenderCapability::Blend, true);
-        m_renderer.setCapability(RenderCapability::CullFace, false);
         m_renderer.setCapability(RenderCapability::DepthTest, false);
         m_renderer.setCapability(RenderCapability::StencilTest, false);
 
         m_shader.use();
-        glm::mat4 model = glm::mat4(1.0f);
+        m_camera.setZoom(1.0);
+        // m_camera.setPosition(glm::vec3(100.0f, 100.0f, 0.0f));
+        
+        glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(m_camera.getZoom(), m_camera.getZoom(), 1.0f));
         glm::mat4 view = m_camera.Get2DOrthoViewMatrix();
         glm::mat4 projection = m_camera.Get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
 
         m_shader.setUniformData("model", &model, sizeof(glm::mat4));
         m_shader.setUniformData("view", &view, sizeof(glm::mat4));
         m_shader.setUniformData("projection", &projection, sizeof(glm::mat4));
-
-        
 
         m_vao.bind();
 
