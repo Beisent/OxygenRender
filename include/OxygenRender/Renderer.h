@@ -12,16 +12,27 @@ namespace OxyRender
         CullFace,
         StencilTest
     };
+    enum class RenderPolygonMode
+    {
+        Fill,
+        Line,
+        Point
+    };
     class IRenderer
     {
     public:
         IRenderer() = default;
         virtual ~IRenderer() = default;
         virtual void setCapability(RenderCapability cap, bool enable) = 0;
-
+        virtual void setPolygonMode(RenderPolygonMode mod, bool enable) = 0;
         virtual void drawTriangles(const VertexArray &vao, size_t indexCount) = 0;
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) = 0;
+       // virtual void drawArray(const VertexArray &vao, size_t vertexCount) = 0;
         virtual void clear() = 0;
+        void setClearColor(const OxyColor &color) { m_clear_color = color; }
+
+    protected:
+        OxyColor m_clear_color = {0.8f, 0.8f, 0.8f, 1.0f};
     };
 
     class OpenGLRenderer : public IRenderer
@@ -30,8 +41,10 @@ namespace OxyRender
         OpenGLRenderer();
         ~OpenGLRenderer() override = default;
         void setCapability(RenderCapability cap, bool enable) override;
+        virtual void setPolygonMode(RenderPolygonMode mod, bool enable) override;
         virtual void drawTriangles(const VertexArray &vao, size_t indexCount) override;
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) override;
+        //virtual void drawArray(const VertexArray &vao, size_t vertexCount) override;
         void clear() override;
     };
 
@@ -59,8 +72,10 @@ namespace OxyRender
     public:
         explicit Renderer(Window &window);
         void setCapability(RenderCapability cap, bool enable);
+        void setPolygonMode(RenderPolygonMode mod, bool enable);
         void drawTriangles(const VertexArray &vao, size_t indexCount);
         void drawLines(const VertexArray &vao, size_t indexCount, float thickness);
+        //void drawArray(const VertexArray &vao, size_t vertexCount);
         void clear();
     };
 } // namespace OxyRender

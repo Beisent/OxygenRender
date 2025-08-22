@@ -21,6 +21,7 @@ namespace OxyRender
 
             float deltaTime = 0.0f;
             float lastFrame = 0.0f;
+            
             while (!window.shouldClose())
             {
                 float currentFrame = glfwGetTime();
@@ -65,6 +66,7 @@ namespace OxyRender
 
                 graphics2D.drawArcAA(0, 0, 100, 0.0f, glm::radians(270.0f), {1, 0, 0, 1}, 5.0f, 128);
 
+                
                 graphics2D.flush();
                 window.swapBuffers();
                 window.pollEvents();

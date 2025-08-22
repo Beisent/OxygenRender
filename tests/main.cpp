@@ -5,8 +5,8 @@ using namespace OxyRender;
 
 int main()
 {
-     Backpack::execute();
-    // LightBox::execute();
+    Backpack::execute();
+     //LightBox::execute();
     //  Graph2D::execute();
     return 0;
 }

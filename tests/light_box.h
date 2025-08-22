@@ -140,7 +140,7 @@ namespace OxyRender
 
                 glm::vec3 viewPos = camera.getPosition();
                 renderer.clear();
-
+               // renderer.setPolygonMode(RenderPolygonMode::Line, true);
                 // 光源
                 light_shader.use();
                 light_shader.setUniformData("model", glm::value_ptr(light_model), sizeof(light_model));

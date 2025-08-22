@@ -7,7 +7,7 @@ namespace OxyRender
     }
     void OpenGLRenderer::clear()
     {
-        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+        glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
     void OpenGLRenderer::drawTriangles(const VertexArray &vao, size_t indexCount)
@@ -48,6 +48,21 @@ namespace OxyRender
         else
             glDisable(glCap);
     }
+
+    void OpenGLRenderer::setPolygonMode(RenderPolygonMode mod, bool enable)
+    {
+        switch (mod)
+        {
+        case RenderPolygonMode::Fill:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            break;
+        case RenderPolygonMode::Line:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            break;
+        case RenderPolygonMode::Point:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        }
+    }
     Renderer::Renderer(Window &window) : m_Window(window)
     {
         switch (Backends::OXYG_CurrentBackend)
@@ -81,6 +96,10 @@ namespace OxyRender
     {
         if (renderer)
             renderer->setCapability(cap, enable);
+    }
+    void Renderer::setPolygonMode(RenderPolygonMode mod, bool enable){
+        if (renderer)
+            renderer->setPolygonMode(mod, enable);
     }
 
 } // namespace OxyRender

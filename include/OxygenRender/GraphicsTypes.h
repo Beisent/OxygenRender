@@ -3,6 +3,11 @@
 
     namespace OxyRender
     {
+        struct OxyColor
+        {
+            float r, g, b, a;
+        };
+
         enum class RendererBackend
         {
             OpenGL,

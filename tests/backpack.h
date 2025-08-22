@@ -124,19 +124,17 @@ namespace OxyRender
                 renderer.clear();
 
                 // 添加光照参数
-                glm::vec3 lightPos = camera.getPosition();    // 光源位置
-                glm::vec3 lightColor(1.0f, 1.0f, 1.0f);       // 光源颜色
-                glm::vec3 lightAmbient(0.5f, 0.5f, 0.5f);     // 环境光
-                glm::vec3 lightDiffuse = lightColor * 2.0f;   // 漫反射光
-                glm::vec3 lightSpecular = lightColor * 0.01f; // 镜面反射光
-                glm::vec3 viewPos = camera.getPosition();     // 观察者位置
+                glm::vec3 lightPos = camera.getPosition();
+                glm::vec3 lightAmbient(0.1f, 0.1f, 0.1f);
+                glm::vec3 lightDiffuse(0.8f, 0.8f, 0.8f);
+                glm::vec3 lightSpecular(1.0f, 1.0f, 1.0f);
 
                 modelProgram.use();
                 modelProgram.setUniformData("light.position", glm::value_ptr(lightPos), sizeof(lightPos));
                 modelProgram.setUniformData("light.ambient", glm::value_ptr(lightAmbient), sizeof(lightAmbient));
                 modelProgram.setUniformData("light.diffuse", glm::value_ptr(lightDiffuse), sizeof(lightDiffuse));
                 modelProgram.setUniformData("light.specular", glm::value_ptr(lightSpecular), sizeof(lightSpecular));
-                modelProgram.setUniformData("viewPos", glm::value_ptr(viewPos), sizeof(viewPos));
+                modelProgram.setUniformData("viewPos", glm::value_ptr(camera.getPosition()), sizeof(glm::vec3));
 
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
@@ -144,10 +142,7 @@ namespace OxyRender
                 modelProgram.setUniformData("view", glm::value_ptr(view), sizeof(view));
                 modelProgram.setUniformData("projection", glm::value_ptr(projection), sizeof(projection));
                 modelProgram.setUniformData("model", glm::value_ptr(model), sizeof(model));
-
-                glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
-                modelProgram.setUniformData("normalMatrix", glm::value_ptr(normalMatrix), sizeof(normalMatrix));
-
+                renderer.setPolygonMode(RenderPolygonMode::Line, true);
                 backpackModel.Draw(modelProgram);
 
                 window.swapBuffers();
