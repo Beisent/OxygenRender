@@ -1,3 +1,4 @@
+// 来自LearnOpenGL
 #pragma once
 
 #include <glm/glm.hpp>
@@ -7,6 +8,8 @@
 
 #include "OxygenRender/Buffer.h"
 #include "OxygenRender/Shader.h"
+#include "OxygenRender/Renderer.h"
+#include "OxygenRender/Texture.h"
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -33,7 +36,7 @@ namespace OxyRender
 
     struct Texture
     {
-        unsigned int id;
+        std::shared_ptr<Texture2D> tex;
         std::string type;
         std::string path;
     };
@@ -47,7 +50,7 @@ namespace OxyRender
         std::vector<Texture> textures;
 
         // constructor
-        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+        Mesh(Renderer& renderer,std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 
         // render the mesh
         void Draw(Shader &shader);
@@ -57,6 +60,7 @@ namespace OxyRender
         Buffer m_VBO;
         Buffer m_EBO;
 
+        Renderer& m_Renderer; 
         void setupMesh();
     };
 

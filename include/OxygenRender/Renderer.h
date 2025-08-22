@@ -1,6 +1,7 @@
 #pragma once
 #include "OxygenRender/GraphicsTypes.h"
 #include "OxygenRender/Window.h"
+#include "OxygenRender/Buffer.h"
 #include <memory>
 namespace OxyRender
 {
@@ -17,6 +18,9 @@ namespace OxyRender
         IRenderer() = default;
         virtual ~IRenderer() = default;
         virtual void setCapability(RenderCapability cap, bool enable) = 0;
+
+        virtual void drawTriangles(const VertexArray &vao, size_t indexCount) = 0;
+        virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) = 0;
         virtual void clear() = 0;
     };
 
@@ -26,6 +30,8 @@ namespace OxyRender
         OpenGLRenderer();
         ~OpenGLRenderer() override = default;
         void setCapability(RenderCapability cap, bool enable) override;
+        virtual void drawTriangles(const VertexArray &vao, size_t indexCount) override;
+        virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) override;
         void clear() override;
     };
 
@@ -34,7 +40,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<IRenderer> createRenderer()
         {
-            switch ( Backends::OXYG_CurrentBackend)
+            switch (Backends::OXYG_CurrentBackend)
             {
             case RendererBackend::OpenGL:
                 return std::make_unique<OpenGLRenderer>();
@@ -53,6 +59,8 @@ namespace OxyRender
     public:
         explicit Renderer(Window &window);
         void setCapability(RenderCapability cap, bool enable);
+        void drawTriangles(const VertexArray &vao, size_t indexCount);
+        void drawLines(const VertexArray &vao, size_t indexCount, float thickness);
         void clear();
     };
 } // namespace OxyRender

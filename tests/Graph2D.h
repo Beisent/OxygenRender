@@ -18,6 +18,7 @@ namespace OxyRender
             Graphics2D graphics2D(window, renderer);
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
+
             float deltaTime = 0.0f;
             float lastFrame = 0.0f;
             while (!window.shouldClose())
@@ -25,6 +26,7 @@ namespace OxyRender
                 float currentFrame = glfwGetTime();
                 deltaTime = currentFrame - lastFrame;
                 lastFrame = currentFrame;
+                
                 Event e;
                 while (EventSystem::pollEvent(e))
                 {

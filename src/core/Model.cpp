@@ -3,8 +3,8 @@
 namespace OxyRender
 {
 
-    Model::Model(const std::string &path, bool gamma)
-        : gammaCorrection(gamma)
+    Model::Model(Renderer &renderer, const std::string &path, bool gamma)
+        : m_Renderer(renderer), gammaCorrection(gamma)
     {
         stbi_set_flip_vertically_on_load(1); // flip image on the y-axis
         loadModel(path);
@@ -120,7 +120,7 @@ namespace OxyRender
         std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-        return Mesh(vertices, indices, textures);
+        return Mesh(m_Renderer, vertices, indices, textures);
     }
 
     std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, const std::string &typeName)
@@ -144,7 +144,7 @@ namespace OxyRender
             if (!skip)
             {
                 Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), this->directory);
+                texture.tex = TextureFromFile(str.C_Str(), this->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
@@ -154,44 +154,21 @@ namespace OxyRender
         return textures;
     }
 
-    unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
+    std::shared_ptr<Texture2D> TextureFromFile(const char *path, const std::string &directory, bool gamma)
     {
-        std::string filename = std::string(path);
-        filename = directory + '/' + filename;
-
-        unsigned int textureID;
-        glGenTextures(1, &textureID);
-
-        int width, height, nrComponents;
-        unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-        if (data)
+        std::string filename = directory + '/' + std::string(path);
+        try
         {
-            GLenum format;
-            if (nrComponents == 1)
-                format = GL_RED;
-            else if (nrComponents == 3)
-                format = GL_RGB;
-            else if (nrComponents == 4)
-                format = GL_RGBA;
 
-            glBindTexture(GL_TEXTURE_2D, textureID);
-            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            stbi_image_free(data);
+            auto texture = std::make_shared<Texture2D>(filename);
+            return texture;
         }
-        else
+        catch (const std::exception &e)
         {
-            std::cout << "Texture failed to load at path: " << path << std::endl;
-            stbi_image_free(data);
+            std::cerr << "Texture failed to load at path: " << filename << "\n"
+                      << e.what() << std::endl;
+            return nullptr;
         }
-
-        return textureID;
     }
 
 } // namespace OxyRender

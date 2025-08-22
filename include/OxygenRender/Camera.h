@@ -31,33 +31,20 @@ namespace OxyRender
 
         Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-        glm::mat4 getViewMatrix();
-        void processKeyboard(CameraMovement direction, float deltaTime);
-        void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-        void processMouseScroll(float yoffset);
-
-        glm::mat4 getOrthoProjectionMatrix(int screenWidth, int screenHeight);
-        glm::mat4 getPerspectiveProjectionMatrix(int screenWidth, int screenHeight);
-
         glm::mat4 get2DOrthoViewMatrix() const;
         glm::mat4 get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
 
+        glm::mat4 getViewMatrix();
+        glm::mat4 getOrthoProjectionMatrix(int screenWidth, int screenHeight);
+        glm::mat4 getPerspectiveProjectionMatrix(int screenWidth, int screenHeight);
+
+        void processKeyboard(CameraMovement direction, float deltaTime);
+        void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
+        void processMouseScroll(float yoffset);
         glm::vec3 getPosition() const { return m_Position; }
         glm::vec3 getFront() const { return m_Front; }
-        glm::vec3 getUp() const { return m_Up; }
-        glm::vec3 getRight() const { return m_Right; }
-        glm::vec3 getWorldUp() const { return m_WorldUp; }
-        float getYaw() const { return m_Yaw; }
-        float getPitch() const { return m_Pitch; }
-        float getMovementSpeed() const { return m_MovementSpeed; }
-        float getMouseSensitivity() const { return m_MouseSensitivity; }
         float getZoom() const { return m_Zoom; }
-
         void setPosition(glm::vec3 position) { m_Position = position; }
-        void setFront(glm::vec3 front) { m_Front = front; }
-        void setUp(glm::vec3 up) { m_Up = up; }
-        void setRight(glm::vec3 right) { m_Right = right; }
-        void setWorldUp(glm::vec3 worldUp) { m_WorldUp = worldUp; }
         void setYaw(float yaw) { m_Yaw = yaw; }
         void setPitch(float pitch) { m_Pitch = pitch; }
         void setMovementSpeed(float movementSpeed) { m_MovementSpeed = movementSpeed; }
@@ -77,10 +64,7 @@ namespace OxyRender
         float m_MovementSpeed;
         float m_MouseSensitivity;
         float m_Zoom;
-        /**
-         * @brief 更新相机的方向向量
-         * 根据偏航角和俯仰角重新计算Front、Right、Up向量
-         */
+
         void updateCameraVectors();
     };
 }

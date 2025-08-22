@@ -254,7 +254,7 @@ namespace OxyRender
         {
             m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
             m_ebo.setData(m_triIndices.data(), m_triIndices.size() * sizeof(unsigned int));
-            glDrawElements(GL_TRIANGLES, (GLsizei)m_triIndexCount, GL_UNSIGNED_INT, 0);
+            m_renderer.drawTriangles(m_vao, m_triIndexCount);
         }
 
         for (auto &batch : m_lineBatches)
@@ -262,10 +262,9 @@ namespace OxyRender
             if (batch.indexCount == 0)
                 continue;
 
-            glLineWidth(batch.thickness);
             m_vbo.setData(batch.vertices.data(), batch.vertices.size() * sizeof(Vertex));
             m_ebo.setData(batch.indices.data(), batch.indices.size() * sizeof(unsigned int));
-            glDrawElements(GL_LINES, (GLsizei)batch.indexCount, GL_UNSIGNED_INT, 0);
+            m_renderer.drawLines(m_vao, batch.indexCount, batch.thickness);
         }
 
         m_vao.unbind();

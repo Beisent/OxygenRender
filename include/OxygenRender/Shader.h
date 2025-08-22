@@ -114,10 +114,6 @@ namespace OxyRender
         {
             m_Shader->setUniformData(name, data, size);
         }
-        void setMat4(const std::string &name, const glm::mat4 &mat)
-        {
-            m_Shader->use();
-            m_Shader->setUniformData(name, &mat, sizeof(glm::mat4));
-        }
+        
     };
 };
