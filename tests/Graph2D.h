@@ -36,7 +36,7 @@ namespace OxyRender
                     case EventType::KeyPressed:
                     {
                         auto key = std::get<KeyEvent>(e.data);
-                        if (key.key == GLFW_KEY_ESCAPE)
+                        if (key.key == KeyCode::Escape)
                         {
                             window.shutdown();
                             return;
@@ -47,13 +47,13 @@ namespace OxyRender
                         break;
                     }
                 }
-                if (EventSystem::isKeyDown(GLFW_KEY_A))
+                if (EventSystem::isKeyDown(KeyCode::A))
                     camera.processKeyboard(CameraMovement::LEFT, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_D))
+                if (EventSystem::isKeyDown(KeyCode::D))
                     camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_W))
+                if (EventSystem::isKeyDown(KeyCode::W))
                     camera.processKeyboard(CameraMovement::UP, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_S))
+                if (EventSystem::isKeyDown(KeyCode::S))
                     camera.processKeyboard(CameraMovement::DOWN, deltaTime);
 
                 renderer.clear();

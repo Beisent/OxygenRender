@@ -6,6 +6,12 @@
 #include <memory>
 namespace OxyRender
 {
+    enum class CursorMode
+    {
+        Normal,
+        Disabled,
+        Hidden
+    };
 
     class IWindow
     {
@@ -28,7 +34,7 @@ namespace OxyRender
 
         // Cursor
         virtual void setCursorPos(float x, float y) = 0;
-        virtual void setCursorMode(int mode) = 0;
+        virtual void setCursorMode(CursorMode mode) = 0;
     };
 
     class GLFWWindow : public IWindow
@@ -46,7 +52,7 @@ namespace OxyRender
         void pollEvents() override;
 
         void setCursorPos(float x, float y) override;
-        void setCursorMode(int mode) override;
+        void setCursorMode(CursorMode mode) override;
     };
 
     class WindowFactory
@@ -54,13 +60,7 @@ namespace OxyRender
     public:
         static std::unique_ptr<IWindow> createWindow(int width, int height, const std::string &title)
         {
-            switch (Backends::OXYG_CurrentWindowBackend)
-            {
-            case WindowBackend::GLFW:
-                return std::make_unique<GLFWWindow>(width, height, title);
-            default:
-                return nullptr;
-            }
+            return std::make_unique<GLFWWindow>(width, height, title);
         }
     };
 
@@ -80,6 +80,6 @@ namespace OxyRender
         int getHeight() const;
 
         void setCursorPos(float x, float y);
-        void setCursorMode(int mode);
+        void setCursorMode(CursorMode mode);
     };
 } // namespace OxyRender

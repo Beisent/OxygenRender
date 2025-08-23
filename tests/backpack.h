@@ -32,7 +32,7 @@ namespace OxyRender
             bool mouseCaptured = false;
             float lastX = 0, lastY = 0;
             bool firstMouse = true;
-            window.setCursorMode(GLFW_CURSOR_DISABLED);
+            window.setCursorMode(CursorMode::Disabled);
             mouseCaptured = true;
 
             Model backpackModel(renderer, "resource/objects/backpack/backpack.obj");
@@ -51,14 +51,14 @@ namespace OxyRender
                     case EventType::KeyPressed:
                     {
                         auto key = std::get<KeyEvent>(e.data);
-                        if (key.key == GLFW_KEY_ESCAPE)
+                        if (key.key == KeyCode::Escape)
                         {
                             window.shutdown();
                             return;
                         }
-                        else if (key.key == GLFW_KEY_LEFT_ALT)
+                        else if (key.key == KeyCode::LeftAlt)
                         {
-                            window.setCursorMode(GLFW_CURSOR_NORMAL);
+                            window.setCursorMode(CursorMode::Normal);
                             mouseCaptured = false;
                         }
                         break;
@@ -66,9 +66,9 @@ namespace OxyRender
                     case EventType::KeyReleased:
                     {
                         auto key = std::get<KeyEvent>(e.data);
-                        if (key.key == GLFW_KEY_LEFT_ALT)
+                        if (key.key == KeyCode::LeftAlt)
                         {
-                            window.setCursorMode(GLFW_CURSOR_DISABLED);
+                            window.setCursorMode(CursorMode::Disabled);
                             mouseCaptured = true;
                         }
                         break;
@@ -105,17 +105,17 @@ namespace OxyRender
                     }
                 }
 
-                if (EventSystem::isKeyDown(GLFW_KEY_W))
+                if (EventSystem::isKeyDown(KeyCode::W))
                     camera.processKeyboard(CameraMovement::FORWARD, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_S))
+                if (EventSystem::isKeyDown(KeyCode::S))
                     camera.processKeyboard(CameraMovement::BACKWARD, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_A))
+                if (EventSystem::isKeyDown(KeyCode::A))
                     camera.processKeyboard(CameraMovement::LEFT, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_D))
+                if (EventSystem::isKeyDown(KeyCode::D))
                     camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_SPACE))
+                if (EventSystem::isKeyDown(KeyCode::Space))
                     camera.processKeyboard(CameraMovement::UP, deltaTime);
-                if (EventSystem::isKeyDown(GLFW_KEY_LEFT_SHIFT))
+                if (EventSystem::isKeyDown(KeyCode::LeftShift))
                     camera.processKeyboard(CameraMovement::DOWN, deltaTime);
 
                 glm::mat4 view = camera.getViewMatrix();
@@ -142,7 +142,7 @@ namespace OxyRender
                 modelProgram.setUniformData("view", glm::value_ptr(view), sizeof(view));
                 modelProgram.setUniformData("projection", glm::value_ptr(projection), sizeof(projection));
                 modelProgram.setUniformData("model", glm::value_ptr(model), sizeof(model));
-                renderer.setPolygonMode(RenderPolygonMode::Line, true);
+                renderer.setPolygonMode(RenderPolygonMode::Fill, true);
                 backpackModel.Draw(modelProgram);
 
                 window.swapBuffers();

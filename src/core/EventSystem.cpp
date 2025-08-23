@@ -11,12 +11,14 @@ namespace OxyRender
         if (e.type == EventType::KeyPressed)
         {
             auto data = std::get<KeyEvent>(e.data);
-            m_keyStates[data.key] = true;
+            int k = keyCodetoGLFW(data.key);
+            m_keyStates[k] = true;
         }
         else if (e.type == EventType::KeyReleased)
         {
             auto data = std::get<KeyEvent>(e.data);
-            m_keyStates[data.key] = false;
+            int k = keyCodetoGLFW(data.key);
+            m_keyStates[k] = false;
         }
         else if (e.type == EventType::MouseButtonPressed)
         {
@@ -48,15 +50,15 @@ namespace OxyRender
             m_events.pop();
     }
 
-    bool EventSystem::isKeyDown(int key)
+    bool EventSystem::isKeyDown(KeyCode key)
     {
-        auto it = m_keyStates.find(key);
+        auto it = m_keyStates.find(keyCodetoGLFW(key));
         return it != m_keyStates.end() && it->second;
     }
 
-    bool EventSystem::isMouseButtonDown(int button)
+    bool EventSystem::isMouseButtonDown(MouseCode button)
     {
-        auto it = m_mouseButtonStates.find(button);
+        auto it = m_mouseButtonStates.find(mouseCodeToGLFW(button));
         return it != m_mouseButtonStates.end() && it->second;
     }
 }

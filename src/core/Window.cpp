@@ -7,15 +7,16 @@ namespace OxyRender
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
     {
         Event e;
+        KeyCode k = glfwToKeyCode(key);
         if (action == GLFW_PRESS)
         {
             e.type = EventType::KeyPressed;
-            e.data = KeyEvent{key, scancode, mods};
+            e.data = KeyEvent{k, scancode, mods};
         }
         else if (action == GLFW_RELEASE)
         {
             e.type = EventType::KeyReleased;
-            e.data = KeyEvent{key, scancode, mods};
+            e.data = KeyEvent{k, scancode, mods};
         }
         EventSystem::pushEvent(e);
     }
@@ -135,9 +136,20 @@ namespace OxyRender
     {
         glfwSetCursorPos(m_window, x, y);
     }
-    void GLFWWindow::setCursorMode(int mode)
+    void GLFWWindow::setCursorMode(CursorMode mode)
     {
-        glfwSetInputMode(m_window, GLFW_CURSOR, mode);
+        switch (mode)
+        {
+        case CursorMode::Normal:
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            break;
+        case CursorMode::Disabled:
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            break;
+        case CursorMode::Hidden:
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            break;
+        }
     }
 
     Window::Window(int width, int height, std::string title)
@@ -184,7 +196,7 @@ namespace OxyRender
     {
         m_window->setCursorPos(x, y);
     }
-    void Window::setCursorMode(int mode)
+    void Window::setCursorMode(CursorMode mode)
     {
         m_window->setCursorMode(mode);
     }
