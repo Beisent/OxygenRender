@@ -74,6 +74,7 @@ namespace OxyRender
     {
         return static_cast<int>(k);
     }
+    
     enum class MouseCode
     {
         ButtonLeft = GLFW_MOUSE_BUTTON_LEFT,

@@ -21,11 +21,6 @@ namespace OxyRender
         updateCameraVectors();
     }
 
-    glm::mat4 Camera::getViewMatrix()
-    {
-        return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
-    }
-
     void Camera::processKeyboard(CameraMovement direction, float deltaTime)
     {
         float velocity = m_MovementSpeed * deltaTime;
@@ -98,6 +93,11 @@ namespace OxyRender
             -halfWidth, halfWidth,
             -halfHeight, halfHeight,
             0.1f, 100.0f);
+    }
+
+    glm::mat4 Camera::getViewMatrix()
+    {
+        return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
     }
     glm::mat4 Camera::getOrthoProjectionMatrix(int screenWidth, int screenHeight)
     {

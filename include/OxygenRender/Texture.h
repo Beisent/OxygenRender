@@ -52,8 +52,8 @@ namespace OxyRender
 
         void setData(const void *data, uint32_t width, uint32_t height) override;
 
-        uint32_t getWidth() const noexcept override { return m_width; }
-        uint32_t getHeight() const noexcept override { return m_height; }
+        inline uint32_t getWidth() const noexcept override { return m_width; }
+        inline uint32_t getHeight() const noexcept override { return m_height; }
 
     private:
         GLuint m_rendererID;
@@ -67,14 +67,7 @@ namespace OxyRender
     class TextureFactory
     {
     public:
-        static std::unique_ptr<ITexture> createTexture2D(const std::string &path, TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat)
-        {
-            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
-            {
-                return std::make_unique<OpenGLTexture2D>(path, filter, wrap);
-            }
-            throw std::runtime_error("Unsupported backend for Texture");
-        }
+        static std::unique_ptr<ITexture> createTexture2D(const std::string &path, TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat);
     };
     class Texture2D
     {
@@ -83,21 +76,11 @@ namespace OxyRender
 
     public:
         Texture2D() = default;
-        Texture2D(const std::string &path, TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat)
-        {
-            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
-            {
-                m_texture = std::make_shared<OpenGLTexture2D>(path, filter, wrap);
-            }
-            else
-            {
-                throw std::runtime_error("Unsupported backend for Texture2D");
-            }
-        }
-        void bind(uint32_t slot = 0) const { m_texture->bind(slot); }
-        void unbind() const { m_texture->unbind(); }
-        void setData(const void *data, uint32_t width, uint32_t height) { m_texture->setData(data, width, height); }
-        uint32_t getWidth() const noexcept { return m_texture->getWidth(); }
-        uint32_t getHeight() const noexcept { return m_texture->getHeight(); }
+        Texture2D(const std::string &path, TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat);
+        inline void bind(uint32_t slot = 0) const { m_texture->bind(slot); }
+        inline void unbind() const { m_texture->unbind(); }
+        inline void setData(const void *data, uint32_t width, uint32_t height) { m_texture->setData(data, width, height); }
+        inline uint32_t getWidth() const noexcept { return m_texture->getWidth(); }
+        inline uint32_t getHeight() const noexcept { return m_texture->getHeight(); }
     };
 }

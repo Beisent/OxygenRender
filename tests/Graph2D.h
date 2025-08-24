@@ -14,8 +14,9 @@ namespace OxyRender
         {
             Window window(800, 600, "OxygenRender");
             Renderer renderer(window);
-
+            // renderer.setPolygonMode(RenderPolygonMode::Line, true);
             Graphics2D graphics2D(window, renderer);
+            
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
 

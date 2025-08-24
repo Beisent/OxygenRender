@@ -34,7 +34,6 @@ namespace OxyRender
             throw std::runtime_error("Unsupported number of channels in texture: " + path);
         }
 
-       
         glGenTextures(1, &m_rendererID);
         glBindTexture(GL_TEXTURE_2D, m_rendererID);
 
@@ -78,4 +77,24 @@ namespace OxyRender
         glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, data);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+    std::unique_ptr<ITexture> TextureFactory::createTexture2D(const std::string &path, TextureFilter filter, TextureWrap wrap)
+    {
+        if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
+        {
+            return std::make_unique<OpenGLTexture2D>(path, filter, wrap);
+        }
+        throw std::runtime_error("Unsupported backend for Texture");
+    }
+    Texture2D::Texture2D(const std::string &path, TextureFilter filter, TextureWrap wrap)
+    {
+        if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
+        {
+            m_texture = std::make_shared<OpenGLTexture2D>(path, filter, wrap);
+        }
+        else
+        {
+            throw std::runtime_error("Unsupported backend for Texture2D");
+        }
+    }
+
 }

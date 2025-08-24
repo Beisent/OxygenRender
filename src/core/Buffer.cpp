@@ -152,7 +152,21 @@ namespace OxyRender
     {
         return m_indexBuffer;
     }
-
+    std::unique_ptr<IBuffer> BufferFactory::createBuffer(BufferType type, BufferUsage usage)
+    {
+        if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
+        {
+            if (type == BufferType::Vertex)
+            {
+                return std::make_unique<OpenGLVertexBuffer>(usage);
+            }
+            else if (type == BufferType::Index)
+            {
+                return std::make_unique<OpenGLIndexBuffer>(usage);
+            }
+        }
+        throw std::runtime_error("Unsupported backend or buffer type");
+    }
     Buffer::Buffer(BufferType type, BufferUsage usage) : m_type(type)
     {
         m_buffer = BufferFactory::createBuffer(type, usage);
@@ -169,7 +183,14 @@ namespace OxyRender
     {
         m_buffer->setData(data, size, offset);
     }
-
+    std::unique_ptr<IVertexArray> VertexArrayFactory::create()
+    {
+        if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
+        {
+            return std::make_unique<OpenGLVertexArray>();
+        }
+        throw std::runtime_error("Unsupported backend for VAO");
+    }
     VertexArray::VertexArray()
     {
         m_vao = VertexArrayFactory::create();

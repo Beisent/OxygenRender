@@ -62,14 +62,6 @@ namespace OxyRender
     IWindow::IWindow(int width, int height, std::string title) : m_width(width), m_height(height), m_title(std::move(title))
     {
     }
-    int IWindow::getWidth() const
-    {
-        return m_width;
-    }
-    int IWindow::getHeight() const
-    {
-        return m_height;
-    }
     GLFWWindow::GLFWWindow(int width, int height, std::string title) : IWindow(width, height, title)
     {
         if (!glfwInit())

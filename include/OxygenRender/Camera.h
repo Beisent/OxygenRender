@@ -41,15 +41,15 @@ namespace OxyRender
         void processKeyboard(CameraMovement direction, float deltaTime);
         void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
         void processMouseScroll(float yoffset);
-        glm::vec3 getPosition() const { return m_Position; }
-        glm::vec3 getFront() const { return m_Front; }
-        float getZoom() const { return m_Zoom; }
-        void setPosition(glm::vec3 position) { m_Position = position; }
-        void setYaw(float yaw) { m_Yaw = yaw; }
-        void setPitch(float pitch) { m_Pitch = pitch; }
-        void setMovementSpeed(float movementSpeed) { m_MovementSpeed = movementSpeed; }
-        void setMouseSensitivity(float mouseSensitivity) { m_MouseSensitivity = mouseSensitivity; }
-        void setZoom(float zoom) { m_Zoom = zoom; }
+        inline glm::vec3 getPosition() const { return m_Position; }
+        inline glm::vec3 getFront() const { return m_Front; }
+        inline float getZoom() const { return m_Zoom; }
+        inline void setPosition(glm::vec3 position) { m_Position = position; }
+        inline void setYaw(float yaw) { m_Yaw = yaw; }
+        inline void setPitch(float pitch) { m_Pitch = pitch; }
+        inline void setMovementSpeed(float movementSpeed) { m_MovementSpeed = movementSpeed; }
+        inline void setMouseSensitivity(float mouseSensitivity) { m_MouseSensitivity = mouseSensitivity; }
+        inline void setZoom(float zoom) { m_Zoom = zoom; }
 
     private:
         glm::vec3 m_Position;

@@ -37,18 +37,52 @@ namespace OxyRender
         glDeleteShader(fragmentShader);
     }
 
+    std::string OpenGLShader::loadFile(const std::string &path)
+    {
+        std::ifstream file(path);
+        if (!file.is_open())
+            throw std::runtime_error("Failed to open shader file: " + path);
+
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return buffer.str();
+    }
+
+    GLuint OpenGLShader::compileShader(GLenum type, const std::string &source)
+    {
+        GLuint shader = glCreateShader(type);
+        const char *src = source.c_str();
+        glShaderSource(shader, 1, &src, nullptr);
+        glCompileShader(shader);
+
+        GLint success;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            char log[512];
+            glGetShaderInfoLog(shader, 512, nullptr, log);
+            glDeleteShader(shader);
+            throw std::runtime_error(std::string("Shader compilation failed: ") + log);
+        }
+        return shader;
+    }
     void OpenGLShader::use()
     {
         glUseProgram(m_program_id);
     }
 
-    GLuint OpenGLShader::getID()
-    {
-        return m_program_id;
-    }
     OpenGLShader::~OpenGLShader()
     {
         glDeleteProgram(m_program_id);
+    }
+    void OpenGLShader::setMat4(const std::string &name, const glm::mat4 &mat)
+    {
+        use();
+        GLint location = glGetUniformLocation(m_program_id, name.c_str());
+        if (location != -1)
+        {
+            glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
+        }
     }
     void OpenGLShader::setUniformData(const std::string &name, const void *data, size_t size)
     {
@@ -72,6 +106,16 @@ namespace OxyRender
             glUniform1i(location, *(const GLint *)data);
         else
             throw std::runtime_error("Unsupported uniform size: " + std::to_string(size));
+    }
+    std::unique_ptr<IShader> ShaderFactory::create(std::string name, std::string path_vertex, std::string path_fragment)
+    {
+        switch (Backends::OXYG_CurrentBackend)
+        {
+        case RendererBackend::OpenGL:
+            return std::make_unique<OpenGLShader>(name, path_vertex, path_fragment);
+        default:
+            return nullptr;
+        }
     }
 
 }

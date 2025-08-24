@@ -29,8 +29,9 @@ namespace OxyRender
         virtual void shutdown() = 0;
         virtual void swapBuffers() = 0;
         virtual void pollEvents() = 0;
-        int getWidth() const;
-        int getHeight() const;
+        inline int getWidth() const { return m_width; }
+
+        inline int getHeight() const { return m_height; }
 
         // Cursor
         virtual void setCursorPos(float x, float y) = 0;

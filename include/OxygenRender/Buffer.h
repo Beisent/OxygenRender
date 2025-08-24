@@ -138,7 +138,7 @@ namespace OxyRender
         void bind() const noexcept override;
         void unbind() const noexcept override;
         void setData(const void *data, size_t size, size_t offset = 0) override;
-        uint32_t getCount() const noexcept override;
+        inline uint32_t getCount() const noexcept override;
 
     private:
         GLuint m_rendererID;
@@ -168,21 +168,7 @@ namespace OxyRender
     class BufferFactory
     {
     public:
-        static std::unique_ptr<IBuffer> createBuffer(BufferType type, BufferUsage usage = BufferUsage::StaticDraw)
-        {
-            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
-            {
-                if (type == BufferType::Vertex)
-                {
-                    return std::make_unique<OpenGLVertexBuffer>(usage);
-                }
-                else if (type == BufferType::Index)
-                {
-                    return std::make_unique<OpenGLIndexBuffer>(usage);
-                }
-            }
-            throw std::runtime_error("Unsupported backend or buffer type");
-        }
+        static std::unique_ptr<IBuffer> createBuffer(BufferType type, BufferUsage usage = BufferUsage::StaticDraw);
     };
 
     class Buffer
@@ -196,16 +182,15 @@ namespace OxyRender
         void bind();
         void unbind();
         void setData(const void *data, size_t size, size_t offset = 0);
-        BufferType getType() const noexcept { return m_type; }
 
-        IBuffer *asIBuffer() noexcept { return m_buffer.get(); }
-        const IBuffer *asIBuffer() const noexcept { return m_buffer.get(); }
-
-        IndexBuffer *asIndexBuffer() noexcept
+        inline BufferType getType() const noexcept { return m_type; }
+        inline IBuffer *asIBuffer() noexcept { return m_buffer.get(); }
+        inline const IBuffer *asIBuffer() const noexcept { return m_buffer.get(); }
+        inline IndexBuffer *asIndexBuffer() noexcept
         {
             return (m_type == BufferType::Index) ? static_cast<IndexBuffer *>(m_buffer.get()) : nullptr;
         }
-        const IndexBuffer *asIndexBuffer() const noexcept
+        inline const IndexBuffer *asIndexBuffer() const noexcept
         {
             return (m_type == BufferType::Index) ? static_cast<const IndexBuffer *>(m_buffer.get()) : nullptr;
         }
@@ -214,14 +199,7 @@ namespace OxyRender
     class VertexArrayFactory
     {
     public:
-        static std::unique_ptr<IVertexArray> create()
-        {
-            if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
-            {
-                return std::make_unique<OpenGLVertexArray>();
-            }
-            throw std::runtime_error("Unsupported backend for VAO");
-        }
+        static std::unique_ptr<IVertexArray> create();
     };
 
     class VertexArray
@@ -231,11 +209,11 @@ namespace OxyRender
 
     public:
         VertexArray();
-        virtual void bind() const;
-        virtual void unbind() const;
-        virtual void setVertexBuffer(Buffer &vertexBuffer, const VertexLayout &layout);
-        virtual void setIndexBuffer(Buffer &indexBuffer);
-        virtual IndexBuffer *getIndexBuffer() const;
+        void bind() const;
+        void unbind() const;
+        void setVertexBuffer(Buffer &vertexBuffer, const VertexLayout &layout);
+        void setIndexBuffer(Buffer &indexBuffer);
+        inline IndexBuffer *getIndexBuffer() const;
     };
 
 }

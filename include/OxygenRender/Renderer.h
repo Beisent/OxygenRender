@@ -29,7 +29,7 @@ namespace OxyRender
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) = 0;
        // virtual void drawArray(const VertexArray &vao, size_t vertexCount) = 0;
         virtual void clear() = 0;
-        void setClearColor(const OxyColor &color) { m_clear_color = color; }
+        inline void setClearColor(const OxyColor &color) { m_clear_color = color; }
 
     protected:
         OxyColor m_clear_color = {0.8f, 0.8f, 0.8f, 1.0f};
