@@ -59,7 +59,8 @@ OxygenRender/
 ```
 bash
 git clone --recursive https://github.com/Beisent/OxygenRender.git
-cd OxygenRender
+cd OxygenRender、
+./build.bat
 
 # 使用 CMake 构建项目
 mkdir build
