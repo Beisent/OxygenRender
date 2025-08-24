@@ -58,7 +58,7 @@ OxygenRender/
 
 ```
 bash
-git clone https://github.com/yourname/OxygenRender.git
+git clone --recursive https://github.com/Beisent/OxygenRender.git
 cd OxygenRender
 
 # 使用 CMake 构建项目
