@@ -20,18 +20,25 @@ namespace OxyRender
         void setClearColor(const OxyColor &color);
         void begin();
 
-        void drawRect(float x, float y, float width, float height, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f});
-        void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f});
-        void drawLine(float x1, float y1, float x2, float y2, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, float thickness = 1.0f);
+        void drawRect(float x, float y, float width, float height, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
+        void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
+        void drawLine(float x1, float y1, float x2, float y2, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
-        void drawCircle(float cx, float cy, float radius, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
-        void drawCircleOutline(float cx, float cy, float radius, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
-        void drawPolygon(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f});
-        void drawPolygonOutline(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, float thickness = 1.0f);
+        void drawCircle(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
+        void drawCircleOutline(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
+        void drawPolygon(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
+        void drawPolygonOutline(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
-        void drawArcAA(float cx, float cy, float radius, float startAngle, float endAngle, OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, float thickness = 2.0f, int segments = 128);
         void drawArrow(float x1, float y1, float x2, float y2,
-                       OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, float thickness = 1.0, float headLength = 20.0f, float headWidth = 15.0f);
+                       OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, float thickness = 1.0, float headLength = 15.0f, float headWidth = 15.0f);
+
+        void drawAxis(const Camera &camera,
+                      float windowWidth, float windowHeight,
+                      OxyColor axisColor = {1.0f, 0.0f, 0.0f, 1.0f},
+                      OxyColor gridColor = {0.8f, 0.8f, 0.8f, 1.0f},
+                      float thickness = 1.0f,
+                      float gridSpacing = 50.0f,
+                      bool drawGrid = true);
         void flush();
 
     private:

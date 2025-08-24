@@ -9,12 +9,21 @@ namespace OxyRender
           m_vbo(BufferType::Vertex, BufferUsage::DynamicDraw),
           m_ebo(BufferType::Index, BufferUsage::DynamicDraw)
     {
+        // 创建顶点布局
         VertexLayout layout;
         layout.addAttribute("aPos", 0, VertexAttribType::Float3);
         layout.addAttribute("aColor", 1, VertexAttribType::Float4);
 
+        // 设置数据
         m_vao.setVertexBuffer(m_vbo, layout);
         m_vao.setIndexBuffer(m_ebo);
+
+        // 初始化渲染
+        m_renderer.setCapability(RenderCapability::Blend, false);
+        m_renderer.setCapability(RenderCapability::DepthTest, true);
+
+        // 初始化相机
+        m_camera.setZoom(1.0);
     }
     void Graphics2D::clear()
     {
@@ -187,53 +196,6 @@ namespace OxyRender
         }
     }
 
-    void Graphics2D::drawArcAA(float cx, float cy, float radius,
-                               float startAngle, float endAngle,
-                               OxyColor color, float thickness, int segments)
-    {
-        if (segments < 8)
-            segments = 8;
-        if (endAngle < startAngle)
-            std::swap(startAngle, endAngle);
-
-        unsigned int startIndex = (unsigned int)m_triVertices.size();
-
-        float rInner = radius - thickness * 0.5f;
-        float rOuter = radius + thickness * 0.5f;
-
-        for (int i = 0; i <= segments; i++)
-        {
-            float t = (float)i / segments;
-            float angle = startAngle + t * (endAngle - startAngle);
-
-            float cs = cos(angle);
-            float sn = sin(angle);
-
-            glm::vec3 pOuter = {cx + cs * rOuter, cy + sn * rOuter, 0.0f};
-            glm::vec3 pInner = {cx + cs * rInner, cy + sn * rInner, 0.0f};
-
-            m_triVertices.push_back({pOuter, color});
-            m_triVertices.push_back({pInner, color});
-        }
-
-        for (int i = 0; i < segments; i++)
-        {
-            unsigned int i0 = startIndex + i * 2;
-            unsigned int i1 = startIndex + i * 2 + 1;
-            unsigned int i2 = startIndex + i * 2 + 2;
-            unsigned int i3 = startIndex + i * 2 + 3;
-
-            m_triIndices.push_back(i0);
-            m_triIndices.push_back(i2);
-            m_triIndices.push_back(i1);
-
-            m_triIndices.push_back(i2);
-            m_triIndices.push_back(i3);
-            m_triIndices.push_back(i1);
-
-            m_triIndexCount += 6;
-        }
-    }
     void Graphics2D::drawArrow(float x1, float y1, float x2, float y2,
                                OxyColor color, float thickness, float headLength, float headWidth)
     {
@@ -251,6 +213,47 @@ namespace OxyRender
 
         drawTriangle(v0.x, v0.y, v1.x, v1.y, v2.x, v2.y, color);
     }
+
+    void Graphics2D::drawAxis(const Camera &camera,
+                              float windowWidth, float windowHeight,
+                              OxyColor axisColor,
+                              OxyColor gridColor,
+                              float thickness,
+                              float gridSpacing,
+                              bool drawGrid)
+    {
+        glm::mat4 proj = camera.get2DOrthoProjectionMatrix(windowWidth, windowHeight);
+        glm::mat4 view = camera.get2DOrthoViewMatrix();
+        glm::mat4 vp = proj * view;
+        glm::mat4 invVP = glm::inverse(vp);
+
+        auto unproject = [&](float ndcX, float ndcY)
+        {
+            glm::vec4 p(ndcX, ndcY, 0.0f, 1.0f);
+            p = invVP * p;
+            return glm::vec2(p.x / p.w, p.y / p.w);
+        };
+
+        glm::vec2 bottomLeft = unproject(-1, -1);
+        glm::vec2 topRight = unproject(1, 1);
+
+        if (drawGrid && gridSpacing > 0.0f)
+        {
+            float yStart = std::floor(bottomLeft.y / gridSpacing) * gridSpacing;
+            for (float y = yStart; y <= topRight.y; y += gridSpacing)
+            {
+                drawLine(bottomLeft.x, y, topRight.x, y, gridColor, 1.0f);
+            }
+            float xStart = std::floor(bottomLeft.x / gridSpacing) * gridSpacing;
+            for (float x = xStart; x <= topRight.x; x += gridSpacing)
+            {
+                drawLine(x, bottomLeft.y, x, topRight.y, gridColor, 1.0f);
+            }
+        }
+        drawArrow(bottomLeft.x, 0, topRight.x, 0, axisColor, thickness);
+        drawArrow(0, bottomLeft.y, 0, topRight.y, axisColor, thickness);
+    }
+
     void Graphics2D::flush()
     {
         if (m_triIndexCount == 0 && m_lineBatches.empty())
@@ -262,9 +265,9 @@ namespace OxyRender
         m_renderer.setCapability(RenderCapability::StencilTest, false);
 
         m_shader.use();
-        m_camera.setZoom(1.0);
-        // m_camera.setPosition(glm::vec3(100.0f, 100.0f, 0.0f));
-        glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(m_camera.getZoom(), m_camera.getZoom(), 1.0f));
+
+        // MVP变换
+        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = m_camera.get2DOrthoViewMatrix();
         glm::mat4 projection = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
 
@@ -274,13 +277,6 @@ namespace OxyRender
 
         m_vao.bind();
 
-        if (m_triIndexCount > 0)
-        {
-            m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
-            m_ebo.setData(m_triIndices.data(), m_triIndices.size() * sizeof(unsigned int));
-            m_renderer.drawTriangles(m_vao, m_triIndexCount);
-        }
-
         for (auto &batch : m_lineBatches)
         {
             if (batch.indexCount == 0)
@@ -289,6 +285,13 @@ namespace OxyRender
             m_vbo.setData(batch.vertices.data(), batch.vertices.size() * sizeof(Vertex));
             m_ebo.setData(batch.indices.data(), batch.indices.size() * sizeof(unsigned int));
             m_renderer.drawLines(m_vao, batch.indexCount, batch.thickness);
+        }
+
+        if (m_triIndexCount > 0)
+        {
+            m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
+            m_ebo.setData(m_triIndices.data(), m_triIndices.size() * sizeof(unsigned int));
+            m_renderer.drawTriangles(m_vao, m_triIndexCount);
         }
 
         m_vao.unbind();

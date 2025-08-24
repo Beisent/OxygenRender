@@ -86,13 +86,10 @@ namespace OxyRender
 
     glm::mat4 Camera::get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const
     {
-        float halfWidth = screenWidth / 2.0f;
-        float halfHeight = screenHeight / 2.0f;
+        float halfWidth = (screenWidth / 2.0f) * m_Zoom;
+        float halfHeight = (screenHeight / 2.0f) * m_Zoom;
 
-        return glm::ortho(
-            -halfWidth, halfWidth,
-            -halfHeight, halfHeight,
-            0.1f, 100.0f);
+        return glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, 0.1f, 100.0f);
     }
 
     glm::mat4 Camera::getViewMatrix() const
