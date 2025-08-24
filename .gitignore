@@ -1,5 +1,5 @@
 bin/*.exe
 build
 .vscode
-bin/resources/objects/test
-bin/resources/objects
+bin/resource/objects/test
+bin/resource/objects
