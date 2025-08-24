@@ -70,11 +70,11 @@ namespace OxyRender
     {
         return static_cast<KeyCode>(key);
     }
-    static int keyCodetoGLFW(KeyCode k)
+    static int keyCodetoGLFW(KeyCode k)  
     {
         return static_cast<int>(k);
     }
-    
+
     enum class MouseCode
     {
         ButtonLeft = GLFW_MOUSE_BUTTON_LEFT,

@@ -16,19 +16,19 @@ namespace OxyRender
             Renderer renderer(window);
             // renderer.setPolygonMode(RenderPolygonMode::Line, true);
             Graphics2D graphics2D(window, renderer);
-            
+
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
 
             double deltaTime = 0.0f;
             double lastFrame = 0.0f;
-            
+
             while (!window.shouldClose())
             {
                 double currentFrame = window.getTime();
                 deltaTime = currentFrame - lastFrame;
                 lastFrame = currentFrame;
-                
+
                 Event e;
                 while (EventSystem::pollEvent(e))
                 {
@@ -57,17 +57,16 @@ namespace OxyRender
                 if (EventSystem::isKeyDown(KeyCode::S))
                     camera.processKeyboard(CameraMovement::DOWN, deltaTime);
 
-                renderer.clear();
+                graphics2D.clear();
                 graphics2D.begin();
 
-                graphics2D.drawCircle(100, 100, 50, {1, 0, 0, 1});
-                graphics2D.drawCircleOutline(200, 100, 50, {0, 1, 0, 1}, 64, 2);
-                graphics2D.drawPolygon({{300, 100}, {350, 150}, {320, 180}}, {0, 0, 1, 1});
-                graphics2D.drawPolygonOutline({{0, 0}, {100, 0}, {50, 100}}, {1, 1, 0, 1}, 2);
+                graphics2D.drawCircle(-350, 250, 50, {1, 0, 0, 1});
+                graphics2D.drawCircleOutline(-250, 250, 50, {0, 1, 0, 1}, 64, 2);
+                graphics2D.drawPolygon({{-200, 200}, {-150, 300}, {-100, 200}}, {0, 0, 1, 1});
+                graphics2D.drawPolygonOutline({{-100, 200}, {-50, 300}, {0, 200}}, {1, 1, 0, 1}, 2);
 
-                graphics2D.drawArcAA(0, 0, 100, 0.0f, glm::radians(270.0f), {1, 0, 0, 1}, 5.0f, 128);
-
-                
+                graphics2D.drawArcAA(50, 250, 50, 0.0f, glm::radians(180.0f), {1, 0, 0, 1}, 5.0f, 128);
+                 graphics2D.drawArrow(100, 300, 200, 200, {1, 0, 0, 1}, 2.0f, 10.0f, 10.0f);
                 graphics2D.flush();
                 window.swapBuffers();
                 window.pollEvents();

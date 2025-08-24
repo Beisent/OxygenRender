@@ -34,9 +34,9 @@ namespace OxyRender
         glm::mat4 get2DOrthoViewMatrix() const;
         glm::mat4 get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
 
-        glm::mat4 getViewMatrix();
-        glm::mat4 getOrthoProjectionMatrix(int screenWidth, int screenHeight);
-        glm::mat4 getPerspectiveProjectionMatrix(int screenWidth, int screenHeight);
+        glm::mat4 getViewMatrix() const;
+        glm::mat4 getOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
+        glm::mat4 getPerspectiveProjectionMatrix(int screenWidth, int screenHeight) const;
 
         void processKeyboard(CameraMovement direction, float deltaTime);
         void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);

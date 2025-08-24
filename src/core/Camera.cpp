@@ -95,17 +95,17 @@ namespace OxyRender
             0.1f, 100.0f);
     }
 
-    glm::mat4 Camera::getViewMatrix()
+    glm::mat4 Camera::getViewMatrix() const
     {
         return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
     }
-    glm::mat4 Camera::getOrthoProjectionMatrix(int screenWidth, int screenHeight)
+    glm::mat4 Camera::getOrthoProjectionMatrix(int screenWidth, int screenHeight) const
     {
         return glm::ortho(0.0f, (float)screenWidth,
                           0.0f, (float)screenHeight,
                           -1.0f, 1.0f);
     }
-    glm::mat4 Camera::getPerspectiveProjectionMatrix(int screenWidth, int screenHeight)
+    glm::mat4 Camera::getPerspectiveProjectionMatrix(int screenWidth, int screenHeight) const
     {
         return glm::perspective(glm::radians(m_Zoom),
                                 (float)screenWidth / (float)screenHeight,

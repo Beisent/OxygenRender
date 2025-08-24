@@ -97,9 +97,13 @@ namespace OxyRender
         if (renderer)
             renderer->setCapability(cap, enable);
     }
-    void Renderer::setPolygonMode(RenderPolygonMode mod, bool enable){
+    void Renderer::setPolygonMode(RenderPolygonMode mod, bool enable)
+    {
         if (renderer)
             renderer->setPolygonMode(mod, enable);
     }
-
+    void Renderer::setClearColor(const OxyColor &color)
+    {
+        renderer->setClearColor(color);
+    }
 } // namespace OxyRender

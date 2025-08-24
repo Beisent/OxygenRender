@@ -101,12 +101,7 @@ namespace OxyRender
     public:
         VertexLayout() noexcept : stride(0) {}
 
-        void addAttribute(const std::string &name, int location, VertexAttribType type)
-        {
-            attributes.push_back({name, location, type, stride});
-            stride += sizeOfAttribType(type);
-        }
-
+        void addAttribute(const std::string &name, int location, VertexAttribType type);
         const std::vector<VertexAttribute> &getAttributes() const noexcept { return attributes; }
         size_t getStride() const noexcept { return stride; }
 

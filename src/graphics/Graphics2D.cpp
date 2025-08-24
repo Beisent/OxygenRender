@@ -16,6 +16,14 @@ namespace OxyRender
         m_vao.setVertexBuffer(m_vbo, layout);
         m_vao.setIndexBuffer(m_ebo);
     }
+    void Graphics2D::clear()
+    {
+        m_renderer.clear();
+    }
+    void Graphics2D::setClearColor(const OxyColor &color)
+    {
+        m_renderer.setClearColor(color);
+    }
     Camera &Graphics2D::getCamera()
     {
         return m_camera;
@@ -29,7 +37,7 @@ namespace OxyRender
         m_lineBatches.clear();
     }
 
-    void Graphics2D::drawRect(float x, float y, float width, float height, glm::vec4 color)
+    void Graphics2D::drawRect(float x, float y, float width, float height, OxyColor color)
     {
         Vertex v0 = {{x, y, 0.0f}, color};
         Vertex v1 = {{x + width, y, 0.0f}, color};
@@ -52,7 +60,7 @@ namespace OxyRender
         m_triIndexCount += 6;
     }
 
-    void Graphics2D::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, glm::vec4 color)
+    void Graphics2D::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, OxyColor color)
     {
         Vertex v1 = {{x1, y1, 0.0f}, color};
         Vertex v2 = {{x2, y2, 0.0f}, color};
@@ -70,7 +78,7 @@ namespace OxyRender
         m_triIndexCount += 3;
     }
 
-    void Graphics2D::drawLine(float x1, float y1, float x2, float y2, glm::vec4 color, float thickness)
+    void Graphics2D::drawLine(float x1, float y1, float x2, float y2, OxyColor color, float thickness)
     {
 
         LineBatch *batch = nullptr;
@@ -101,7 +109,7 @@ namespace OxyRender
         batch->indexCount += 2;
     }
 
-    void Graphics2D::drawCircle(float cx, float cy, float radius, glm::vec4 color, int segments)
+    void Graphics2D::drawCircle(float cx, float cy, float radius, OxyColor color, int segments)
     {
         if (segments < 3)
             segments = 3;
@@ -127,7 +135,7 @@ namespace OxyRender
         }
     }
 
-    void Graphics2D::drawCircleOutline(float cx, float cy, float radius, glm::vec4 color, int segments, float thickness)
+    void Graphics2D::drawCircleOutline(float cx, float cy, float radius, OxyColor color, int segments, float thickness)
     {
         if (segments < 3)
             segments = 3;
@@ -147,7 +155,7 @@ namespace OxyRender
         }
     }
 
-    void Graphics2D::drawPolygon(const std::vector<glm::vec2> &points, glm::vec4 color)
+    void Graphics2D::drawPolygon(const std::vector<glm::vec2> &points, OxyColor color)
     {
         if (points.size() < 3)
             return;
@@ -166,7 +174,7 @@ namespace OxyRender
         }
     }
 
-    void Graphics2D::drawPolygonOutline(const std::vector<glm::vec2> &points, glm::vec4 color, float thickness)
+    void Graphics2D::drawPolygonOutline(const std::vector<glm::vec2> &points, OxyColor color, float thickness)
     {
         if (points.size() < 2)
             return;
@@ -181,7 +189,7 @@ namespace OxyRender
 
     void Graphics2D::drawArcAA(float cx, float cy, float radius,
                                float startAngle, float endAngle,
-                               glm::vec4 color, float thickness, int segments)
+                               OxyColor color, float thickness, int segments)
     {
         if (segments < 8)
             segments = 8;
@@ -226,7 +234,23 @@ namespace OxyRender
             m_triIndexCount += 6;
         }
     }
+    void Graphics2D::drawArrow(float x1, float y1, float x2, float y2,
+                               OxyColor color, float thickness, float headLength, float headWidth)
+    {
 
+        drawLine(x1, y1, x2, y2, color, thickness);
+
+        glm::vec2 dir = glm::normalize(glm::vec2(x2 - x1, y2 - y1));
+        glm::vec2 perp = glm::vec2(-dir.y, dir.x);
+
+        glm::vec2 base = glm::vec2(x2, y2) - dir * headLength;
+
+        glm::vec2 v0 = glm::vec2(x2, y2);
+        glm::vec2 v1 = base + perp * (headWidth * 0.5f);
+        glm::vec2 v2 = base - perp * (headWidth * 0.5f);
+
+        drawTriangle(v0.x, v0.y, v1.x, v1.y, v2.x, v2.y, color);
+    }
     void Graphics2D::flush()
     {
         if (m_triIndexCount == 0 && m_lineBatches.empty())

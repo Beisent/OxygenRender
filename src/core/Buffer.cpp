@@ -1,6 +1,11 @@
 #include "OxygenRender/Buffer.h"
 namespace OxyRender
 {
+    void VertexLayout::addAttribute(const std::string &name, int location, VertexAttribType type)
+    {
+        attributes.push_back({name, location, type, stride});
+        stride += sizeOfAttribType(type);
+    }
     OpenGLVertexBuffer::OpenGLVertexBuffer(BufferUsage usage)
     {
         GLenum glUsage = GL_STATIC_DRAW;
