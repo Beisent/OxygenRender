@@ -152,6 +152,11 @@ namespace OxyRender
         }
     }
 
+    double GLFWWindow::getTime()
+    {
+        return glfwGetTime();
+    }
+
     Window::Window(int width, int height, std::string title)
     {
         m_window = WindowFactory::createWindow(width, height, std::move(title));
@@ -199,6 +204,11 @@ namespace OxyRender
     void Window::setCursorMode(CursorMode mode)
     {
         m_window->setCursorMode(mode);
+    }
+
+    double Window::getTime()
+    {
+        return m_window->getTime();
     }
 
 } // namespace OxyRender

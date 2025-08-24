@@ -83,14 +83,14 @@ namespace OxyRender
             vao2.setVertexBuffer(vbo2, layout);
 
             Camera camera(glm::vec3(0.0f, 3.0f, 10.0f));
-            float deltaTime = 0.0f;
-            float lastFrame = 0.0f;
+            double deltaTime = 0.0f;
+            double lastFrame = 0.0f;
             float cameraAngle = 0.0f;
             float cameraRadius = 10.0f;
 
             while (!window.shouldClose())
             {
-                float currentFrame = glfwGetTime();
+                double currentFrame = window.getTime();
                 deltaTime = currentFrame - lastFrame;
                 lastFrame = currentFrame;
 

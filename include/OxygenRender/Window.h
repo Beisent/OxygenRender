@@ -35,6 +35,8 @@ namespace OxyRender
         // Cursor
         virtual void setCursorPos(float x, float y) = 0;
         virtual void setCursorMode(CursorMode mode) = 0;
+
+        virtual double getTime() = 0;
     };
 
     class GLFWWindow : public IWindow
@@ -53,6 +55,8 @@ namespace OxyRender
 
         void setCursorPos(float x, float y) override;
         void setCursorMode(CursorMode mode) override;
+
+        double getTime() override;
     };
 
     class WindowFactory
@@ -81,5 +85,7 @@ namespace OxyRender
 
         void setCursorPos(float x, float y);
         void setCursorMode(CursorMode mode);
+
+        double getTime();
     };
 } // namespace OxyRender

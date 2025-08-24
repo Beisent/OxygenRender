@@ -26,8 +26,8 @@ namespace OxyRender
             Shader modelProgram("model_shader", "shaders/model_vertex.vert", "shaders/model_fragment.frag");
 
             Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-            float deltaTime = 0.0f;
-            float lastFrame = 0.0f;
+            double deltaTime = 0.0f;
+            double lastFrame = 0.0f;
 
             bool mouseCaptured = false;
             float lastX = 0, lastY = 0;
@@ -39,7 +39,7 @@ namespace OxyRender
 
             while (!window.shouldClose())
             {
-                float currentFrame = glfwGetTime();
+                double currentFrame = window.getTime();
                 deltaTime = currentFrame - lastFrame;
                 lastFrame = currentFrame;
 

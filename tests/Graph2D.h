@@ -19,12 +19,12 @@ namespace OxyRender
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
 
-            float deltaTime = 0.0f;
-            float lastFrame = 0.0f;
+            double deltaTime = 0.0f;
+            double lastFrame = 0.0f;
             
             while (!window.shouldClose())
             {
-                float currentFrame = glfwGetTime();
+                double currentFrame = window.getTime();
                 deltaTime = currentFrame - lastFrame;
                 lastFrame = currentFrame;
                 
