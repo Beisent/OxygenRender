@@ -164,6 +164,53 @@ namespace OxyRender
         }
     }
 
+    void Graphics2D::drawEllipse(float cx, float cy, float radiusX, float radiusY,
+                                 OxyColor color, int segments)
+    {
+        if (segments < 3)
+            segments = 3;
+
+        unsigned int startIndex = (unsigned int)m_triVertices.size();
+        m_triVertices.push_back({{cx, cy, 0.0f}, color}); // 椭圆中心
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
+            float x = cx + cos(angle) * radiusX;
+            float y = cy + sin(angle) * radiusY;
+            m_triVertices.push_back({{x, y, 0.0f}, color});
+        }
+
+        for (int i = 1; i <= segments; i++)
+        {
+            m_triIndices.push_back(startIndex);
+            m_triIndices.push_back(startIndex + i);
+            m_triIndices.push_back(startIndex + i + 1);
+            m_triIndexCount += 3;
+        }
+    }
+
+    void Graphics2D::drawEllipseOutline(float cx, float cy, float radiusX, float radiusY,
+                                        OxyColor color, int segments, float thickness)
+    {
+        if (segments < 3)
+            segments = 3;
+
+        float prevX = cx + radiusX;
+        float prevY = cy;
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
+            float x = cx + cos(angle) * radiusX;
+            float y = cy + sin(angle) * radiusY;
+
+            drawLine(prevX, prevY, x, y, color, thickness);
+
+            prevX = x;
+            prevY = y;
+        }
+    }
+
     void Graphics2D::drawPolygon(const std::vector<glm::vec2> &points, OxyColor color)
     {
         if (points.size() < 3)
@@ -259,7 +306,7 @@ namespace OxyRender
         if (m_triIndexCount == 0 && m_lineBatches.empty())
             return;
 
-        glEnable(GL_MULTISAMPLE);
+        m_renderer.setCapability(RenderCapability::Multisample, true);
         m_renderer.setCapability(RenderCapability::Blend, true);
         m_renderer.setCapability(RenderCapability::DepthTest, false);
         m_renderer.setCapability(RenderCapability::StencilTest, false);
@@ -299,4 +346,34 @@ namespace OxyRender
         m_triIndexCount = 0;
         m_lineBatches.clear();
     }
+    // void Graphics2D::beginMask(const std::vector<glm::vec2> &maskPolygon)
+    // {
+    //     bool wasDepthTestEnabled = false;
+
+    //     m_renderer.setCapability(RenderCapability::Blend, false);
+    //     m_renderer.setCapability(RenderCapability::StencilTest, true);
+
+    //     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+    //     m_renderer.setStencilFunc(StencilFunc::Always, 1, 0xFF);
+    //     m_renderer.setStencilOp(StencilOp::Replace, StencilOp::Replace, StencilOp::Replace);
+    //     m_renderer.setStencilMask(0xFF);
+    //     m_renderer.clearStencil();
+
+    //     drawPolygon(maskPolygon, {0, 0, 0, 0});
+    //     flush();
+
+    //     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    //     m_renderer.setStencilFunc(StencilFunc::Equal, 1, 0xFF);
+    //     m_renderer.setStencilMask(0x00);
+    // }
+
+    // void Graphics2D::endMask()
+    // {
+    //     // 重置模板测试
+    //     m_renderer.setCapability(RenderCapability::StencilTest, false);
+    //     // 恢复颜色遮罩
+    //     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    // }
+
 }

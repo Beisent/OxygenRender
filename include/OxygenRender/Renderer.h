@@ -11,13 +11,38 @@ namespace OxyRender
         DepthTest,
         Blend,
         CullFace,
-        StencilTest
+        StencilTest,
+        Multisample,
+        ColorMask
     };
     enum class RenderPolygonMode
     {
         Fill,
         Line,
         Point
+    };
+    enum class StencilFunc
+    {
+        Always,
+        Equal,
+        Notequal,
+        Less,
+        Lequal,
+        Greater,
+        Gequal,
+        Never
+    };
+
+    enum class StencilOp
+    {
+        Keep,
+        Zero,
+        Replace,
+        Incr,
+        IncrWrap,
+        Decr,
+        DecrWrap,
+        Invert
     };
     class IRenderer
     {
@@ -30,6 +55,12 @@ namespace OxyRender
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) = 0;
         // virtual void drawArray(const VertexArray &vao, size_t vertexCount) = 0;
         virtual void clear() = 0;
+
+        // virtual void setStencilFunc(StencilFunc func, GLint ref, GLuint mask) = 0;
+        // virtual void setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass) = 0;
+
+        // virtual void setStencilMask(GLuint mask) = 0;
+        // virtual void clearStencil() = 0;
         inline void setClearColor(const OxyColor &color) { m_clear_color = color; }
 
     protected:
@@ -47,6 +78,16 @@ namespace OxyRender
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) override;
         // virtual void drawArray(const VertexArray &vao, size_t vertexCount) override;
         void clear() override;
+
+        // void setStencilFunc(StencilFunc func, GLint ref, GLuint mask) override;
+        // void setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass) override;
+
+        // virtual void setStencilMask(GLuint mask) override;
+        // virtual void clearStencil() override;
+
+    private:
+        GLenum convertStencilFunc(StencilFunc func);
+        GLenum convertStencilOp(StencilOp op);
     };
 
     class RendererFactory
@@ -79,5 +120,10 @@ namespace OxyRender
         // void drawArray(const VertexArray &vao, size_t vertexCount);
         void setClearColor(const OxyColor &color);
         void clear();
+
+        // void setStencilFunc(StencilFunc func, GLint ref, GLuint mask);
+        // void setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass);
+        // void setStencilMask(GLuint mask);
+        // void clearStencil();
     };
 } // namespace OxyRender

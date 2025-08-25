@@ -41,6 +41,9 @@ namespace OxyRender
         case RenderCapability::StencilTest:
             glCap = GL_STENCIL_TEST;
             break;
+        case RenderCapability::Multisample:
+            glCap = GL_MULTISAMPLE;
+            break;
         }
 
         if (enable)
@@ -63,6 +66,76 @@ namespace OxyRender
             glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         }
     }
+
+    // GLenum OpenGLRenderer::convertStencilFunc(StencilFunc func)
+    // {
+    //     switch (func)
+    //     {
+    //     case StencilFunc::Always:
+    //         return GL_ALWAYS;
+    //     case StencilFunc::Equal:
+    //         return GL_EQUAL;
+    //     case StencilFunc::Notequal:
+    //         return GL_NOTEQUAL;
+    //     case StencilFunc::Less:
+    //         return GL_LESS;
+    //     case StencilFunc::Lequal:
+    //         return GL_LEQUAL;
+    //     case StencilFunc::Greater:
+    //         return GL_GREATER;
+    //     case StencilFunc::Gequal:
+    //         return GL_GEQUAL;
+    //     case StencilFunc::Never:
+    //         return GL_NEVER;
+    //     default:
+    //         return GL_ALWAYS;
+    //     }
+    // }
+
+    // GLenum OpenGLRenderer::convertStencilOp(StencilOp op)
+    // {
+    //     switch (op)
+    //     {
+    //     case StencilOp::Keep:
+    //         return GL_KEEP;
+    //     case StencilOp::Zero:
+    //         return GL_ZERO;
+    //     case StencilOp::Replace:
+    //         return GL_REPLACE;
+    //     case StencilOp::Incr:
+    //         return GL_INCR;
+    //     case StencilOp::IncrWrap:
+    //         return GL_INCR_WRAP;
+    //     case StencilOp::Decr:
+    //         return GL_DECR;
+    //     case StencilOp::DecrWrap:
+    //         return GL_DECR_WRAP;
+    //     case StencilOp::Invert:
+    //         return GL_INVERT;
+    //     default:
+    //         return GL_KEEP;
+    //     }
+    // }
+
+    // void OpenGLRenderer::setStencilFunc(StencilFunc func, GLint ref, GLuint mask)
+    // {
+    //     glStencilFunc(convertStencilFunc(func), ref, mask);
+    // }
+
+    // void OpenGLRenderer::setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass)
+    // {
+    //     glStencilOp(convertStencilOp(sfail), convertStencilOp(dpfail), convertStencilOp(dppass));
+    // }
+
+    // void OpenGLRenderer::setStencilMask(GLuint mask)
+    // {
+    //     glStencilMask(mask);
+    // }
+
+    // void OpenGLRenderer::clearStencil()
+    // {
+    //     glClear(GL_STENCIL_BUFFER_BIT);
+    // }
     Renderer::Renderer(Window &window) : m_Window(window)
     {
         switch (Backends::OXYG_CurrentBackend)
@@ -104,6 +177,28 @@ namespace OxyRender
     }
     void Renderer::setClearColor(const OxyColor &color)
     {
-        renderer->setClearColor(color);
+        if (renderer)
+            renderer->setClearColor(color);
     }
+    // void Renderer::setStencilFunc(StencilFunc func, GLint ref, GLuint mask)
+    // {
+    //     if (renderer)
+    //         renderer->setStencilFunc(func, ref, mask);
+    // }
+
+    // void Renderer::setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass)
+    // {
+    //     if (renderer)
+    //         renderer->setStencilOp(sfail, dpfail, dppass);
+    // }
+    // void Renderer::setStencilMask(GLuint mask)
+    // {
+    //     if (renderer)
+    //         renderer->setStencilMask(mask);
+    // }
+    // void Renderer::clearStencil()
+    // {
+    //     if (renderer)
+    //         renderer->clearStencil();
+    // }
 } // namespace OxyRender

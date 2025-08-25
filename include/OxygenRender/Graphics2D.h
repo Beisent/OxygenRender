@@ -26,6 +26,11 @@ namespace OxyRender
 
         void drawCircle(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
         void drawCircleOutline(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
+        void drawEllipse(float cx, float cy, float radiusX, float radiusY,
+                         OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
+        void drawEllipseOutline(float cx, float cy, float radiusX, float radiusY,
+                                OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
+
         void drawPolygon(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
         void drawPolygonOutline(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
@@ -39,7 +44,11 @@ namespace OxyRender
                       float thickness = 1.0f,
                       float gridSpacing = 50.0f,
                       bool drawGrid = true);
+
         void flush();
+
+        // void beginMask(const std::vector<glm::vec2> &maskPolygon);
+        // void endMask();
 
     private:
         struct Vertex
