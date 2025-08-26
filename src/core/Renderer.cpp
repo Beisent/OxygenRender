@@ -24,6 +24,12 @@ namespace OxyRender
         glDrawElements(GL_LINES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
         vao.unbind();
     }
+    void OpenGLRenderer::drawPoints(const VertexArray &vao, size_t vertexCount)
+    {
+        vao.bind();
+        glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(vertexCount));
+        vao.unbind();
+    }
     void OpenGLRenderer::setCapability(RenderCapability cap, bool enable)
     {
         GLenum glCap = 0;
@@ -43,6 +49,9 @@ namespace OxyRender
             break;
         case RenderCapability::Multisample:
             glCap = GL_MULTISAMPLE;
+            break;
+        case RenderCapability::ProgramPointSize:
+            glCap = GL_PROGRAM_POINT_SIZE;
             break;
         }
 
@@ -165,6 +174,11 @@ namespace OxyRender
         if (renderer)
             renderer->drawLines(vao, indexCount, thickness);
     }
+    void Renderer::drawPoints(const VertexArray &vao, size_t vertexCount)
+    {
+        if (renderer)
+            renderer->drawPoints(vao, vertexCount);
+    }
     void Renderer::setCapability(RenderCapability cap, bool enable)
     {
         if (renderer)
@@ -180,6 +194,7 @@ namespace OxyRender
         if (renderer)
             renderer->setClearColor(color);
     }
+
     // void Renderer::setStencilFunc(StencilFunc func, GLint ref, GLuint mask)
     // {
     //     if (renderer)

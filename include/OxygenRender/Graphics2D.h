@@ -31,6 +31,7 @@ namespace OxyRender
         void drawEllipseOutline(float cx, float cy, float radiusX, float radiusY,
                                 OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
 
+        void drawPoints(const std::vector<glm::vec2> &points, float size, const OxyColor &color);
         void drawPolygon(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
         void drawPolygonOutline(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
@@ -65,6 +66,12 @@ namespace OxyRender
             size_t indexCount = 0;
         };
 
+        struct PointBatch
+        {
+            float size;
+            OxyColor color;
+            std::vector<Vertex> vertices;
+        };
         Window &m_window;
         Renderer &m_renderer;
         Camera m_camera;
@@ -81,5 +88,8 @@ namespace OxyRender
 
         // 线段批次
         std::vector<LineBatch> m_lineBatches;
+
+        // 点批次
+        std::vector<PointBatch> m_pointBatches;
     };
 }

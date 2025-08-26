@@ -44,6 +44,7 @@ namespace OxyRender
         m_triIndexCount = 0;
 
         m_lineBatches.clear();
+        m_pointBatches.clear();
     }
 
     void Graphics2D::drawRect(float x, float y, float width, float height, OxyColor color)
@@ -124,7 +125,7 @@ namespace OxyRender
             segments = 3;
 
         unsigned int startIndex = (unsigned int)m_triVertices.size();
-        // 圆心
+        
         m_triVertices.push_back({{cx, cy, 0.0f}, color});
 
         for (int i = 0; i <= segments; i++)
@@ -171,7 +172,7 @@ namespace OxyRender
             segments = 3;
 
         unsigned int startIndex = (unsigned int)m_triVertices.size();
-        m_triVertices.push_back({{cx, cy, 0.0f}, color}); // 椭圆中心
+        m_triVertices.push_back({{cx, cy, 0.0f}, color});
 
         for (int i = 0; i <= segments; i++)
         {
@@ -208,6 +209,35 @@ namespace OxyRender
 
             prevX = x;
             prevY = y;
+        }
+    }
+
+    void Graphics2D::drawPoints(const std::vector<glm::vec2> &points, float size, const OxyColor &color)
+    {
+        if (points.empty())
+            return;
+
+        PointBatch *batch = nullptr;
+        for (auto &b : m_pointBatches)
+        {
+            if (std::fabs(b.size - size) < 0.001f &&
+                b.color.r == color.r && b.color.g == color.g &&
+                b.color.b == color.b && b.color.a == color.a)
+            {
+                batch = &b;
+                break;
+            }
+        }
+        if (!batch)
+        {
+            m_pointBatches.push_back(PointBatch{size, color});
+            batch = &m_pointBatches.back();
+        }
+
+        batch->vertices.reserve(batch->vertices.size() + points.size());
+        for (const auto &p : points)
+        {
+            batch->vertices.push_back({glm::vec3(p.x, p.y, 0.0f), color});
         }
     }
 
@@ -284,6 +314,7 @@ namespace OxyRender
         glm::vec2 bottomLeft = unproject(-1, -1);
         glm::vec2 topRight = unproject(1, 1);
 
+        // 渲染网格
         if (drawGrid && gridSpacing > 0.0f)
         {
             float yStart = std::floor(bottomLeft.y / gridSpacing) * gridSpacing;
@@ -297,6 +328,7 @@ namespace OxyRender
                 drawLine(x, bottomLeft.y, x, topRight.y, gridColor, 1.0f);
             }
         }
+        // 渲染坐标轴
         drawArrow(bottomLeft.x, 0, topRight.x, 0, axisColor, thickness);
         drawArrow(0, bottomLeft.y, 0, topRight.y, axisColor, thickness);
     }
@@ -324,6 +356,7 @@ namespace OxyRender
 
         m_vao.bind();
 
+        // 线绘制
         for (auto &batch : m_lineBatches)
         {
             if (batch.indexCount == 0)
@@ -334,6 +367,7 @@ namespace OxyRender
             m_renderer.drawLines(m_vao, batch.indexCount, batch.thickness);
         }
 
+        // 三角形绘制
         if (m_triIndexCount > 0)
         {
             m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
@@ -341,10 +375,30 @@ namespace OxyRender
             m_renderer.drawTriangles(m_vao, m_triIndexCount);
         }
 
+        // 点绘制
+        if (!m_pointBatches.empty())
+        {
+            m_renderer.setCapability(RenderCapability::ProgramPointSize, true);
+
+            for (auto &pb : m_pointBatches)
+            {
+                if (pb.vertices.empty())
+                    continue;
+
+                m_vbo.setData(pb.vertices.data(), pb.vertices.size() * sizeof(Vertex));
+
+                float size = pb.size;
+                m_shader.setUniformData("uPointSize", &size, sizeof(float));
+                m_renderer.drawPoints(m_vao, static_cast<uint32_t>(pb.vertices.size()));
+            }
+
+            m_renderer.setCapability(RenderCapability::ProgramPointSize, false);
+        }
         m_vao.unbind();
 
         m_triIndexCount = 0;
         m_lineBatches.clear();
+        m_pointBatches.clear();
     }
     // void Graphics2D::beginMask(const std::vector<glm::vec2> &maskPolygon)
     // {

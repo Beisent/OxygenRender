@@ -13,7 +13,8 @@ namespace OxyRender
         CullFace,
         StencilTest,
         Multisample,
-        ColorMask
+        ColorMask,
+        ProgramPointSize
     };
     enum class RenderPolygonMode
     {
@@ -53,6 +54,7 @@ namespace OxyRender
         virtual void setPolygonMode(RenderPolygonMode mod, bool enable) = 0;
         virtual void drawTriangles(const VertexArray &vao, size_t indexCount) = 0;
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) = 0;
+        virtual void drawPoints(const VertexArray &vao, size_t vertexCount) = 0;
         // virtual void drawArray(const VertexArray &vao, size_t vertexCount) = 0;
         virtual void clear() = 0;
 
@@ -76,6 +78,7 @@ namespace OxyRender
         virtual void setPolygonMode(RenderPolygonMode mod, bool enable) override;
         virtual void drawTriangles(const VertexArray &vao, size_t indexCount) override;
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) override;
+        virtual void drawPoints(const VertexArray &vao, size_t vertexCount) override;
         // virtual void drawArray(const VertexArray &vao, size_t vertexCount) override;
         void clear() override;
 
@@ -117,6 +120,7 @@ namespace OxyRender
         void setPolygonMode(RenderPolygonMode mod, bool enable);
         void drawTriangles(const VertexArray &vao, size_t indexCount);
         void drawLines(const VertexArray &vao, size_t indexCount, float thickness);
+        void drawPoints(const VertexArray &vao, size_t vertexCount);
         // void drawArray(const VertexArray &vao, size_t vertexCount);
         void setClearColor(const OxyColor &color);
         void clear();

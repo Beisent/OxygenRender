@@ -8,6 +8,7 @@ out vec2 vLocalPos;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float uPointSize;
 
 void main()
 {
@@ -15,4 +16,5 @@ void main()
 
     vColor = aColor;
     vLocalPos = aPos.xy;   
+    gl_PointSize = uPointSize;
 }
