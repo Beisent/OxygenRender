@@ -46,6 +46,26 @@ namespace OxyRender
                       float gridSpacing = 50.0f,
                       bool drawGrid = true);
 
+        void drawBezier(float x0, float y0,
+                        float cx, float cy,
+                        float x1, float y1,
+                        OxyColor color,
+                        float thickness = 1.0f,
+                        int segments = 32);
+
+        void drawBezier(float x0, float y0,
+                        float c1x, float c1y,
+                        float c2x, float c2y,
+                        float x1, float y1,
+                        OxyColor color,
+                        float thickness = 1.0f,
+                        int segments = 32);
+
+        void drawBezier(const std::vector<glm::vec2> &ctrlPoints,
+                        OxyColor color,
+                        float thickness = 1.0f,
+                        int segments = 32);
+
         void flush();
 
         // void beginMask(const std::vector<glm::vec2> &maskPolygon);

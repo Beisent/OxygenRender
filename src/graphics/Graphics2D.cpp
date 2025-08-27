@@ -125,7 +125,7 @@ namespace OxyRender
             segments = 3;
 
         unsigned int startIndex = (unsigned int)m_triVertices.size();
-        
+
         m_triVertices.push_back({{cx, cy, 0.0f}, color});
 
         for (int i = 0; i <= segments; i++)
@@ -331,6 +331,76 @@ namespace OxyRender
         // 渲染坐标轴
         drawArrow(bottomLeft.x, 0, topRight.x, 0, axisColor, thickness);
         drawArrow(0, bottomLeft.y, 0, topRight.y, axisColor, thickness);
+    }
+    void Graphics2D::drawBezier(float x0, float y0,
+                                float cx, float cy,
+                                float x1, float y1,
+                                OxyColor color,
+                                float thickness,
+                                int segments)
+    {
+        if (segments < 1)
+            segments = 1;
+        glm::vec2 prev(x0, y0);
+
+        for (int i = 1; i <= segments; ++i)
+        {
+            float t = static_cast<float>(i) / static_cast<float>(segments);
+            float u = 1.0f - t;
+            glm::vec2 pt = u * u * glm::vec2(x0, y0) + 2.0f * u * t * glm::vec2(cx, cy) + t * t * glm::vec2(x1, y1);
+
+            drawLine(prev.x, prev.y, pt.x, pt.y, color, thickness);
+            prev = pt;
+        }
+    }
+
+    void Graphics2D::drawBezier(float x0, float y0,
+                                float c1x, float c1y,
+                                float c2x, float c2y,
+                                float x1, float y1,
+                                OxyColor color,
+                                float thickness,
+                                int segments)
+    {
+        if (segments < 1)
+            segments = 1;
+        glm::vec2 prev(x0, y0);
+
+        for (int i = 1; i <= segments; ++i)
+        {
+            float t = static_cast<float>(i) / static_cast<float>(segments);
+            float u = 1.0f - t;
+
+            // B(t) = u^3 P0 + 3 u^2 t P1 + 3 u t^2 P2 + t^3 P3
+            glm::vec2 pt = (u * u * u) * glm::vec2(x0, y0) + 3.0f * (u * u) * t * glm::vec2(c1x, c1y) + 3.0f * u * (t * t) * glm::vec2(c2x, c2y) + (t * t * t) * glm::vec2(x1, y1);
+
+            drawLine(prev.x, prev.y, pt.x, pt.y, color, thickness);
+            prev = pt;
+        }
+    }
+
+    void Graphics2D::drawBezier(const std::vector<glm::vec2> &ctrlPoints,
+                                OxyColor color,
+                                float thickness,
+                                int segments)
+    {
+        if (ctrlPoints.size() == 3)
+        {
+            drawBezier(
+                ctrlPoints[0].x, ctrlPoints[0].y,
+                ctrlPoints[1].x, ctrlPoints[1].y,
+                ctrlPoints[2].x, ctrlPoints[2].y,
+                color, thickness, segments);
+        }
+        else if (ctrlPoints.size() == 4)
+        {
+            drawBezier(
+                ctrlPoints[0].x, ctrlPoints[0].y,
+                ctrlPoints[1].x, ctrlPoints[1].y,
+                ctrlPoints[2].x, ctrlPoints[2].y,
+                ctrlPoints[3].x, ctrlPoints[3].y,
+                color, thickness, segments);
+        }
     }
 
     void Graphics2D::flush()
