@@ -2,6 +2,41 @@
 #include <glad/glad.h>
 namespace OxyRender
 {
+    GLenum toGLBlendFunc(RenderBlendFunc func)
+    {
+        switch (func)
+        {
+        case RenderBlendFunc::Zero:
+            return GL_ZERO;
+        case RenderBlendFunc::One:
+            return GL_ONE;
+        case RenderBlendFunc::SrcColor:
+            return GL_SRC_COLOR;
+        case RenderBlendFunc::OneMinusSrcColor:
+            return GL_ONE_MINUS_SRC_COLOR;
+        case RenderBlendFunc::DstColor:
+            return GL_DST_COLOR;
+        case RenderBlendFunc::OneMinusDstColor:
+            return GL_ONE_MINUS_DST_COLOR;
+        case RenderBlendFunc::SrcAlpha:
+            return GL_SRC_ALPHA;
+        case RenderBlendFunc::OneMinusSrcAlpha:
+            return GL_ONE_MINUS_SRC_ALPHA;
+        case RenderBlendFunc::DstAlpha:
+            return GL_DST_ALPHA;
+        case RenderBlendFunc::OneMinusDstAlpha:
+            return GL_ONE_MINUS_DST_ALPHA;
+        case RenderBlendFunc::ConstantColor:
+            return GL_CONSTANT_COLOR;
+        case RenderBlendFunc::OneMinusConstantColor:
+            return GL_ONE_MINUS_CONSTANT_COLOR;
+        case RenderBlendFunc::ConstantAlpha:
+            return GL_CONSTANT_ALPHA;
+        case RenderBlendFunc::OneMinusConstantAlpha:
+            return GL_ONE_MINUS_CONSTANT_ALPHA;
+        }
+        return GL_ONE;
+    }
     OpenGLRenderer::OpenGLRenderer()
     {
     }
@@ -74,6 +109,10 @@ namespace OxyRender
         case RenderPolygonMode::Point:
             glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         }
+    }
+    void OpenGLRenderer::setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor)
+    {
+        glBlendFunc(toGLBlendFunc(sfactor), toGLBlendFunc(dfactor));
     }
 
     // GLenum OpenGLRenderer::convertStencilFunc(StencilFunc func)
@@ -188,6 +227,11 @@ namespace OxyRender
     {
         if (renderer)
             renderer->setPolygonMode(mod, enable);
+    }
+    void Renderer::setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor)
+    {
+        if (renderer)
+            renderer->setBlendFunc(sfactor, dfactor);
     }
     void Renderer::setClearColor(const OxyColor &color)
     {

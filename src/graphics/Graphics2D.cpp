@@ -19,8 +19,9 @@ namespace OxyRender
         m_vao.setIndexBuffer(m_ebo);
 
         // 初始化渲染
-        m_renderer.setCapability(RenderCapability::Blend, false);
         m_renderer.setCapability(RenderCapability::DepthTest, true);
+        m_renderer.setCapability(RenderCapability::Blend, true);
+        m_renderer.setBlendFunc(RenderBlendFunc::SrcAlpha, RenderBlendFunc::OneMinusSrcAlpha);
 
         // 初始化相机
         m_camera.setZoom(1.0);
@@ -291,19 +292,19 @@ namespace OxyRender
         drawTriangle(v0.x, v0.y, v1.x, v1.y, v2.x, v2.y, color);
     }
 
-    void Graphics2D::drawAxis(const Camera &camera,
-                              float windowWidth, float windowHeight,
-                              OxyColor axisColor,
+    void Graphics2D::drawAxis(OxyColor axisColor,
                               OxyColor gridColor,
                               float thickness,
                               float gridSpacing,
                               bool drawGrid)
     {
-        glm::mat4 proj = camera.get2DOrthoProjectionMatrix(windowWidth, windowHeight);
-        glm::mat4 view = camera.get2DOrthoViewMatrix();
+        // 投影和视图矩阵
+        glm::mat4 proj = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
         glm::mat4 vp = proj * view;
         glm::mat4 invVP = glm::inverse(vp);
 
+        // 将 NDC 转换为屏幕坐标
         auto unproject = [&](float ndcX, float ndcY)
         {
             glm::vec4 p(ndcX, ndcY, 0.0f, 1.0f);
@@ -332,12 +333,10 @@ namespace OxyRender
         drawArrow(bottomLeft.x, 0, topRight.x, 0, axisColor, thickness);
         drawArrow(0, bottomLeft.y, 0, topRight.y, axisColor, thickness);
     }
-    void Graphics2D::drawBezier(float x0, float y0,
-                                float cx, float cy,
-                                float x1, float y1,
-                                OxyColor color,
-                                float thickness,
-                                int segments)
+
+    //二次贝塞尔曲线
+    void Graphics2D::drawBezier(float x0, float y0, float cx, float cy, float x1,
+                                float y1, OxyColor color, float thickness, int segments)
     {
         if (segments < 1)
             segments = 1;
@@ -354,13 +353,9 @@ namespace OxyRender
         }
     }
 
-    void Graphics2D::drawBezier(float x0, float y0,
-                                float c1x, float c1y,
-                                float c2x, float c2y,
-                                float x1, float y1,
-                                OxyColor color,
-                                float thickness,
-                                int segments)
+     //三次贝塞尔曲线
+    void Graphics2D::drawBezier(float x0, float y0, float c1x, float c1y, float c2x, float c2y,
+                                float x1, float y1, OxyColor color, float thickness, int segments)
     {
         if (segments < 1)
             segments = 1;
@@ -380,9 +375,7 @@ namespace OxyRender
     }
 
     void Graphics2D::drawBezier(const std::vector<glm::vec2> &ctrlPoints,
-                                OxyColor color,
-                                float thickness,
-                                int segments)
+                                OxyColor color, float thickness, int segments)
     {
         if (ctrlPoints.size() == 3)
         {

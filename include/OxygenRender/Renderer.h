@@ -6,6 +6,7 @@
 #include <memory>
 namespace OxyRender
 {
+
     enum class RenderCapability
     {
         DepthTest,
@@ -16,6 +17,25 @@ namespace OxyRender
         ColorMask,
         ProgramPointSize
     };
+    enum class RenderBlendFunc
+    {
+        Zero,
+        One,
+        SrcColor,
+        OneMinusSrcColor,
+        DstColor,
+        OneMinusDstColor,
+        SrcAlpha,
+        OneMinusSrcAlpha,
+        DstAlpha,
+        OneMinusDstAlpha,
+        ConstantColor,
+        OneMinusConstantColor,
+        ConstantAlpha,
+        OneMinusConstantAlpha
+    };
+
+
     enum class RenderPolygonMode
     {
         Fill,
@@ -55,8 +75,8 @@ namespace OxyRender
         virtual void drawTriangles(const VertexArray &vao, size_t indexCount) = 0;
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) = 0;
         virtual void drawPoints(const VertexArray &vao, size_t vertexCount) = 0;
-        // virtual void drawArray(const VertexArray &vao, size_t vertexCount) = 0;
         virtual void clear() = 0;
+        virtual void setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor) = 0;
 
         // virtual void setStencilFunc(StencilFunc func, GLint ref, GLuint mask) = 0;
         // virtual void setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass) = 0;
@@ -79,7 +99,8 @@ namespace OxyRender
         virtual void drawTriangles(const VertexArray &vao, size_t indexCount) override;
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) override;
         virtual void drawPoints(const VertexArray &vao, size_t vertexCount) override;
-        // virtual void drawArray(const VertexArray &vao, size_t vertexCount) override;
+        void setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor);
+
         void clear() override;
 
         // void setStencilFunc(StencilFunc func, GLint ref, GLuint mask) override;
@@ -118,10 +139,10 @@ namespace OxyRender
         explicit Renderer(Window &window);
         void setCapability(RenderCapability cap, bool enable);
         void setPolygonMode(RenderPolygonMode mod, bool enable);
+        void setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor);
         void drawTriangles(const VertexArray &vao, size_t indexCount);
         void drawLines(const VertexArray &vao, size_t indexCount, float thickness);
         void drawPoints(const VertexArray &vao, size_t vertexCount);
-        // void drawArray(const VertexArray &vao, size_t vertexCount);
         void setClearColor(const OxyColor &color);
         void clear();
 

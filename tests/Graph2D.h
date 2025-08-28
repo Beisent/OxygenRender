@@ -14,7 +14,6 @@ namespace OxyRender
         {
             Window window(800, 600, "OxygenRender");
             Renderer renderer(window);
-
             Graphics2D graphics2D(window, renderer);
 
             graphics2D.setClearColor({1.0f, 1.0f, 1.0f, 1.0f});
@@ -67,16 +66,15 @@ namespace OxyRender
                 graphics2D.clear();
                 graphics2D.begin();
 
-                graphics2D.drawAxis(camera, window.getWidth(), window.getHeight(),
-                                    {1, 0, 0, 1}, {0.8f, 0.8f, 0.8f, 1},
+                graphics2D.drawAxis({1, 0, 0, 1}, {0.8f, 0.8f, 0.8f, 1},
                                     2.0f, 50.0f, true);
                 graphics2D.flush();
 
                 graphics2D.begin();
-                graphics2D.drawCircle(-350, 250, 50, {1, 0, 0, 1});
+                graphics2D.drawCircle(-350, 250, 50, {1, 0, 0, 0.5f});
                 graphics2D.drawCircleOutline(-250, 250, 50, {0, 1, 0, 1}, 64, 2);
 
-                graphics2D.drawEllipse(100, 200, 80, 50, {0.5f, 0, 0.5f, 1});
+                graphics2D.drawEllipse(100, 200, 80, 50, {0.5f, 0, 0.5f, 0.5f});
                 graphics2D.drawEllipseOutline(250, 200, 80, 50, {0, 0.5f, 0.5f, 1}, 64, 2);
 
                 std::vector<glm::vec2> pts = {
@@ -88,9 +86,7 @@ namespace OxyRender
                 graphics2D.drawArrow(100, 300, 200, 200, {1, 0, 0, 1}, 2.0f, 10.0f, 10.0f);
 
                 graphics2D.drawBezier(10, 10, 150, 10, 200, 200, {1, 0, 0, 1}, 2.0f, 48);
-
                 graphics2D.drawBezier(10, 10, 100, 200, 200, -50, 300, 100, {0, 1, 0, 1}, 2.0f, 64);
-
                 std::vector<glm::vec2> ctrl = {{10, 10}, {100, 200}, {200, -50}, {300, 200}};
                 graphics2D.drawBezier(ctrl, {0, 0, 1, 1}, 1.5f, 64);
 

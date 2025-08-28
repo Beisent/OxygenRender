@@ -38,9 +38,7 @@ namespace OxyRender
         void drawArrow(float x1, float y1, float x2, float y2,
                        OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, float thickness = 1.0, float headLength = 15.0f, float headWidth = 15.0f);
 
-        void drawAxis(const Camera &camera,
-                      float windowWidth, float windowHeight,
-                      OxyColor axisColor = {1.0f, 0.0f, 0.0f, 1.0f},
+        void drawAxis(OxyColor axisColor = {1.0f, 0.0f, 0.0f, 1.0f},
                       OxyColor gridColor = {0.8f, 0.8f, 0.8f, 1.0f},
                       float thickness = 1.0f,
                       float gridSpacing = 50.0f,
