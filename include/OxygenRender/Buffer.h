@@ -25,6 +25,18 @@ namespace OxyRender
         StreamDraw
     };
 
+    enum class VertexAttribType
+    {
+        Float1,
+        Float2,
+        Float3,
+        Float4,
+        Int1,
+        Int2,
+        Int3,
+        Int4
+    };
+
     class IBuffer
     {
     public:
@@ -50,43 +62,6 @@ namespace OxyRender
         virtual void setIndexBuffer(IndexBuffer *indexBuffer) = 0;
         virtual IndexBuffer *getIndexBuffer() const noexcept = 0;
     };
-
-    enum class VertexAttribType
-    {
-        Float1,
-        Float2,
-        Float3,
-        Float4,
-        Int1,
-        Int2,
-        Int3,
-        Int4
-    };
-
-    constexpr size_t sizeOfAttribType(VertexAttribType type) noexcept
-    {
-        switch (type)
-        {
-        case VertexAttribType::Float1:
-            return sizeof(float) * 1;
-        case VertexAttribType::Float2:
-            return sizeof(float) * 2;
-        case VertexAttribType::Float3:
-            return sizeof(float) * 3;
-        case VertexAttribType::Float4:
-            return sizeof(float) * 4;
-        case VertexAttribType::Int1:
-            return sizeof(int) * 1;
-        case VertexAttribType::Int2:
-            return sizeof(int) * 2;
-        case VertexAttribType::Int3:
-            return sizeof(int) * 3;
-        case VertexAttribType::Int4:
-            return sizeof(int) * 4;
-        default:
-            return 0;
-        }
-    }
 
     struct VertexAttribute
     {

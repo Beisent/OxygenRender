@@ -1,0 +1,311 @@
+#include "OxygenRender/Graphics3D.h"
+
+namespace OxyRender
+{
+    Graphics3D::Graphics3D(Window &window, Renderer &renderer)
+        : m_window(window),
+          m_renderer(renderer),
+          m_camera(glm::vec3(0.0f, 1.5f, 5.0f)),
+          m_shader("default3D", "shaders/graphics3d/vertex.vert", "shaders/graphics3d/fragment.frag"),
+          m_vbo(BufferType::Vertex, BufferUsage::DynamicDraw),
+          m_ebo(BufferType::Index, BufferUsage::DynamicDraw)
+    {
+        // 顶点布局
+        VertexLayout layout;
+        layout.addAttribute("aPos", 0, VertexAttribType::Float3);
+        layout.addAttribute("aColor", 1, VertexAttribType::Float4);
+        layout.addAttribute("aNormal", 2, VertexAttribType::Float3);
+
+        m_vao.setVertexBuffer(m_vbo, layout);
+        m_vao.setIndexBuffer(m_ebo);
+
+        m_renderer.setCapability(RenderCapability::DepthTest, true);
+        m_renderer.setCapability(RenderCapability::Blend, true);
+        m_renderer.setBlendFunc(RenderBlendFunc::SrcAlpha, RenderBlendFunc::OneMinusSrcAlpha);
+
+        // 默认相机参数
+        m_camera.setZoom(45.0f);
+    }
+
+    Camera &Graphics3D::getCamera()
+    {
+        return m_camera;
+    }
+
+    void Graphics3D::clear()
+    {
+        m_renderer.clear();
+    }
+
+    void Graphics3D::setClearColor(const OxyColor &color)
+    {
+        m_renderer.setClearColor(color);
+    }
+
+    void Graphics3D::begin()
+    {
+        m_triVertices.clear();
+        m_triIndices.clear();
+        m_triIndexCount = 0;
+
+        m_lineBatches.clear();
+        m_pointBatches.clear();
+    }
+
+    void Graphics3D::drawTriangle(const glm::vec3 &p1,
+                                  const glm::vec3 &p2,
+                                  const glm::vec3 &p3,
+                                  OxyColor color)
+    {
+
+        glm::vec3 n = glm::normalize(glm::cross(p2 - p1, p3 - p1));
+        unsigned int start = (unsigned int)m_triVertices.size();
+        m_triVertices.push_back({p1, color, n});
+        m_triVertices.push_back({p2, color, n});
+        m_triVertices.push_back({p3, color, n});
+
+        m_triIndices.push_back(start + 0);
+        m_triIndices.push_back(start + 1);
+        m_triIndices.push_back(start + 2);
+        m_triIndexCount += 3;
+    }
+
+    void Graphics3D::drawLine(const glm::vec3 &p1,
+                              const glm::vec3 &p2,
+                              OxyColor color,
+                              float thickness)
+    {
+        LineBatch *batch = nullptr;
+        for (auto &b : m_lineBatches)
+        {
+            if (std::fabs(b.thickness - thickness) < 0.001f)
+            {
+                batch = &b;
+                break;
+            }
+        }
+        if (!batch)
+        {
+            m_lineBatches.push_back(LineBatch{thickness});
+            batch = &m_lineBatches.back();
+        }
+
+        unsigned int start = (unsigned int)batch->vertices.size();
+
+        batch->vertices.push_back({p1, color, glm::vec3(0.0f)});
+        batch->vertices.push_back({p2, color, glm::vec3(0.0f)});
+        batch->indices.push_back(start + 0);
+        batch->indices.push_back(start + 1);
+        batch->indexCount += 2;
+    }
+
+    void Graphics3D::drawPoints(const std::vector<glm::vec3> &points,
+                                float size,
+                                const OxyColor &color)
+    {
+        if (points.empty())
+            return;
+
+        PointBatch *batch = nullptr;
+        for (auto &b : m_pointBatches)
+        {
+            if (std::fabs(b.size - size) < 0.001f &&
+                b.color.r == color.r && b.color.g == color.g &&
+                b.color.b == color.b && b.color.a == color.a)
+            {
+                batch = &b;
+                break;
+            }
+        }
+        if (!batch)
+        {
+            m_pointBatches.push_back(PointBatch{size, color});
+            batch = &m_pointBatches.back();
+        }
+
+        batch->vertices.reserve(batch->vertices.size() + points.size());
+        for (const auto &p : points)
+        {
+            batch->vertices.push_back({p, color, glm::vec3(0.0f)});
+        }
+    }
+
+    void Graphics3D::drawBox(const glm::vec3 &center, const glm::vec3 &size, const OxyColor &color)
+    {
+        glm::vec3 half = size * 0.5f;
+
+        glm::vec3 p[8] = {
+            center + glm::vec3(-half.x, -half.y, -half.z),
+            center + glm::vec3(half.x, -half.y, -half.z),
+            center + glm::vec3(half.x, half.y, -half.z),
+            center + glm::vec3(-half.x, half.y, -half.z),
+            center + glm::vec3(-half.x, -half.y, half.z),
+            center + glm::vec3(half.x, -half.y, half.z),
+            center + glm::vec3(half.x, half.y, half.z),
+            center + glm::vec3(-half.x, half.y, half.z)};
+
+        // 每个面 push 顶点并按当前顶点基址写索引
+        auto pushFace = [&](int i0, int i1, int i2, int i3, const glm::vec3 &normal)
+        {
+            unsigned int base = (unsigned int)m_triVertices.size();
+            m_triVertices.push_back({p[i0], color, normal});
+            m_triVertices.push_back({p[i1], color, normal});
+            m_triVertices.push_back({p[i2], color, normal});
+            m_triVertices.push_back({p[i2], color, normal});
+            m_triVertices.push_back({p[i3], color, normal});
+            m_triVertices.push_back({p[i0], color, normal});
+
+            // 对应索引
+            m_triIndices.push_back(base + 0);
+            m_triIndices.push_back(base + 1);
+            m_triIndices.push_back(base + 2);
+            m_triIndices.push_back(base + 3);
+            m_triIndices.push_back(base + 4);
+            m_triIndices.push_back(base + 5);
+            m_triIndexCount += 6;
+        };
+
+        // 六个面（法线朝外）
+        pushFace(0, 1, 2, 3, {0, 0, -1}); //  -Z
+        pushFace(4, 5, 6, 7, {0, 0, 1});  //  +Z
+        pushFace(0, 4, 7, 3, {-1, 0, 0}); //  -X
+        pushFace(1, 5, 6, 2, {1, 0, 0});  //  +X
+        pushFace(3, 2, 6, 7, {0, 1, 0});  //  +Y
+        pushFace(0, 1, 5, 4, {0, -1, 0}); //  -Y
+    }
+
+    void Graphics3D::drawSphere(const glm::vec3 &center, float radius,
+                                int stacks, int slices, const OxyColor &color)
+    {
+        if (stacks < 2)
+            stacks = 2;
+        if (slices < 3)
+            slices = 3;
+
+        for (int i = 0; i < stacks; ++i)
+        {
+            float phi1 = glm::pi<float>() * float(i) / float(stacks);
+            float phi2 = glm::pi<float>() * float(i + 1) / float(stacks);
+
+            for (int j = 0; j < slices; ++j)
+            {
+                float theta1 = glm::two_pi<float>() * float(j) / float(slices);
+                float theta2 = glm::two_pi<float>() * float(j + 1) / float(slices);
+
+                glm::vec3 p1 = center + radius * glm::vec3(
+                                                     std::sin(phi1) * std::cos(theta1),
+                                                     std::cos(phi1),
+                                                     std::sin(phi1) * std::sin(theta1));
+                glm::vec3 p2 = center + radius * glm::vec3(
+                                                     std::sin(phi2) * std::cos(theta1),
+                                                     std::cos(phi2),
+                                                     std::sin(phi2) * std::sin(theta1));
+                glm::vec3 p3 = center + radius * glm::vec3(
+                                                     std::sin(phi2) * std::cos(theta2),
+                                                     std::cos(phi2),
+                                                     std::sin(phi2) * std::sin(theta2));
+                glm::vec3 p4 = center + radius * glm::vec3(
+                                                     std::sin(phi1) * std::cos(theta2),
+                                                     std::cos(phi1),
+                                                     std::sin(phi1) * std::sin(theta2));
+
+                glm::vec3 n1 = glm::normalize(p1 - center);
+                glm::vec3 n2 = glm::normalize(p2 - center);
+                glm::vec3 n3 = glm::normalize(p3 - center);
+                glm::vec3 n4 = glm::normalize(p4 - center);
+
+                unsigned int base = (unsigned int)m_triVertices.size();
+                // 第一个三角形
+                m_triVertices.push_back({p1, color, n1});
+                m_triVertices.push_back({p2, color, n2});
+                m_triVertices.push_back({p3, color, n3});
+                m_triIndices.push_back(base + 0);
+                m_triIndices.push_back(base + 1);
+                m_triIndices.push_back(base + 2);
+                m_triIndexCount += 3;
+
+                // 第二个三角形
+                m_triVertices.push_back({p3, color, n3});
+                m_triVertices.push_back({p4, color, n4});
+                m_triVertices.push_back({p1, color, n1});
+                m_triIndices.push_back(base + 3);
+                m_triIndices.push_back(base + 4);
+                m_triIndices.push_back(base + 5);
+                m_triIndexCount += 3;
+            }
+        }
+    }
+
+    void Graphics3D::flush()
+    {
+        if (m_triIndexCount == 0 && m_lineBatches.empty() && m_pointBatches.empty())
+            return;
+
+        m_renderer.setCapability(RenderCapability::Multisample, true);
+        m_renderer.setCapability(RenderCapability::Blend, true);
+        m_renderer.setCapability(RenderCapability::DepthTest, true);
+        m_renderer.setCapability(RenderCapability::StencilTest, false);
+
+        m_shader.use();
+
+        // 3D MVP
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = m_camera.getViewMatrix();
+        glm::mat4 projection = m_camera.getPerspectiveProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+
+        m_shader.setUniformData("model", &model, sizeof(glm::mat4));
+        m_shader.setUniformData("view", &view, sizeof(glm::mat4));
+        m_shader.setUniformData("projection", &projection, sizeof(glm::mat4));
+
+        // 设置光照和相机位置
+        glm::vec3 lightPos(5.0f, 5.0f, 5.0f);
+        glm::vec3 camPos = m_camera.getPosition();
+        m_shader.setUniformData("lightPos", &lightPos, sizeof(glm::vec3));
+        m_shader.setUniformData("viewPos", &camPos, sizeof(glm::vec3));
+
+        m_vao.bind();
+
+        // 线绘制
+        for (auto &batch : m_lineBatches)
+        {
+            if (batch.indexCount == 0)
+                continue;
+            m_vbo.setData(batch.vertices.data(), batch.vertices.size() * sizeof(Vertex));
+            m_ebo.setData(batch.indices.data(), batch.indices.size() * sizeof(unsigned int));
+            m_renderer.drawLines(m_vao, batch.indexCount, batch.thickness);
+        }
+
+        // 面绘制
+        if (m_triIndexCount > 0)
+        {
+            m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
+            m_ebo.setData(m_triIndices.data(), m_triIndices.size() * sizeof(unsigned int));
+            m_renderer.drawTriangles(m_vao, m_triIndexCount);
+        }
+
+        // 点绘制
+        if (!m_pointBatches.empty())
+        {
+            m_renderer.setCapability(RenderCapability::ProgramPointSize, true);
+            for (auto &pb : m_pointBatches)
+            {
+                if (pb.vertices.empty())
+                    continue;
+                m_vbo.setData(pb.vertices.data(), pb.vertices.size() * sizeof(Vertex));
+                float size = pb.size;
+                m_shader.setUniformData("uPointSize", &size, sizeof(float));
+                m_renderer.drawPoints(m_vao, static_cast<uint32_t>(pb.vertices.size()));
+            }
+            m_renderer.setCapability(RenderCapability::ProgramPointSize, false);
+        }
+
+        m_vao.unbind();
+
+        // 清空批次
+        m_triIndexCount = 0;
+        m_triVertices.clear();
+        m_triIndices.clear();
+        m_lineBatches.clear();
+        m_pointBatches.clear();
+    }
+}
