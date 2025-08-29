@@ -4,6 +4,7 @@
 #include "OxygenRender/Renderer.h"
 #include "OxygenRender/Graphics2D.h"
 #include "OxygenRender/EventSystem.h"
+#include "OxygenRender/Time.h"
 
 namespace OxyRender
 {
@@ -20,14 +21,10 @@ namespace OxyRender
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
 
-            double deltaTime = 0.0f;
-            double lastFrame = 0.0f;
-
             while (!window.shouldClose())
             {
-                double currentFrame = window.getTime();
-                deltaTime = currentFrame - lastFrame;
-                lastFrame = currentFrame;
+                Time::update(window);
+                double dt = Time::deltaTime();
 
                 Event e;
                 while (EventSystem::pollEvent(e))
@@ -55,13 +52,13 @@ namespace OxyRender
                     }
                 }
                 if (EventSystem::isKeyDown(KeyCode::A))
-                    camera.processKeyboard(CameraMovement::LEFT, deltaTime * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::LEFT, dt * camera.getZoom());
                 if (EventSystem::isKeyDown(KeyCode::D))
-                    camera.processKeyboard(CameraMovement::RIGHT, deltaTime * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::RIGHT, dt * camera.getZoom());
                 if (EventSystem::isKeyDown(KeyCode::W))
-                    camera.processKeyboard(CameraMovement::UP, deltaTime * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::UP, dt * camera.getZoom());
                 if (EventSystem::isKeyDown(KeyCode::S))
-                    camera.processKeyboard(CameraMovement::DOWN, deltaTime * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::DOWN, dt * camera.getZoom());
 
                 graphics2D.clear();
                 graphics2D.begin();

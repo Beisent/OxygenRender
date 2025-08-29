@@ -7,6 +7,7 @@
 #include "OxygenRender/EventSystem.h"
 #include "OxygenRender/Camera.h"
 #include "OxygenRender/Model.h"
+#include "OxygenRender/Time.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -26,22 +27,16 @@ namespace OxyRender
             Shader modelProgram("model_shader", "shaders/model_vertex.vert", "shaders/model_fragment.frag");
 
             Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-            double deltaTime = 0.0f;
-            double lastFrame = 0.0f;
 
-            bool mouseCaptured = false;
-            float lastX = 0, lastY = 0;
-            bool firstMouse = true;
             window.setCursorMode(CursorMode::Disabled);
-            mouseCaptured = true;
+            bool mouseCaptured = true;
 
             Model backpackModel(renderer, "resource/objects/backpack/backpack.obj");
 
             while (!window.shouldClose())
             {
-                double currentFrame = window.getTime();
-                deltaTime = currentFrame - lastFrame;
-                lastFrame = currentFrame;
+                Time::update(window);
+                double dt = Time::deltaTime();
 
                 Event e;
                 while (EventSystem::pollEvent(e))
@@ -83,40 +78,27 @@ namespace OxyRender
                         if (mouseCaptured)
                         {
                             auto mouse = std::get<MouseMoveEvent>(e.data);
-
-                            if (firstMouse)
-                            {
-                                lastX = mouse.position.x;
-                                lastY = mouse.position.y;
-                                firstMouse = false;
-                                break;
-                            }
-
-                            float xoffset = mouse.position.x - lastX;
-                            float yoffset = lastY - mouse.position.y;
-
-                            lastX = mouse.position.x;
-                            lastY = mouse.position.y;
-
-                            camera.processMouseMovement(xoffset, yoffset);
+                            auto offset = EventSystem::handleMouseMoved(mouse);
+                            camera.processMouseMovement(offset.x, offset.y);
                         }
+                        break;
                     default:
                         break;
                     }
                 }
 
                 if (EventSystem::isKeyDown(KeyCode::W))
-                    camera.processKeyboard(CameraMovement::FORWARD, deltaTime);
+                    camera.processKeyboard(CameraMovement::FORWARD, dt);
                 if (EventSystem::isKeyDown(KeyCode::S))
-                    camera.processKeyboard(CameraMovement::BACKWARD, deltaTime);
+                    camera.processKeyboard(CameraMovement::BACKWARD, dt);
                 if (EventSystem::isKeyDown(KeyCode::A))
-                    camera.processKeyboard(CameraMovement::LEFT, deltaTime);
+                    camera.processKeyboard(CameraMovement::LEFT, dt);
                 if (EventSystem::isKeyDown(KeyCode::D))
-                    camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
+                    camera.processKeyboard(CameraMovement::RIGHT, dt);
                 if (EventSystem::isKeyDown(KeyCode::Space))
-                    camera.processKeyboard(CameraMovement::UP, deltaTime);
+                    camera.processKeyboard(CameraMovement::UP, dt);
                 if (EventSystem::isKeyDown(KeyCode::LeftShift))
-                    camera.processKeyboard(CameraMovement::DOWN, deltaTime);
+                    camera.processKeyboard(CameraMovement::DOWN, dt);
 
                 glm::mat4 view = camera.getViewMatrix();
                 glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);

@@ -70,7 +70,7 @@ namespace OxyRender
     {
         return static_cast<KeyCode>(key);
     }
-    static int keyCodetoGLFW(KeyCode k)  
+    static int keyCodetoGLFW(KeyCode k)
     {
         return static_cast<int>(k);
     }
@@ -142,6 +142,10 @@ namespace OxyRender
         static std::unordered_map<int, bool> m_keyStates;
         static std::unordered_map<int, bool> m_mouseButtonStates;
 
+        static bool m_firstMouse;
+        static float m_mouseLastX;
+        static float m_mouseLastY;
+
     public:
         static void pushEvent(const Event &e);
         static bool pollEvent(Event &e);
@@ -149,5 +153,8 @@ namespace OxyRender
 
         static bool isKeyDown(KeyCode key);
         static bool isMouseButtonDown(MouseCode button);
+
+        static glm::vec2 handleMouseMoved(const MouseMoveEvent &mouse);
+        static void resetMouse();
     };
 }

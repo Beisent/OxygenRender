@@ -5,6 +5,9 @@ namespace OxyRender
     std::queue<Event> EventSystem::m_events;
     std::unordered_map<int, bool> EventSystem::m_keyStates;
     std::unordered_map<int, bool> EventSystem::m_mouseButtonStates;
+    bool EventSystem::m_firstMouse = true;
+    float EventSystem::m_mouseLastX = 0.0f;
+    float EventSystem::m_mouseLastY = 0.0f;
 
     void EventSystem::pushEvent(const Event &e)
     {
@@ -60,5 +63,28 @@ namespace OxyRender
     {
         auto it = m_mouseButtonStates.find(mouseCodeToGLFW(button));
         return it != m_mouseButtonStates.end() && it->second;
+    }
+    glm::vec2 EventSystem::handleMouseMoved(const MouseMoveEvent &mouse)
+    {
+        if (m_firstMouse)
+        {
+            m_mouseLastX = mouse.position.x;
+            m_mouseLastY = mouse.position.y;
+            m_firstMouse = false;
+            return {0.0f, 0.0f};
+        }
+
+        float xoffset = mouse.position.x - m_mouseLastX;
+        float yoffset = m_mouseLastY - mouse.position.y; 
+
+        m_mouseLastX = mouse.position.x;
+        m_mouseLastY = mouse.position.y;
+
+        return {xoffset, yoffset};
+    }
+
+    void EventSystem::resetMouse()
+    {
+        m_firstMouse = true;
     }
 }
