@@ -7,7 +7,7 @@
 #include "OxygenRender/EventSystem.h"
 #include "OxygenRender/Camera.h"
 #include "OxygenRender/Model.h"
-#include "OxygenRender/Time.h"
+#include "OxygenRender/Timer.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -35,8 +35,8 @@ namespace OxyRender
 
             while (!window.shouldClose())
             {
-                Time::update(window);
-                double dt = Time::deltaTime();
+                Timer::getInstance().update(window);
+                double dt = Timer::getInstance().deltaTime();
 
                 Event e;
                 while (EventSystem::pollEvent(e))

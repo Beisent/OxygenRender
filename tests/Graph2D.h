@@ -4,7 +4,7 @@
 #include "OxygenRender/Renderer.h"
 #include "OxygenRender/Graphics2D.h"
 #include "OxygenRender/EventSystem.h"
-#include "OxygenRender/Time.h"
+#include "OxygenRender/Timer.h"
 
 namespace OxyRender
 {
@@ -23,8 +23,8 @@ namespace OxyRender
 
             while (!window.shouldClose())
             {
-                Time::update(window);
-                double dt = Time::deltaTime();
+                Timer::getInstance().update(window);
+                double dt = Timer::getInstance().deltaTime();
 
                 Event e;
                 while (EventSystem::pollEvent(e))
