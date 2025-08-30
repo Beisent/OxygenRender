@@ -83,7 +83,7 @@ namespace OxyRender
         }
 
         float xoffset = mouse.position.x - m_mouseLastX;
-        float yoffset = m_mouseLastY - mouse.position.y; 
+        float yoffset = m_mouseLastY - mouse.position.y;
 
         m_mouseLastX = mouse.position.x;
         m_mouseLastY = mouse.position.y;
@@ -94,5 +94,23 @@ namespace OxyRender
     void EventSystem::resetMouse()
     {
         m_firstMouse = true;
+    }
+    void EventSystem::registerCallback(EventType type, std::function<void(const Event &)> callback)
+    {
+        m_eventCallbacks[type] = callback;
+    }
+    void EventSystem::handleEvent()
+    {
+        while (!m_events.empty())
+        {
+            Event event = m_events.front();
+            m_events.pop();
+
+            auto it = m_eventCallbacks.find(event.type);
+            if (it != m_eventCallbacks.end())
+            {
+                it->second(event);
+            }
+        }
     }
 }

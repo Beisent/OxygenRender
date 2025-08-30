@@ -33,62 +33,54 @@ namespace OxyRender
 
             Model backpackModel(renderer, "resource/objects/backpack/backpack.obj");
             EventSystem &eventSystem = eventSystem.getInstance();
-            
+           
+            // 注册键盘按下事件
+            eventSystem.registerCallback(EventType::KeyPressed, [&window, &mouseCaptured](const Event &e)
+                                         {
+            const KeyEvent& keyEvent = std::get<KeyEvent>(e.data);
+            if (keyEvent.key == KeyCode::Escape)
+            {
+                window.shutdown();
+            }
+            else if (keyEvent.key == KeyCode::LeftAlt)
+            {
+                window.setCursorMode(CursorMode::Normal);
+                mouseCaptured = false;
+            } });
+
+            // 注册键盘释放事件
+            eventSystem.registerCallback(EventType::KeyReleased, [&window, &mouseCaptured](const Event &e)
+                                         {
+            const KeyEvent& keyEvent = std::get<KeyEvent>(e.data);
+            if (keyEvent.key == KeyCode::LeftAlt)
+            {
+                window.setCursorMode(CursorMode::Disabled);
+                mouseCaptured = true;
+            } });
+
+            // 注册鼠标滚动事件
+            eventSystem.registerCallback(EventType::MouseScrolled, [&camera](const Event &e)
+                                         {
+            const MouseScrollEvent& scrollEvent = std::get<MouseScrollEvent>(e.data);
+            camera.processMouseScroll(scrollEvent.yoffset); });
+
+            // 注册鼠标移动事件
+            eventSystem.registerCallback(EventType::MouseMoved, [&camera, &eventSystem, &mouseCaptured](const Event &e)
+                                         {
+            if (mouseCaptured)
+            {
+                const MouseMoveEvent& mouse = std::get<MouseMoveEvent>(e.data);
+                auto offset = eventSystem.handleMouseMoved(mouse);
+                camera.processMouseMovement(offset.x, offset.y);
+            } });
+
             while (!window.shouldClose())
             {
                 Timer::getInstance().update(window);
                 double dt = Timer::getInstance().deltaTime();
 
-                Event e;
-
-                while (eventSystem.pollEvent(e))
-                {
-                    switch (e.type)
-                    {
-                    case EventType::KeyPressed:
-                    {
-                        auto key = std::get<KeyEvent>(e.data);
-                        if (key.key == KeyCode::Escape)
-                        {
-                            window.shutdown();
-                            return;
-                        }
-                        else if (key.key == KeyCode::LeftAlt)
-                        {
-                            window.setCursorMode(CursorMode::Normal);
-                            mouseCaptured = false;
-                        }
-                        break;
-                    }
-                    case EventType::KeyReleased:
-                    {
-                        auto key = std::get<KeyEvent>(e.data);
-                        if (key.key == KeyCode::LeftAlt)
-                        {
-                            window.setCursorMode(CursorMode::Disabled);
-                            mouseCaptured = true;
-                        }
-                        break;
-                    }
-                    case EventType::MouseScrolled:
-                    {
-                        auto scroll = std::get<MouseScrollEvent>(e.data);
-                        camera.processMouseScroll(scroll.yoffset);
-                        break;
-                    }
-                    case EventType::MouseMoved:
-                        if (mouseCaptured)
-                        {
-                            auto mouse = std::get<MouseMoveEvent>(e.data);
-                            auto offset = eventSystem.handleMouseMoved(mouse);
-                            camera.processMouseMovement(offset.x, offset.y);
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                }
-
+                eventSystem.handleEvent();
+                
                 if (eventSystem.isKeyDown(KeyCode::W))
                     camera.processKeyboard(CameraMovement::FORWARD, dt);
                 if (eventSystem.isKeyDown(KeyCode::S))

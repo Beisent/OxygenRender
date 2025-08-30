@@ -3,11 +3,13 @@
 #include <variant>
 #include <glm/vec2.hpp>
 #include <unordered_map>
+#include <functional>
 #include "OxygenRender/GraphicsTypes.h"
 #include <GLFW/glfw3.h>
 
 namespace OxyRender
 {
+
     enum class KeyCode
     {
         Unknown = GLFW_KEY_UNKNOWN,
@@ -134,13 +136,18 @@ namespace OxyRender
         EventType type = EventType::None;
         std::variant<std::monostate, KeyEvent, MouseButtonEvent, MouseScrollEvent, MouseMoveEvent, WindowResizeEvent> data;
     };
-
+    using KeyEventCallback = std::function<void(const KeyEvent &)>;
+    using MouseButtonEventCallback = std::function<void(const MouseButtonEvent &)>;
+    using MouseMoveEventCallback = std::function<void(const MouseMoveEvent &)>;
+    using MouseScrollEventCallback = std::function<void(const MouseScrollEvent &)>;
+    using WindowResizeEventCallback = std::function<void(const WindowResizeEvent &)>;
     class EventSystem
     {
     private:
         std::queue<Event> m_events;
         std::unordered_map<int, bool> m_keyStates;
         std::unordered_map<int, bool> m_mouseButtonStates;
+        std::unordered_map<EventType, std::function<void(const Event &)>> m_eventCallbacks;
 
         bool m_firstMouse;
         float m_mouseLastX;
@@ -150,12 +157,14 @@ namespace OxyRender
         ~EventSystem() = default;
         EventSystem(const EventSystem &) = delete;
         EventSystem &operator=(const EventSystem &) = delete;
+
     public:
         static EventSystem &getInstance()
-        { 
+        {
             static EventSystem instance;
             return instance;
         }
+        void registerCallback(EventType type, std::function<void(const Event &)> callback);
         void handleEvent();
         void pushEvent(const Event &e);
         bool pollEvent(Event &e);

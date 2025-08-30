@@ -113,8 +113,7 @@ namespace OxyRender
 
     void GLFWWindow::shutdown()
     {
-        glfwDestroyWindow(m_window);
-        glfwTerminate();
+        glfwSetWindowShouldClose(m_window, GLFW_TRUE);
     }
     void GLFWWindow::swapBuffers()
     {

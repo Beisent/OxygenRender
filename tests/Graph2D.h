@@ -20,37 +20,30 @@ namespace OxyRender
             graphics2D.setClearColor({1.0f, 1.0f, 1.0f, 1.0f});
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
-            EventSystem& eventSystem = eventSystem.getInstance();
+            
+            EventSystem &eventSystem = eventSystem.getInstance();
+            eventSystem.registerCallback(EventType::KeyPressed,
+                                         [&window](const Event &e)
+                                         {
+            const KeyEvent& keyEvent = std::get<KeyEvent>(e.data);
+            if (keyEvent.key == KeyCode::Escape)
+            {
+                window.shutdown();
+            } });
+
+            eventSystem.registerCallback(EventType::MouseScrolled,
+                                         [&camera](const Event &e)
+                                         {
+            const MouseScrollEvent& scrollEvent = std::get<MouseScrollEvent>(e.data);
+            camera.processMouseScroll(scrollEvent.yoffset); });
+
             while (!window.shouldClose())
             {
                 Timer::getInstance().update(window);
                 double dt = Timer::getInstance().deltaTime();
 
-                Event e;
-                while (eventSystem.pollEvent(e))
-                {
-                    switch (e.type)
-                    {
-                    case EventType::KeyPressed:
-                    {
-                        auto key = std::get<KeyEvent>(e.data);
-                        if (key.key == KeyCode::Escape)
-                        {
-                            window.shutdown();
-                            return;
-                        }
-                        break;
-                    }
-                    case EventType::MouseScrolled:
-                    {
-                        auto scroll = std::get<MouseScrollEvent>(e.data);
-                        camera.processMouseScroll(scroll.yoffset);
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-                }
+                eventSystem.handleEvent();
+
                 if (eventSystem.isKeyDown(KeyCode::A))
                     camera.processKeyboard(CameraMovement::LEFT, dt * camera.getZoom());
                 if (eventSystem.isKeyDown(KeyCode::D))
