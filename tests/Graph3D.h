@@ -26,14 +26,15 @@ namespace OxyRender
 
             window.setCursorMode(CursorMode::Disabled);
             bool mouseCaptured = true;
-
+            EventSystem &eventSystem = eventSystem.getInstance();
             while (!window.shouldClose())
             {
                 Timer::getInstance().update(window);
                 double dt = Timer::getInstance().deltaTime();
 
                 Event e;
-                while (EventSystem::pollEvent(e))
+
+                while (eventSystem.pollEvent(e))
                 {
                     switch (e.type)
                     {
@@ -72,7 +73,7 @@ namespace OxyRender
                         if (mouseCaptured)
                         {
                             auto mouse = std::get<MouseMoveEvent>(e.data);
-                            auto offset = EventSystem::handleMouseMoved(mouse);
+                            auto offset = eventSystem.handleMouseMoved(mouse);
                             camera.processMouseMovement(offset.x, offset.y);
                         }
                         break;
@@ -81,17 +82,17 @@ namespace OxyRender
                     }
                 }
 
-                if (EventSystem::isKeyDown(KeyCode::W))
+                if (eventSystem.isKeyDown(KeyCode::W))
                     camera.processKeyboard(CameraMovement::FORWARD, dt);
-                if (EventSystem::isKeyDown(KeyCode::S))
+                if (eventSystem.isKeyDown(KeyCode::S))
                     camera.processKeyboard(CameraMovement::BACKWARD, dt);
-                if (EventSystem::isKeyDown(KeyCode::A))
+                if (eventSystem.isKeyDown(KeyCode::A))
                     camera.processKeyboard(CameraMovement::LEFT, dt);
-                if (EventSystem::isKeyDown(KeyCode::D))
+                if (eventSystem.isKeyDown(KeyCode::D))
                     camera.processKeyboard(CameraMovement::RIGHT, dt);
-                if (EventSystem::isKeyDown(KeyCode::Space))
+                if (eventSystem.isKeyDown(KeyCode::Space))
                     camera.processKeyboard(CameraMovement::UP, dt);
-                if (EventSystem::isKeyDown(KeyCode::LeftShift))
+                if (eventSystem.isKeyDown(KeyCode::LeftShift))
                     camera.processKeyboard(CameraMovement::DOWN, dt);
 
                 graphics3D.clear();

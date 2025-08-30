@@ -138,23 +138,33 @@ namespace OxyRender
     class EventSystem
     {
     private:
-        static std::queue<Event> m_events;
-        static std::unordered_map<int, bool> m_keyStates;
-        static std::unordered_map<int, bool> m_mouseButtonStates;
+        std::queue<Event> m_events;
+        std::unordered_map<int, bool> m_keyStates;
+        std::unordered_map<int, bool> m_mouseButtonStates;
 
-        static bool m_firstMouse;
-        static float m_mouseLastX;
-        static float m_mouseLastY;
+        bool m_firstMouse;
+        float m_mouseLastX;
+        float m_mouseLastY;
 
+        EventSystem();
+        ~EventSystem() = default;
+        EventSystem(const EventSystem &) = delete;
+        EventSystem &operator=(const EventSystem &) = delete;
     public:
-        static void pushEvent(const Event &e);
-        static bool pollEvent(Event &e);
-        static void clear();
+        static EventSystem &getInstance()
+        { 
+            static EventSystem instance;
+            return instance;
+        }
+        void handleEvent();
+        void pushEvent(const Event &e);
+        bool pollEvent(Event &e);
+        void clear();
 
-        static bool isKeyDown(KeyCode key);
-        static bool isMouseButtonDown(MouseCode button);
+        bool isKeyDown(KeyCode key);
+        bool isMouseButtonDown(MouseCode button);
 
-        static glm::vec2 handleMouseMoved(const MouseMoveEvent &mouse);
-        static void resetMouse();
+        glm::vec2 handleMouseMoved(const MouseMoveEvent &mouse);
+        void resetMouse();
     };
 }

@@ -18,14 +18,14 @@ namespace OxyRender
             e.type = EventType::KeyReleased;
             e.data = KeyEvent{k, scancode, mods};
         }
-        EventSystem::pushEvent(e);
+        EventSystem::getInstance().pushEvent(e);
     }
     static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
     {
         Event e;
         e.type = EventType::MouseScrolled;
         e.data = MouseScrollEvent{(float)xoffset, (float)yoffset};
-        EventSystem::pushEvent(e);
+       EventSystem::getInstance().pushEvent(e);
     }
 
     static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
@@ -41,7 +41,7 @@ namespace OxyRender
             e.type = EventType::MouseButtonReleased;
             e.data = MouseButtonEvent{button, mods};
         }
-        EventSystem::pushEvent(e);
+       EventSystem::getInstance().pushEvent(e);
     }
 
     static void cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
@@ -49,7 +49,7 @@ namespace OxyRender
         Event e;
         e.type = EventType::MouseMoved;
         e.data = MouseMoveEvent{{(float)xpos, (float)ypos}};
-        EventSystem::pushEvent(e);
+       EventSystem::getInstance().pushEvent(e);
     }
 
     static void framebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -57,7 +57,7 @@ namespace OxyRender
         Event e;
         e.type = EventType::WindowResized;
         e.data = WindowResizeEvent{width, height};
-        EventSystem::pushEvent(e);
+        EventSystem::getInstance().pushEvent(e);
     }
     IWindow::IWindow(int width, int height, std::string title) : m_width(width), m_height(height), m_title(std::move(title))
     {

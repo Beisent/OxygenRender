@@ -88,6 +88,7 @@ namespace OxyRender
             float cameraAngle = 0.0f;
             float cameraRadius = 10.0f;
 
+            EventSystem& eventSystem = eventSystem.getInstance();
             while (!window.shouldClose())
             {
                 double currentFrame = window.getTime();
@@ -95,7 +96,7 @@ namespace OxyRender
                 lastFrame = currentFrame;
 
                 Event e;
-                while (EventSystem::pollEvent(e))
+                while (eventSystem.pollEvent(e))
                 {
                     switch (e.type)
                     {
@@ -114,17 +115,17 @@ namespace OxyRender
                     }
                 }
 
-                if (EventSystem::isKeyDown(KeyCode::W))
+                if (eventSystem.isKeyDown(KeyCode::W))
                     camera.processKeyboard(CameraMovement::FORWARD, deltaTime);
-                if (EventSystem::isKeyDown(KeyCode::S))
+                if (eventSystem.isKeyDown(KeyCode::S))
                     camera.processKeyboard(CameraMovement::BACKWARD, deltaTime);
-                if (EventSystem::isKeyDown(KeyCode::A))
+                if (eventSystem.isKeyDown(KeyCode::A))
                     camera.processKeyboard(CameraMovement::LEFT, deltaTime);
-                if (EventSystem::isKeyDown(KeyCode::D))
+                if (eventSystem.isKeyDown(KeyCode::D))
                     camera.processKeyboard(CameraMovement::RIGHT, deltaTime);
-                if (EventSystem::isKeyDown(KeyCode::Space))
+                if (eventSystem.isKeyDown(KeyCode::Space))
                     camera.processKeyboard(CameraMovement::UP, deltaTime);
-                if (EventSystem::isKeyDown(KeyCode::LeftShift))
+                if (eventSystem.isKeyDown(KeyCode::LeftShift))
                     camera.processKeyboard(CameraMovement::DOWN, deltaTime);
 
                 cameraAngle += 1.0f * deltaTime;

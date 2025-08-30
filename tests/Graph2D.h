@@ -20,14 +20,14 @@ namespace OxyRender
             graphics2D.setClearColor({1.0f, 1.0f, 1.0f, 1.0f});
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
-
+            EventSystem& eventSystem = eventSystem.getInstance();
             while (!window.shouldClose())
             {
                 Timer::getInstance().update(window);
                 double dt = Timer::getInstance().deltaTime();
 
                 Event e;
-                while (EventSystem::pollEvent(e))
+                while (eventSystem.pollEvent(e))
                 {
                     switch (e.type)
                     {
@@ -51,13 +51,13 @@ namespace OxyRender
                         break;
                     }
                 }
-                if (EventSystem::isKeyDown(KeyCode::A))
+                if (eventSystem.isKeyDown(KeyCode::A))
                     camera.processKeyboard(CameraMovement::LEFT, dt * camera.getZoom());
-                if (EventSystem::isKeyDown(KeyCode::D))
+                if (eventSystem.isKeyDown(KeyCode::D))
                     camera.processKeyboard(CameraMovement::RIGHT, dt * camera.getZoom());
-                if (EventSystem::isKeyDown(KeyCode::W))
+                if (eventSystem.isKeyDown(KeyCode::W))
                     camera.processKeyboard(CameraMovement::UP, dt * camera.getZoom());
-                if (EventSystem::isKeyDown(KeyCode::S))
+                if (eventSystem.isKeyDown(KeyCode::S))
                     camera.processKeyboard(CameraMovement::DOWN, dt * camera.getZoom());
 
                 graphics2D.clear();
