@@ -6,13 +6,15 @@ namespace OxyRender
           m_renderer(renderer),
           m_camera(glm::vec3(0, 0, 10.0f)),
           m_shader("default", "shaders/graphics2d/vertex.vert", "shaders/graphics2d/fragment.frag"),
+          m_textureShader("texture", "shaders/graphics2d/texture_vertex.vert", "shaders/graphics2d/texture_fragment.frag"),
           m_vbo(BufferType::Vertex, BufferUsage::DynamicDraw),
           m_ebo(BufferType::Index, BufferUsage::DynamicDraw)
     {
-        // 创建顶点布局
+        // 创建顶点布局（支持纹理坐标）
         VertexLayout layout;
         layout.addAttribute("aPos", 0, VertexAttribType::Float3);
         layout.addAttribute("aColor", 1, VertexAttribType::Float4);
+        layout.addAttribute("aTexCoord", 2, VertexAttribType::Float2);
 
         // 设置数据
         m_vao.setVertexBuffer(m_vbo, layout);
@@ -46,14 +48,15 @@ namespace OxyRender
 
         m_lineBatches.clear();
         m_pointBatches.clear();
+        m_textureBatches.clear();
     }
 
     void Graphics2D::drawRect(float x, float y, float width, float height, OxyColor color)
     {
-        Vertex v0 = {{x, y, 0.0f}, color};
-        Vertex v1 = {{x + width, y, 0.0f}, color};
-        Vertex v2 = {{x + width, y + height, 0.0f}, color};
-        Vertex v3 = {{x, y + height, 0.0f}, color};
+        Vertex v0 = {{x, y, 0.0f}, color, {0.0f, 0.0f}};
+        Vertex v1 = {{x + width, y, 0.0f}, color, {1.0f, 0.0f}};
+        Vertex v2 = {{x + width, y + height, 0.0f}, color, {1.0f, 1.0f}};
+        Vertex v3 = {{x, y + height, 0.0f}, color, {0.0f, 1.0f}};
 
         unsigned int startIndex = (unsigned int)m_triVertices.size();
         m_triVertices.push_back(v0);
@@ -73,9 +76,9 @@ namespace OxyRender
 
     void Graphics2D::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, OxyColor color)
     {
-        Vertex v1 = {{x1, y1, 0.0f}, color};
-        Vertex v2 = {{x2, y2, 0.0f}, color};
-        Vertex v3 = {{x3, y3, 0.0f}, color};
+        Vertex v1 = {{x1, y1, 0.0f}, color, {0.0f, 0.0f}};
+        Vertex v2 = {{x2, y2, 0.0f}, color, {0.5f, 1.0f}};
+        Vertex v3 = {{x3, y3, 0.0f}, color, {1.0f, 0.0f}};
 
         unsigned int startIndex = (unsigned int)m_triVertices.size();
         m_triVertices.push_back(v1);
@@ -107,8 +110,8 @@ namespace OxyRender
             batch = &m_lineBatches.back();
         }
 
-        Vertex v1 = {{x1, y1, 0.0f}, color};
-        Vertex v2 = {{x2, y2, 0.0f}, color};
+        Vertex v1 = {{x1, y1, 0.0f}, color, {0.0f, 0.0f}};
+        Vertex v2 = {{x2, y2, 0.0f}, color, {1.0f, 1.0f}};
 
         unsigned int startIndex = (unsigned int)batch->vertices.size();
         batch->vertices.push_back(v1);
@@ -134,14 +137,16 @@ namespace OxyRender
 
         unsigned int startIndex = (unsigned int)m_triVertices.size();
 
-        m_triVertices.push_back({{cx, cy, 0.0f}, color});
+        m_triVertices.push_back({{cx, cy, 0.0f}, color, {0.5f, 0.5f}});
 
         for (int i = 0; i <= segments; i++)
         {
             float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
             float x = cx + cos(angle) * radius;
             float y = cy + sin(angle) * radius;
-            m_triVertices.push_back({{x, y, 0.0f}, color});
+            float u = 0.5f + 0.5f * cos(angle);
+            float v = 0.5f + 0.5f * sin(angle);
+            m_triVertices.push_back({{x, y, 0.0f}, color, {u, v}});
         }
 
         for (int i = 1; i <= segments; i++)
@@ -180,14 +185,16 @@ namespace OxyRender
             segments = 3;
 
         unsigned int startIndex = (unsigned int)m_triVertices.size();
-        m_triVertices.push_back({{cx, cy, 0.0f}, color});
+        m_triVertices.push_back({{cx, cy, 0.0f}, color, {0.5f, 0.5f}});
 
         for (int i = 0; i <= segments; i++)
         {
             float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
             float x = cx + cos(angle) * radiusX;
             float y = cy + sin(angle) * radiusY;
-            m_triVertices.push_back({{x, y, 0.0f}, color});
+            float u = 0.5f + 0.5f * cos(angle);
+            float v = 0.5f + 0.5f * sin(angle);
+            m_triVertices.push_back({{x, y, 0.0f}, color, {u, v}});
         }
 
         for (int i = 1; i <= segments; i++)
@@ -245,7 +252,7 @@ namespace OxyRender
         batch->vertices.reserve(batch->vertices.size() + points.size());
         for (const auto &p : points)
         {
-            batch->vertices.push_back({glm::vec3(p.x, p.y, 0.0f), color});
+            batch->vertices.push_back({glm::vec3(p.x, p.y, 0.0f), color, {0.5f, 0.5f}});
         }
     }
 
@@ -257,7 +264,7 @@ namespace OxyRender
         unsigned int startIndex = (unsigned int)m_triVertices.size();
 
         for (auto &p : points)
-            m_triVertices.push_back({{p.x, p.y, 0.0f}, color});
+            m_triVertices.push_back({{p.x, p.y, 0.0f}, color, {0.5f, 0.5f}});
 
         for (size_t i = 1; i + 1 < points.size(); i++)
         {
@@ -447,35 +454,279 @@ namespace OxyRender
         m_triIndexCount = 0;
         m_lineBatches.clear();
         m_pointBatches.clear();
+
+        // 刷新纹理批次
+        flushTextureBatches();
     }
-    // void Graphics2D::beginMask(const std::vector<glm::vec2> &maskPolygon)
-    // {
-    //     bool wasDepthTestEnabled = false;
 
-    //     m_renderer.setCapability(RenderCapability::Blend, false);
-    //     m_renderer.setCapability(RenderCapability::StencilTest, true);
+    // 纹理相关方法实现
+    void Graphics2D::setTexture(const Texture2D *texture)
+    {
+        m_currentTexture = texture;
+    }
 
-    //     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    void Graphics2D::clearTexture()
+    {
+        m_currentTexture = nullptr;
+    }
 
-    //     m_renderer.setStencilFunc(StencilFunc::Always, 1, 0xFF);
-    //     m_renderer.setStencilOp(StencilOp::Replace, StencilOp::Replace, StencilOp::Replace);
-    //     m_renderer.setStencilMask(0xFF);
-    //     m_renderer.clearStencil();
+    void Graphics2D::drawRect(float x, float y, float width, float height, const Texture2D &texture, OxyColor tintColor)
+    {
+        // 查找或创建对应的纹理批次
+        TextureBatch *batch = nullptr;
+        for (auto &b : m_textureBatches)
+        {
+            if (b.texture == &texture)
+            {
+                batch = &b;
+                break;
+            }
+        }
 
-    //     drawPolygon(maskPolygon, {0, 0, 0, 0});
-    //     flush();
+        if (!batch)
+        {
+            m_textureBatches.push_back(TextureBatch{&texture});
+            batch = &m_textureBatches.back();
+        }
 
-    //     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    //     m_renderer.setStencilFunc(StencilFunc::Equal, 1, 0xFF);
-    //     m_renderer.setStencilMask(0x00);
-    // }
+        unsigned int startIndex = static_cast<unsigned int>(batch->vertices.size());
+        batch->vertices.push_back({{x, y, 0.0f}, tintColor, {0.0f, 0.0f}});                  // 左下
+        batch->vertices.push_back({{x + width, y, 0.0f}, tintColor, {1.0f, 0.0f}});          // 右下
+        batch->vertices.push_back({{x + width, y + height, 0.0f}, tintColor, {1.0f, 1.0f}}); // 右上
+        batch->vertices.push_back({{x, y + height, 0.0f}, tintColor, {0.0f, 1.0f}});         // 左上
 
-    // void Graphics2D::endMask()
-    // {
-    //     // 重置模板测试
-    //     m_renderer.setCapability(RenderCapability::StencilTest, false);
-    //     // 恢复颜色遮罩
-    //     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    // }
+        // 添加索引（两个三角形）
+        batch->indices.push_back(startIndex + 0);
+        batch->indices.push_back(startIndex + 1);
+        batch->indices.push_back(startIndex + 2);
+        batch->indices.push_back(startIndex + 2);
+        batch->indices.push_back(startIndex + 3);
+        batch->indices.push_back(startIndex + 0);
+        batch->indexCount += 6;
+    }
+
+    void Graphics2D::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3,
+                                  const Texture2D &texture, OxyColor tintColor)
+    {
+        // 查找或创建对应的纹理批次
+        TextureBatch *batch = nullptr;
+        for (auto &b : m_textureBatches)
+        {
+            if (b.texture == &texture)
+            {
+                batch = &b;
+                break;
+            }
+        }
+
+        if (!batch)
+        {
+            m_textureBatches.push_back(TextureBatch{&texture});
+            batch = &m_textureBatches.back();
+        }
+
+        // 为三角形添加三个顶点
+        unsigned int startIndex = static_cast<unsigned int>(batch->vertices.size());
+        batch->vertices.push_back({{x1, y1, 0.0f}, tintColor, {0.0f, 0.0f}});
+        batch->vertices.push_back({{x2, y2, 0.0f}, tintColor, {0.5f, 1.0f}});
+        batch->vertices.push_back({{x3, y3, 0.0f}, tintColor, {1.0f, 0.0f}});
+
+        // 添加索引
+        batch->indices.push_back(startIndex + 0);
+        batch->indices.push_back(startIndex + 1);
+        batch->indices.push_back(startIndex + 2);
+        batch->indexCount += 3;
+    }
+
+    void Graphics2D::drawPolygon(const std::vector<glm::vec2> &points, const Texture2D &texture, OxyColor tintColor)
+    {
+        if (points.size() < 3)
+            return;
+
+        // 查找或创建对应的纹理批次
+        TextureBatch *batch = nullptr;
+        for (auto &b : m_textureBatches)
+        {
+            if (b.texture == &texture)
+            {
+                batch = &b;
+                break;
+            }
+        }
+
+        if (!batch)
+        {
+            m_textureBatches.push_back(TextureBatch{&texture});
+            batch = &m_textureBatches.back();
+        }
+
+        // 计算多边形的中心点
+        glm::vec2 center(0.0f);
+        for (const auto &point : points)
+        {
+            center += point;
+        }
+        center /= static_cast<float>(points.size());
+
+        // 添加中心顶点
+        unsigned int startIndex = static_cast<unsigned int>(batch->vertices.size());
+        batch->vertices.push_back({{center.x, center.y, 0.0f}, tintColor, {0.5f, 0.5f}});
+
+        // 添加边界顶点
+        for (size_t i = 0; i < points.size(); ++i)
+        {
+            float u = static_cast<float>(i) / static_cast<float>(points.size());
+            batch->vertices.push_back({{points[i].x, points[i].y, 0.0f}, tintColor, {u, 0.0f}});
+        }
+
+        // 添加第一个点作为闭合
+        batch->vertices.push_back({{points[0].x, points[0].y, 0.0f}, tintColor, {1.0f, 0.0f}});
+
+        // 添加索引（扇形三角形）
+        for (size_t i = 0; i < points.size(); ++i)
+        {
+            batch->indices.push_back(startIndex); // 中心点
+            batch->indices.push_back(startIndex + 1 + i);
+            batch->indices.push_back(startIndex + 1 + ((i + 1) % points.size()));
+            batch->indexCount += 3;
+        }
+    }
+
+    void Graphics2D::drawCircle(float cx, float cy, float radius, const Texture2D &texture,
+                                OxyColor tintColor, int segments)
+    {
+        if (segments < 3)
+            segments = 3;
+
+        // 查找或创建对应的纹理批次
+        TextureBatch *batch = nullptr;
+        for (auto &b : m_textureBatches)
+        {
+            if (b.texture == &texture)
+            {
+                batch = &b;
+                break;
+            }
+        }
+
+        if (!batch)
+        {
+            m_textureBatches.push_back(TextureBatch{&texture});
+            batch = &m_textureBatches.back();
+        }
+
+        // 添加中心顶点
+        unsigned int startIndex = static_cast<unsigned int>(batch->vertices.size());
+        batch->vertices.push_back({{cx, cy, 0.0f}, tintColor, {0.5f, 0.5f}});
+
+        // 添加边界顶点
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
+            float x = cx + cos(angle) * radius;
+            float y = cy + sin(angle) * radius;
+            // 将角度映射到纹理坐标 [0,1]
+            float u = 0.5f + 0.5f * cos(angle);
+            float v = 0.5f + 0.5f * sin(angle);
+            batch->vertices.push_back({{x, y, 0.0f}, tintColor, {u, v}});
+        }
+
+        // 添加索引
+        for (int i = 1; i <= segments; i++)
+        {
+            batch->indices.push_back(startIndex); // 中心点
+            batch->indices.push_back(startIndex + i);
+            batch->indices.push_back(startIndex + i + 1);
+            batch->indexCount += 3;
+        }
+    }
+
+    void Graphics2D::drawEllipse(float cx, float cy, float radiusX, float radiusY,
+                                 const Texture2D &texture, OxyColor tintColor, int segments)
+    {
+        if (segments < 3)
+            segments = 3;
+
+        // 查找或创建对应的纹理批次
+        TextureBatch *batch = nullptr;
+        for (auto &b : m_textureBatches)
+        {
+            if (b.texture == &texture)
+            {
+                batch = &b;
+                break;
+            }
+        }
+
+        if (!batch)
+        {
+            m_textureBatches.push_back(TextureBatch{&texture});
+            batch = &m_textureBatches.back();
+        }
+
+        // 添加中心顶点
+        unsigned int startIndex = static_cast<unsigned int>(batch->vertices.size());
+        batch->vertices.push_back({{cx, cy, 0.0f}, tintColor, {0.5f, 0.5f}});
+
+        // 添加边界顶点
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
+            float x = cx + cos(angle) * radiusX;
+            float y = cy + sin(angle) * radiusY;
+            // 将角度映射到纹理坐标 [0,1]
+            float u = 0.5f + 0.5f * cos(angle);
+            float v = 0.5f + 0.5f * sin(angle);
+            batch->vertices.push_back({{x, y, 0.0f}, tintColor, {u, v}});
+        }
+
+        // 添加索引
+        for (int i = 1; i <= segments; i++)
+        {
+            batch->indices.push_back(startIndex); // 中心点
+            batch->indices.push_back(startIndex + i);
+            batch->indices.push_back(startIndex + i + 1);
+            batch->indexCount += 3;
+        }
+    }
+
+    void Graphics2D::flushTextureBatches()
+    {
+        if (m_textureBatches.empty())
+            return;
+
+        m_textureShader.use();
+
+        // MVP变换
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
+        glm::mat4 projection = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+
+        m_textureShader.setUniformData("model", &model, sizeof(glm::mat4));
+        m_textureShader.setUniformData("view", &view, sizeof(glm::mat4));
+        m_textureShader.setUniformData("projection", &projection, sizeof(glm::mat4));
+
+        m_vao.bind();
+
+        for (auto &batch : m_textureBatches)
+        {
+            if (batch.indexCount == 0 || !batch.texture)
+                continue;
+
+            // 绑定纹理
+            batch.texture->bind(0);
+            int useTexture = 1;
+            m_textureShader.setUniformData("uUseTexture", &useTexture, sizeof(int));
+
+            // 设置顶点数据
+            m_vbo.setData(batch.vertices.data(), batch.vertices.size() * sizeof(Vertex));
+            m_ebo.setData(batch.indices.data(), batch.indices.size() * sizeof(unsigned int));
+
+            // 绘制
+            m_renderer.drawTriangles(m_vao, batch.indexCount);
+        }
+
+        m_vao.unbind();
+    }
 
 }

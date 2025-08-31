@@ -4,6 +4,7 @@
 #include "OxygenRender/Shader.h"
 #include "OxygenRender/Buffer.h"
 #include "OxygenRender/Camera.h"
+#include "OxygenRender/Texture.h"
 #include <vector>
 #include <glm/glm.hpp>
 #include <cmath>
@@ -60,6 +61,22 @@ namespace OxyRender
                         float thickness = 1.0f,
                         int segments = 32);
 
+        
+        void drawRect(float x, float y, float width, float height, const Texture2D& texture, 
+                               OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, 
+                                   const Texture2D& texture, OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        void drawPolygon(const std::vector<glm::vec2> &points, const Texture2D& texture, 
+                                  OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        void drawCircle(float cx, float cy, float radius, const Texture2D& texture, 
+                                 OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
+        void drawEllipse(float cx, float cy, float radiusX, float radiusY, const Texture2D& texture, 
+                                  OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
+
+        // 设置当前纹理
+        void setTexture(const Texture2D* texture);
+        void clearTexture();
+
         void flush();
 
         // void beginMask(const std::vector<glm::vec2> &maskPolygon);
@@ -70,6 +87,7 @@ namespace OxyRender
         {
             glm::vec3 pos;
             OxyColor color;
+            glm::vec2 texCoord;
         };
 
         struct LineBatch
@@ -86,10 +104,21 @@ namespace OxyRender
             OxyColor color;
             std::vector<Vertex> vertices;
         };
+
+        // 纹理批次
+        struct TextureBatch
+        {
+            const Texture2D* texture;
+            std::vector<Vertex> vertices;
+            std::vector<unsigned int> indices;
+            size_t indexCount = 0;
+        };
+
         Window &m_window;
         Renderer &m_renderer;
         Camera m_camera;
         Shader m_shader;
+        Shader m_textureShader;
 
         VertexArray m_vao;
         Buffer m_vbo;
@@ -105,5 +134,15 @@ namespace OxyRender
 
         // 点批次
         std::vector<PointBatch> m_pointBatches;
+
+        // 纹理批次
+        std::vector<TextureBatch> m_textureBatches;
+
+        // 当前纹理
+        const Texture2D* m_currentTexture = nullptr;
+
+        // 辅助方法
+        void addTextureVertex(float x, float y, float u, float v, OxyColor color);
+        void flushTextureBatches();
     };
 }
