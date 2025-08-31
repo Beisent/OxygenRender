@@ -119,6 +119,13 @@ namespace OxyRender
 
         batch->indexCount += 2;
     }
+    void Graphics2D::drawLines(const std::vector<glm::vec2> &points, OxyColor color, float thickness)
+    {
+        for (int i = 0; i < points.size() - 1; i++)
+        {
+            drawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, color, thickness);
+        }
+    }
 
     void Graphics2D::drawCircle(float cx, float cy, float radius, OxyColor color, int segments)
     {
@@ -334,7 +341,7 @@ namespace OxyRender
         drawArrow(0, bottomLeft.y, 0, topRight.y, axisColor, thickness);
     }
 
-    //二次贝塞尔曲线
+    // 二次贝塞尔曲线
     void Graphics2D::drawBezier(float x0, float y0, float cx, float cy, float x1,
                                 float y1, OxyColor color, float thickness, int segments)
     {
@@ -353,7 +360,7 @@ namespace OxyRender
         }
     }
 
-     //三次贝塞尔曲线
+    // 三次贝塞尔曲线
     void Graphics2D::drawBezier(float x0, float y0, float c1x, float c1y, float c2x, float c2y,
                                 float x1, float y1, OxyColor color, float thickness, int segments)
     {
@@ -371,28 +378,6 @@ namespace OxyRender
 
             drawLine(prev.x, prev.y, pt.x, pt.y, color, thickness);
             prev = pt;
-        }
-    }
-
-    void Graphics2D::drawBezier(const std::vector<glm::vec2> &ctrlPoints,
-                                OxyColor color, float thickness, int segments)
-    {
-        if (ctrlPoints.size() == 3)
-        {
-            drawBezier(
-                ctrlPoints[0].x, ctrlPoints[0].y,
-                ctrlPoints[1].x, ctrlPoints[1].y,
-                ctrlPoints[2].x, ctrlPoints[2].y,
-                color, thickness, segments);
-        }
-        else if (ctrlPoints.size() == 4)
-        {
-            drawBezier(
-                ctrlPoints[0].x, ctrlPoints[0].y,
-                ctrlPoints[1].x, ctrlPoints[1].y,
-                ctrlPoints[2].x, ctrlPoints[2].y,
-                ctrlPoints[3].x, ctrlPoints[3].y,
-                color, thickness, segments);
         }
     }
 

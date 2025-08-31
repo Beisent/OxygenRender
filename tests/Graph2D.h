@@ -20,7 +20,7 @@ namespace OxyRender
             graphics2D.setClearColor({1.0f, 1.0f, 1.0f, 1.0f});
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
-            
+
             EventSystem &eventSystem = eventSystem.getInstance();
             eventSystem.registerCallback(EventType::KeyPressed,
                                          [&window](const Event &e)
@@ -77,10 +77,53 @@ namespace OxyRender
 
                 graphics2D.drawBezier(10, 10, 150, 10, 200, 200, {1, 0, 0, 1}, 2.0f, 48);
                 graphics2D.drawBezier(10, 10, 100, 200, 200, -50, 300, 100, {0, 1, 0, 1}, 2.0f, 64);
-                std::vector<glm::vec2> ctrl = {{10, 10}, {100, 200}, {200, -50}, {300, 200}};
-                graphics2D.drawBezier(ctrl, {0, 0, 1, 1}, 1.5f, 64);
+
+                std::vector<glm::vec2> p;
+                for (float i = 0; i <= 30; i += 0.1)
+                {
+                    p.push_back({i * 10, 100 * sin(i)});
+                }
+                graphics2D.drawLines(p, {1, 0, 0, 1}, 2.0f);
 
                 graphics2D.flush();
+                // graphics2D.begin();
+
+                // int gridSize = 50;
+                // float spacing = 10.0f;
+                // float radius = 4.0f;
+
+                // for (int i = 0; i < gridSize; ++i)
+                // {
+                //     for (int j = 0; j < gridSize; ++j)
+                //     {
+                //         float x = i * spacing - (gridSize * spacing) / 2.0f;
+                //         float y = j * spacing - (gridSize * spacing) / 2.0f;
+                //         graphics2D.drawCircle(x, y, radius, {0.5f, 0.2f, 0.8f, 1.0f});
+                //     }
+                // }
+
+                // int gridSize = 100;
+                // float spacing = 10.0f;
+                // float width = 20.0f;
+                // float height = 20.0f;
+
+                // for (int i = 0; i < gridSize; ++i)
+                // {
+                //     for (int j = 0; j < gridSize; ++j)
+                //     {
+                //         float x = i * spacing - (gridSize * spacing) / 2.0f;
+                //         float y = j * spacing - (gridSize * spacing) / 2.0f;
+                //         if (i % 2 != j % 2)
+                //         {
+                //             graphics2D.drawRect(x, y, width, height, {0.2f, 0.6f, 0.9f, 1.0f});
+                //         }
+                //         else
+                //         {
+                //             graphics2D.drawRect(x, y, width, height, {0.9f, 0.2f, 0.2f, 1.0f});
+                //         }
+                //     }
+                // }
+                // graphics2D.flush();
 
                 window.swapBuffers();
                 window.pollEvents();
