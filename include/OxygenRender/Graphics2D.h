@@ -11,6 +11,7 @@
 
 namespace OxyRender
 {
+    // 2D 绘图类
     class Graphics2D
     {
     public:
@@ -83,13 +84,14 @@ namespace OxyRender
         // void endMask();
 
     private:
+        // 顶点结构体
         struct Vertex
         {
             glm::vec3 pos;
             OxyColor color;
             glm::vec2 texCoord;
         };
-
+        // 线段批次
         struct LineBatch
         {
             float thickness;
@@ -97,7 +99,7 @@ namespace OxyRender
             std::vector<unsigned int> indices;
             size_t indexCount = 0;
         };
-
+        // 点批次
         struct PointBatch
         {
             float size;

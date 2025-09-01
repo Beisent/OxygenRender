@@ -37,6 +37,16 @@ namespace OxyRender
         Int4
     };
 
+    // Vertex属性结构体
+    struct VertexAttribute
+    {
+        std::string name;
+        int location; // location in shader
+        VertexAttribType type;
+        size_t offset; // offset in vertex
+    };
+
+    // Buffer 抽象接口类
     class IBuffer
     {
     public:
@@ -46,12 +56,15 @@ namespace OxyRender
         virtual void setData(const void *data, size_t size, size_t offset = 0) = 0;
     };
 
+    // 索引缓冲抽象接口类
     class IndexBuffer : public IBuffer
     {
     public:
         virtual ~IndexBuffer() = default;
         virtual uint32_t getCount() const noexcept = 0;
     };
+
+    // 顶点数组抽象接口类
     class IVertexArray
     {
     public:
@@ -63,14 +76,7 @@ namespace OxyRender
         virtual IndexBuffer *getIndexBuffer() const noexcept = 0;
     };
 
-    struct VertexAttribute
-    {
-        std::string name;
-        int location; // location in shader
-        VertexAttribType type;
-        size_t offset; // offset in vertex
-    };
-
+    // 顶点布局抽象接口类
     class VertexLayout
     {
     public:

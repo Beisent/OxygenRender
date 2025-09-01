@@ -12,6 +12,7 @@
 
 namespace OxyRender
 {
+    // 3D 绘图类
     class Graphics3D
     {
     public:

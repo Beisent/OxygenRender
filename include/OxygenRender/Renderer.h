@@ -7,6 +7,7 @@
 namespace OxyRender
 {
 
+    // Renderer Capability
     enum class RenderCapability
     {
         DepthTest,
@@ -17,6 +18,7 @@ namespace OxyRender
         ColorMask,
         ProgramPointSize
     };
+    // Blend Function
     enum class RenderBlendFunc
     {
         Zero,
@@ -35,13 +37,14 @@ namespace OxyRender
         OneMinusConstantAlpha
     };
 
-
+    // 多边形渲染模式
     enum class RenderPolygonMode
     {
         Fill,
         Line,
         Point
     };
+    // 模板测试函数
     enum class StencilFunc
     {
         Always,
@@ -53,7 +56,7 @@ namespace OxyRender
         Gequal,
         Never
     };
-
+    // 模板操作
     enum class StencilOp
     {
         Keep,
@@ -65,6 +68,7 @@ namespace OxyRender
         DecrWrap,
         Invert
     };
+    // 渲染器抽象接口类
     class IRenderer
     {
     public:
@@ -89,6 +93,7 @@ namespace OxyRender
         OxyColor m_clear_color = {0.8f, 0.8f, 0.8f, 1.0f};
     };
 
+    // OpenGL渲染器实现类
     class OpenGLRenderer : public IRenderer
     {
     public:
@@ -114,6 +119,7 @@ namespace OxyRender
         GLenum convertStencilOp(StencilOp op);
     };
 
+    // 渲染器工厂类
     class RendererFactory
     {
     public:
@@ -129,6 +135,7 @@ namespace OxyRender
         }
     };
 
+    // 渲染器类，封装渲染器接口
     class Renderer
     {
     private:

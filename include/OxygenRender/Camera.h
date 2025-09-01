@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 namespace OxyRender
 {
+    // 定义相机移动的可能选项。用作processKeyboard的参数
     enum class CameraMovement
     {
         FORWARD,
@@ -14,6 +15,7 @@ namespace OxyRender
         UP,
         DOWN
     };
+    // 默认相机值
     namespace CameraConstants
     {
         const float YAW = -90.0f;
@@ -23,7 +25,7 @@ namespace OxyRender
         const float ZOOM = 45.0f;
 
     }
-
+    // 相机类，处理视图和投影矩阵，并响应输入以移动相机位置
     class Camera
     {
     public:

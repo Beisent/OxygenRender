@@ -3,6 +3,7 @@
 
 namespace OxyRender
 {
+    // 计时器单例类
     class Timer
     {
     private:

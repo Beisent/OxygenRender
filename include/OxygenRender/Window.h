@@ -6,6 +6,7 @@
 #include <memory>
 namespace OxyRender
 {
+    // 鼠标光标模式
     enum class CursorMode
     {
         Normal,
@@ -13,6 +14,7 @@ namespace OxyRender
         Hidden
     };
 
+    // Window 抽象接口类
     class IWindow
     {
     protected:
@@ -39,7 +41,7 @@ namespace OxyRender
 
         virtual double getTime() = 0;
     };
-
+    // GLFW实现Window
     class GLFWWindow : public IWindow
     {
     private:
@@ -59,7 +61,7 @@ namespace OxyRender
 
         double getTime() override;
     };
-
+    // Window工厂类
     class WindowFactory
     {
     public:
@@ -68,7 +70,7 @@ namespace OxyRender
             return std::make_unique<GLFWWindow>(width, height, title);
         }
     };
-
+    // Window类对外接口
     class Window
     {
     private:

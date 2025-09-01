@@ -10,6 +10,7 @@
 namespace OxyRender
 {
 
+    // 键盘按键枚举
     enum class KeyCode
     {
         Unknown = GLFW_KEY_UNKNOWN,
@@ -68,6 +69,8 @@ namespace OxyRender
         Y = GLFW_KEY_Y,
         Z = GLFW_KEY_Z
     };
+
+    // 键盘按键与GLFW键值转换
     static KeyCode glfwToKeyCode(int key)
     {
         return static_cast<KeyCode>(key);
@@ -77,12 +80,14 @@ namespace OxyRender
         return static_cast<int>(k);
     }
 
+    // 鼠标按键枚举
     enum class MouseCode
     {
         ButtonLeft = GLFW_MOUSE_BUTTON_LEFT,
         ButtonRight = GLFW_MOUSE_BUTTON_RIGHT,
         ButtonMiddle = GLFW_MOUSE_BUTTON_MIDDLE
     };
+    // 鼠标按键与GLFW键值转换
     static MouseCode glfwToMouseCode(int button)
     {
         return static_cast<MouseCode>(button);
@@ -91,6 +96,7 @@ namespace OxyRender
     {
         return static_cast<int>(button);
     }
+    // 事件枚举
     enum class EventType
     {
         None,
@@ -102,7 +108,7 @@ namespace OxyRender
         MouseMoved,
         WindowResized
     };
-
+    // Key事件数据结构体
     struct KeyEvent
     {
         KeyCode key;
@@ -110,27 +116,31 @@ namespace OxyRender
         int mods;
     };
 
+    // MouseButton事件数据结构体
     struct MouseButtonEvent
     {
         int button;
         int mods;
     };
+    // MouseScroll事件数据结构体
     struct MouseScrollEvent
     {
         float xoffset;
         float yoffset;
     };
+    // MouseMove事件数据结构体
     struct MouseMoveEvent
     {
         glm::vec2 position;
     };
 
+    // WindowResize事件数据结构体
     struct WindowResizeEvent
     {
         int width;
         int height;
     };
-
+    // 事件数据结构体
     struct Event
     {
         EventType type = EventType::None;
@@ -141,6 +151,7 @@ namespace OxyRender
     using MouseMoveEventCallback = std::function<void(const MouseMoveEvent &)>;
     using MouseScrollEventCallback = std::function<void(const MouseScrollEvent &)>;
     using WindowResizeEventCallback = std::function<void(const WindowResizeEvent &)>;
+    // 事件系统类，处理事件的注册、分发和状态查询
     class EventSystem
     {
     private:

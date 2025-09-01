@@ -9,6 +9,7 @@
 #include "OxygenRender/GraphicsTypes.h"
 namespace OxyRender
 {
+    // 渲染器抽象接口类
     class IShader
     {
     protected:
@@ -23,7 +24,7 @@ namespace OxyRender
         virtual GLuint getID() = 0;
         virtual ~IShader() = default;
     };
-
+    // OpenGL实现Shader
     class OpenGLShader : public IShader
     {
     private:
@@ -41,13 +42,14 @@ namespace OxyRender
         virtual void setUniformData(const std::string &name, const void *data, size_t size) override;
         void setMat4(const std::string &name, const glm::mat4 &mat);
     };
-
+    // 渲染器工厂类
     class ShaderFactory
     {
     public:
         static std::unique_ptr<IShader> create(std::string name, std::string path_vertex, std::string path_fragment);
     };
 
+    // Shader类对外接口
     class Shader
     {
     private:

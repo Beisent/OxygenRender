@@ -8,25 +8,26 @@
 
 namespace OxyRender
 {
+    // Texture相关枚举
     enum class TextureFormat
     {
         RGBA8,
         RGB8,
         DEPTH24STENCIL8
     };
-
+    // Texture过滤和环绕模式
     enum class TextureFilter
     {
         Nearest,
         Linear
     };
-
+    // 纹理环绕模式
     enum class TextureWrap
     {
         Repeat,
         ClampToEdge
     };
-
+    // Texture 抽象接口类
     class ITexture
     {
     public:
@@ -38,6 +39,7 @@ namespace OxyRender
         virtual uint32_t getHeight() const noexcept = 0;
     };
 
+    // OpenGL实现Texture2D
     class OpenGLTexture2D : public ITexture
     {
     public:
@@ -63,12 +65,13 @@ namespace OxyRender
         GLenum m_filter;
         GLenum m_wrap;
     };
-
+    // Texture工厂类
     class TextureFactory
     {
     public:
         static std::unique_ptr<ITexture> createTexture2D(const std::string &path, TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat);
     };
+    // Texture2D类对外接口
     class Texture2D
     {
     private:
