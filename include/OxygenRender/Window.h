@@ -85,6 +85,7 @@ namespace OxyRender
         void pollEvents();
         int getWidth() const;
         int getHeight() const;
+        void update() ;
 
         void setCursorPos(float x, float y);
         void setCursorMode(CursorMode mode);

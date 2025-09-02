@@ -1,6 +1,7 @@
 #include "OxygenRender/Buffer.h"
 namespace OxyRender
 {
+    // 根据类型获取大小
     constexpr size_t sizeOfAttribType(VertexAttribType type) noexcept
     {
         switch (type)
@@ -25,14 +26,17 @@ namespace OxyRender
             return 0;
         }
     }
+    // 添加属性布局
     void VertexLayout::addAttribute(const std::string &name, int location, VertexAttribType type)
     {
         attributes.push_back({name, location, type, stride});
         stride += sizeOfAttribType(type);
     }
+    // OpenGL实现VertexBuffer
     OpenGLVertexBuffer::OpenGLVertexBuffer(BufferUsage usage)
     {
         GLenum glUsage = GL_STATIC_DRAW;
+        // 将BufferUsage映射为OpenGL的GLenum
         switch (usage)
         {
         case BufferUsage::StaticDraw:
@@ -49,6 +53,7 @@ namespace OxyRender
         glGenBuffers(1, &m_rendererID);
     }
 
+    
     OpenGLVertexBuffer::~OpenGLVertexBuffer()
     {
         glDeleteBuffers(1, &m_rendererID);
@@ -77,9 +82,11 @@ namespace OxyRender
         }
     }
 
+    // OpenGL实现IndexBuffer
     OpenGLIndexBuffer::OpenGLIndexBuffer(BufferUsage usage)
     {
         GLenum glUsage = GL_STATIC_DRAW;
+        // 将BufferUsage映射为OpenGL的GLenum
         switch (usage)
         {
         case BufferUsage::StaticDraw:
@@ -151,6 +158,7 @@ namespace OxyRender
         glBindVertexArray(0);
     }
 
+    // 设置顶点缓冲和布局
     void OpenGLVertexArray::setVertexBuffer(IBuffer *vertexBuffer, const VertexLayout &layout)
     {
         m_vertexBuffer = vertexBuffer;
@@ -181,10 +189,13 @@ namespace OxyRender
     {
         return m_indexBuffer;
     }
+    // 创建缓冲对象
     std::unique_ptr<IBuffer> BufferFactory::createBuffer(BufferType type, BufferUsage usage)
     {
+
         if (Backends::OXYG_CurrentBackend == RendererBackend::OpenGL)
         {
+            // 根据类型创建对应的缓冲对象
             if (type == BufferType::Vertex)
             {
                 return std::make_unique<OpenGLVertexBuffer>(usage);

@@ -25,7 +25,7 @@ namespace OxyRender
         Event e;
         e.type = EventType::MouseScrolled;
         e.data = MouseScrollEvent{(float)xoffset, (float)yoffset};
-       EventSystem::getInstance().pushEvent(e);
+        EventSystem::getInstance().pushEvent(e);
     }
 
     static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
@@ -41,7 +41,7 @@ namespace OxyRender
             e.type = EventType::MouseButtonReleased;
             e.data = MouseButtonEvent{button, mods};
         }
-       EventSystem::getInstance().pushEvent(e);
+        EventSystem::getInstance().pushEvent(e);
     }
 
     static void cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
@@ -49,7 +49,7 @@ namespace OxyRender
         Event e;
         e.type = EventType::MouseMoved;
         e.data = MouseMoveEvent{{(float)xpos, (float)ypos}};
-       EventSystem::getInstance().pushEvent(e);
+        EventSystem::getInstance().pushEvent(e);
     }
 
     static void framebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -200,6 +200,12 @@ namespace OxyRender
     double Window::getTime()
     {
         return m_window->getTime();
+    }
+
+    void Window::update()
+    {
+        pollEvents();
+        swapBuffers();
     }
 
 } // namespace OxyRender

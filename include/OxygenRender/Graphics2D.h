@@ -62,20 +62,19 @@ namespace OxyRender
                         float thickness = 1.0f,
                         int segments = 32);
 
-        
-        void drawRect(float x, float y, float width, float height, const Texture2D& texture, 
-                               OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, 
-                                   const Texture2D& texture, OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        void drawPolygon(const std::vector<glm::vec2> &points, const Texture2D& texture, 
-                                  OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        void drawCircle(float cx, float cy, float radius, const Texture2D& texture, 
-                                 OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
-        void drawEllipse(float cx, float cy, float radiusX, float radiusY, const Texture2D& texture, 
-                                  OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
+        void drawRect(float x, float y, float width, float height, const Texture2D &texture,
+                      OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3,
+                          const Texture2D &texture, OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        void drawPolygon(const std::vector<glm::vec2> &points, const Texture2D &texture,
+                         OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        void drawCircle(float cx, float cy, float radius, const Texture2D &texture,
+                        OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
+        void drawEllipse(float cx, float cy, float radiusX, float radiusY, const Texture2D &texture,
+                         OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
 
         // 设置当前纹理
-        void setTexture(const Texture2D* texture);
+        void setTexture(const Texture2D *texture);
         void clearTexture();
 
         void flush();
@@ -110,7 +109,7 @@ namespace OxyRender
         // 纹理批次
         struct TextureBatch
         {
-            const Texture2D* texture;
+            const Texture2D *texture;
             std::vector<Vertex> vertices;
             std::vector<unsigned int> indices;
             size_t indexCount = 0;
@@ -141,7 +140,7 @@ namespace OxyRender
         std::vector<TextureBatch> m_textureBatches;
 
         // 当前纹理
-        const Texture2D* m_currentTexture = nullptr;
+        const Texture2D *m_currentTexture = nullptr;
 
         // 辅助方法
         void addTextureVertex(float x, float y, float u, float v, OxyColor color);

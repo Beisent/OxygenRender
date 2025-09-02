@@ -7,6 +7,13 @@
         struct OxyColor
         {
             float r, g, b, a;
+            OxyColor(float r, float g, float b, float a = 1.0f)
+            {
+                this->r = r;
+                this->g = g;
+                this->b = b;
+                this->a = a;
+            }
         };
 
         // 渲染器后端枚举

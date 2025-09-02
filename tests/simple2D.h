@@ -1,0 +1,24 @@
+﻿#include "OxygenRender/Graphics2D.h"
+using namespace OxyRender;
+
+class Simple2D
+{
+public:
+    static void execute()
+    {
+        Window window(800, 600, "Simple2D");
+        Renderer renderer(window);
+
+        Graphics2D graphics2D(window, renderer);
+        
+        while (!window.shouldClose())
+        {
+            graphics2D.clear();
+            graphics2D.begin();
+            graphics2D.drawCircle(-350, 250, 50, {1, 0, 0, 0.5f});
+            graphics2D.flush();
+
+            window.update();
+        }
+    }
+};

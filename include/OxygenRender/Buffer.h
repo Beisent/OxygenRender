@@ -76,7 +76,7 @@ namespace OxyRender
         virtual IndexBuffer *getIndexBuffer() const noexcept = 0;
     };
 
-    // 顶点布局抽象接口类
+    // 顶点布局
     class VertexLayout
     {
     public:
@@ -91,6 +91,7 @@ namespace OxyRender
         size_t stride;
     };
 
+    // OpenGL实现VertexBuffer
     class OpenGLVertexBuffer : public IBuffer
     {
     public:
@@ -105,6 +106,7 @@ namespace OxyRender
         GLuint m_rendererID;
         GLenum m_usage;
     };
+    // OpenGL实现IndexBuffer
     class OpenGLIndexBuffer : public IndexBuffer
     {
     public:
@@ -122,6 +124,7 @@ namespace OxyRender
         uint32_t m_count;
     };
 
+    // OpenGL实现VertexArray
     class OpenGLVertexArray : public IVertexArray
     {
     public:
@@ -141,6 +144,7 @@ namespace OxyRender
         IndexBuffer *m_indexBuffer;
     };
 
+    // Buffer工厂类
     class BufferFactory
     {
     public:
@@ -172,6 +176,7 @@ namespace OxyRender
         }
     };
 
+    // VertexArray工厂类
     class VertexArrayFactory
     {
     public:
