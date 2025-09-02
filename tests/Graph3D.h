@@ -90,6 +90,7 @@ namespace OxyRender
 
                 graphics3D.clear();
                 graphics3D.begin();
+                graphics3D.drawPlane({0.0f, -20.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1000.0f, 1000.0f}, {0.2f, 0.8f, 0.2f, 1.0f});
                 graphics3D.drawBox({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.8f, 0.2f, 0.2f, 1.0f});
                 graphics3D.drawSphere({0.0f, 1.5f, 0.0f}, 0.5f);
                 graphics3D.drawBox({2.0f, 0.0f, 0.0f}, {1.0f, 2.0f, 1.0f}, {0.2f, 0.2f, 0.8f, 1.0f});

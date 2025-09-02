@@ -45,7 +45,9 @@ namespace OxyRender
     void Graphics3D::begin()
     {
         m_triVertices.clear();
+        m_triVertices.reserve(4096);
         m_triIndices.clear();
+        m_triIndices.reserve(6144);
         m_triIndexCount = 0;
 
         m_lineBatches.clear();
@@ -128,6 +130,58 @@ namespace OxyRender
         {
             batch->vertices.push_back({p, color, glm::vec3(0.0f)});
         }
+    }
+
+    void Graphics3D::drawPlane(const glm::vec3 &center,
+                               const glm::vec3 &inNormal,
+                               const glm::vec2 &size,
+                               const OxyColor &color)
+    {
+        glm::vec3 N = inNormal;
+        float nlen = glm::length(N);
+        if (nlen < 1e-6f)
+        {
+            N = glm::vec3(0, 1, 0);
+        }
+        else
+        {
+            N /= nlen;
+        }
+
+        glm::vec3 ref = (std::fabs(N.y) < 0.9f) ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
+        glm::vec3 T = glm::normalize(glm::cross(ref, N));
+
+        if (glm::dot(T, T) < 1e-12f)
+        {
+            ref = glm::vec3(0, 0, 1);
+            T = glm::normalize(glm::cross(ref, N));
+        }
+        glm::vec3 B = glm::normalize(glm::cross(N, T));
+
+        float hx = size.x * 0.5f;
+        float hy = size.y * 0.5f;
+
+        glm::vec3 p0 = center - T * hx - B * hy; // 左下
+        glm::vec3 p1 = center + T * hx - B * hy; // 右下
+        glm::vec3 p2 = center + T * hx + B * hy; // 右上
+        glm::vec3 p3 = center - T * hx + B * hy; // 左上
+
+        unsigned base = (unsigned)m_triVertices.size();
+        m_triVertices.push_back({p0, color, N});
+        m_triVertices.push_back({p1, color, N});
+        m_triVertices.push_back({p2, color, N});
+        m_triVertices.push_back({p3, color, N});
+
+        // 两个三角形：p0->p1->p2, p0->p2->p3（CCW）
+        m_triIndices.push_back(base + 0);
+        m_triIndices.push_back(base + 1);
+        m_triIndices.push_back(base + 2);
+
+        m_triIndices.push_back(base + 0);
+        m_triIndices.push_back(base + 2);
+        m_triIndices.push_back(base + 3);
+
+        m_triIndexCount += 6;
     }
 
     void Graphics3D::drawBox(const glm::vec3 &center, const glm::vec3 &size, const OxyColor &color)

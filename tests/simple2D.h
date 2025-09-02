@@ -10,12 +10,14 @@ public:
         Renderer renderer(window);
 
         Graphics2D graphics2D(window, renderer);
-        
+
         while (!window.shouldClose())
         {
             graphics2D.clear();
             graphics2D.begin();
-            graphics2D.drawCircle(-350, 250, 50, {1, 0, 0, 0.5f});
+
+            graphics2D.drawRect(-50, 50, 100, -100, {1, 0, 0, 0.5f});
+
             graphics2D.flush();
 
             window.update();
