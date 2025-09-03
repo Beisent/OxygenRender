@@ -289,6 +289,42 @@ namespace OxyRender
             }
         }
     }
+    void Graphics3D::drawFunctionSurface(
+        const glm::vec2 &xDomain,
+        const glm::vec2 &zDomain,
+        const FunctionExp &func,
+        const OxyColor &color,
+        float dx,
+        float dz)
+    {
+        glm::vec2 xRange = xDomain;
+        glm::vec2 zRange = zDomain;
+        int nx = static_cast<int>((xRange[1] - xRange[0]) / dx);
+        int nz = static_cast<int>((zRange[1] - zRange[0]) / dz);
+
+        // 调整 xMax，yMax 以确保整除避免边缘不完整
+        xRange[1] = xRange[0] + nx * dx;
+        zRange[1] = zRange[0] + nz * dz;
+
+        for (int i = 0; i < nx; ++i)
+        {
+            for (int j = 0; j < nz; ++j)
+            {
+                float x1 = xRange[0] + i * dx;
+                float x2 = xRange[0] + (i + 1) * dx;
+                float z1 = zRange[0] + j * dz;
+                float z2 = zRange[0] + (j + 1) * dz;
+
+                glm::vec3 p1(x1, func(x1, z1), z1);
+                glm::vec3 p2(x2, func(x2, z1), z1);
+                glm::vec3 p3(x2, func(x2, z2), z2);
+                glm::vec3 p4(x1, func(x1, z2), z2);
+
+                drawTriangle(p1, p2, p4, color);
+                drawTriangle(p2, p3, p4, color);
+            }
+        }
+    }
 
     void Graphics3D::flush()
     {

@@ -9,9 +9,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <cmath>
+#include <functional>
 
 namespace OxyRender
 {
+    using FunctionExp = std::function<float(float, float)>;
     // 3D 绘图类
     class Graphics3D
     {
@@ -38,7 +40,7 @@ namespace OxyRender
                         const OxyColor &color);
 
         void drawPlane(const glm::vec3 &center, const glm::vec3 &normal, const glm::vec2 &size, const OxyColor &color);
-        
+
         void drawBox(const glm::vec3 &center,
                      const glm::vec3 &size,
                      const OxyColor &color = {0.8f, 0.2f, 0.2f, 1.0f});
@@ -48,6 +50,13 @@ namespace OxyRender
                         int stacks = 16,
                         int slices = 24,
                         const OxyColor &color = {0.2f, 0.6f, 0.9f, 1.0f});
+        void drawFunctionSurface(
+            const glm::vec2 &xValues,
+            const glm::vec2 &yValues,
+            const FunctionExp &func,
+            const OxyColor &color = {0.2f, 0.6f, 0.9f, 1.0f},
+            float dx = 0.1f,
+            float dy = 0.1f);
 
         void flush();
 
