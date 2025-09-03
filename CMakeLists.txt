@@ -20,13 +20,21 @@ set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/GLAD
-    ${CMAKE_SOURCE_DIR}/include/GLFW
     ${CMAKE_SOURCE_DIR}/include/glm
     ${CMAKE_SOURCE_DIR}/include/stb
     ${CMAKE_SOURCE_DIR}/tests
 )
 
-# 3. 源文件收集
+# 3. 添加GLM和GLFW子目录
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/vendor/glm)
+
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/vendor/glfw)
+
+# 4. 源文件收集
 file(GLOB_RECURSE OXYGEN_SRC
     ${CMAKE_SOURCE_DIR}/src/core/*.cpp
     ${CMAKE_SOURCE_DIR}/src/graphics/*.cpp
@@ -35,27 +43,25 @@ file(GLOB_RECURSE OXYGEN_SRC
     ${CMAKE_SOURCE_DIR}/src/vendor/GLAD/*.c
 )
 
-# 4. 添加静态库 OxygenRender
+# 5. 添加静态库 OxygenRender
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/vendor/assimp)
 
 add_library(OxygenRender STATIC ${OXYGEN_SRC})
-target_link_libraries(OxygenRender assimp)
+target_link_libraries(OxygenRender assimp glm::glm glfw)
 
-# 5. 链接外部库 GLFW
+# 6. 链接外部库 
+target_link_libraries(OxygenRender glfw)
+
+# 根据平台链接OpenGL
 if(WIN32)
-    target_link_libraries(OxygenRender
-        ${CMAKE_SOURCE_DIR}/libs/GLFW/lib-mingw-w64/libglfw3.a
-        opengl32
-    )
+    target_link_libraries(OxygenRender opengl32)
 elseif(APPLE)
-    find_package(glfw3 REQUIRED)
-    target_link_libraries(OxygenRender glfw "-framework OpenGL")
+    target_link_libraries(OxygenRender "-framework OpenGL")
 else()
-    find_package(glfw3 REQUIRED)
-    target_link_libraries(OxygenRender glfw GL)
+    target_link_libraries(OxygenRender GL)
 endif()
 
-# 6. 测试程序
+# 7. 测试程序
 file(GLOB TEST_SRC ${CMAKE_SOURCE_DIR}/tests/*.cpp)
 add_executable(TestApp ${TEST_SRC})
 target_link_libraries(TestApp OxygenRender)

@@ -51,6 +51,17 @@ namespace OxyRender
         m_textureBatches.clear();
     }
 
+    // 纹理相关方法实现
+    void Graphics2D::setTexture(const Texture2D *texture)
+    {
+        m_currentTexture = texture;
+    }
+
+    void Graphics2D::clearTexture()
+    {
+        m_currentTexture = nullptr;
+    }
+
     void Graphics2D::drawRect(float x, float y, float width, float height, OxyColor color)
     {
         Vertex v0 = {{x, y, 0.0f}, color, {0.0f, 0.0f}};
@@ -305,182 +316,6 @@ namespace OxyRender
 
         drawTriangle(v0.x, v0.y, v1.x, v1.y, v2.x, v2.y, color);
     }
-
-    void Graphics2D::drawAxis(OxyColor axisColor,
-                              OxyColor gridColor,
-                              float thickness,
-                              float gridSpacing,
-                              bool drawGrid)
-    {
-        // 投影和视图矩阵
-        glm::mat4 proj = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
-        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
-        glm::mat4 vp = proj * view;
-        glm::mat4 invVP = glm::inverse(vp);
-
-        // 将 NDC 转换为屏幕坐标
-        auto unproject = [&](float ndcX, float ndcY)
-        {
-            glm::vec4 p(ndcX, ndcY, 0.0f, 1.0f);
-            p = invVP * p;
-            return glm::vec2(p.x / p.w, p.y / p.w);
-        };
-
-        glm::vec2 bottomLeft = unproject(-1, -1);
-        glm::vec2 topRight = unproject(1, 1);
-
-        // 渲染网格
-        if (drawGrid && gridSpacing > 0.0f)
-        {
-            float yStart = std::floor(bottomLeft.y / gridSpacing) * gridSpacing;
-            for (float y = yStart; y <= topRight.y; y += gridSpacing)
-            {
-                drawLine(bottomLeft.x, y, topRight.x, y, gridColor, 1.0f);
-            }
-            float xStart = std::floor(bottomLeft.x / gridSpacing) * gridSpacing;
-            for (float x = xStart; x <= topRight.x; x += gridSpacing)
-            {
-                drawLine(x, bottomLeft.y, x, topRight.y, gridColor, 1.0f);
-            }
-        }
-        // 渲染坐标轴
-        drawArrow(bottomLeft.x, 0, topRight.x, 0, axisColor, thickness);
-        drawArrow(0, bottomLeft.y, 0, topRight.y, axisColor, thickness);
-    }
-
-    // 二次贝塞尔曲线
-    void Graphics2D::drawBezier(float x0, float y0, float cx, float cy, float x1,
-                                float y1, OxyColor color, float thickness, int segments)
-    {
-        if (segments < 1)
-            segments = 1;
-        glm::vec2 prev(x0, y0);
-
-        for (int i = 1; i <= segments; ++i)
-        {
-            float t = static_cast<float>(i) / static_cast<float>(segments);
-            float u = 1.0f - t;
-            glm::vec2 pt = u * u * glm::vec2(x0, y0) + 2.0f * u * t * glm::vec2(cx, cy) + t * t * glm::vec2(x1, y1);
-
-            drawLine(prev.x, prev.y, pt.x, pt.y, color, thickness);
-            prev = pt;
-        }
-    }
-
-    // 三次贝塞尔曲线
-    void Graphics2D::drawBezier(float x0, float y0, float c1x, float c1y, float c2x, float c2y,
-                                float x1, float y1, OxyColor color, float thickness, int segments)
-    {
-        if (segments < 1)
-            segments = 1;
-        glm::vec2 prev(x0, y0);
-
-        for (int i = 1; i <= segments; ++i)
-        {
-            float t = static_cast<float>(i) / static_cast<float>(segments);
-            float u = 1.0f - t;
-
-            // B(t) = u^3 P0 + 3 u^2 t P1 + 3 u t^2 P2 + t^3 P3
-            glm::vec2 pt = (u * u * u) * glm::vec2(x0, y0) + 3.0f * (u * u) * t * glm::vec2(c1x, c1y) + 3.0f * u * (t * t) * glm::vec2(c2x, c2y) + (t * t * t) * glm::vec2(x1, y1);
-
-            drawLine(prev.x, prev.y, pt.x, pt.y, color, thickness);
-            prev = pt;
-        }
-    }
-    void Graphics2D::drawFunction(const float &xStart, const float &xEnd,
-                                  const std::function<float(float)> &func,
-                                  const OxyColor &color,
-                                  const float &dx,
-                                  const float &thickness)
-    {
-        for (float x = xStart; x < xEnd; x += dx)
-        {
-            drawLine(x, func(x), x + dx, func(x + dx), color, thickness);
-        }
-    }
-
-    void Graphics2D::flush()
-    {
-        if (m_triIndexCount == 0 && m_lineBatches.empty())
-            return;
-
-        m_renderer.setCapability(RenderCapability::Multisample, true);
-        m_renderer.setCapability(RenderCapability::Blend, true);
-        m_renderer.setCapability(RenderCapability::DepthTest, false);
-        m_renderer.setCapability(RenderCapability::StencilTest, false);
-
-        m_shader.use();
-
-        // MVP变换
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
-        glm::mat4 projection = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
-
-        m_shader.setUniformData("model", &model, sizeof(glm::mat4));
-        m_shader.setUniformData("view", &view, sizeof(glm::mat4));
-        m_shader.setUniformData("projection", &projection, sizeof(glm::mat4));
-
-        m_vao.bind();
-
-        // 线绘制
-        for (auto &batch : m_lineBatches)
-        {
-            if (batch.indexCount == 0)
-                continue;
-
-            m_vbo.setData(batch.vertices.data(), batch.vertices.size() * sizeof(Vertex));
-            m_ebo.setData(batch.indices.data(), batch.indices.size() * sizeof(unsigned int));
-            m_renderer.drawLines(m_vao, batch.indexCount, batch.thickness);
-        }
-
-        // 三角形绘制
-        if (m_triIndexCount > 0)
-        {
-            m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
-            m_ebo.setData(m_triIndices.data(), m_triIndices.size() * sizeof(unsigned int));
-            m_renderer.drawTriangles(m_vao, m_triIndexCount);
-        }
-
-        // 点绘制
-        if (!m_pointBatches.empty())
-        {
-            m_renderer.setCapability(RenderCapability::ProgramPointSize, true);
-
-            for (auto &pb : m_pointBatches)
-            {
-                if (pb.vertices.empty())
-                    continue;
-
-                m_vbo.setData(pb.vertices.data(), pb.vertices.size() * sizeof(Vertex));
-
-                float size = pb.size;
-                m_shader.setUniformData("uPointSize", &size, sizeof(float));
-                m_renderer.drawPoints(m_vao, static_cast<uint32_t>(pb.vertices.size()));
-            }
-
-            m_renderer.setCapability(RenderCapability::ProgramPointSize, false);
-        }
-        m_vao.unbind();
-
-        m_triIndexCount = 0;
-        m_lineBatches.clear();
-        m_pointBatches.clear();
-
-        // 刷新纹理批次
-        flushTextureBatches();
-    }
-
-    // 纹理相关方法实现
-    void Graphics2D::setTexture(const Texture2D *texture)
-    {
-        m_currentTexture = texture;
-    }
-
-    void Graphics2D::clearTexture()
-    {
-        m_currentTexture = nullptr;
-    }
-
     void Graphics2D::drawRect(float x, float y, float width, float height, const Texture2D &texture, OxyColor tintColor)
     {
         // 查找或创建对应的纹理批次
@@ -699,6 +534,170 @@ namespace OxyRender
             batch->indices.push_back(startIndex + i + 1);
             batch->indexCount += 3;
         }
+    }
+
+    void Graphics2D::drawAxis(OxyColor axisColor,
+                              OxyColor gridColor,
+                              float thickness,
+                              float gridSpacing,
+                              bool drawGrid)
+    {
+        // 投影和视图矩阵
+        glm::mat4 proj = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
+        glm::mat4 vp = proj * view;
+        glm::mat4 invVP = glm::inverse(vp);
+
+        // 将 NDC 转换为屏幕坐标
+        auto unproject = [&](float ndcX, float ndcY)
+        {
+            glm::vec4 p(ndcX, ndcY, 0.0f, 1.0f);
+            p = invVP * p;
+            return glm::vec2(p.x / p.w, p.y / p.w);
+        };
+
+        glm::vec2 bottomLeft = unproject(-1, -1);
+        glm::vec2 topRight = unproject(1, 1);
+
+        // 渲染网格
+        if (drawGrid && gridSpacing > 0.0f)
+        {
+            float yStart = std::floor(bottomLeft.y / gridSpacing) * gridSpacing;
+            for (float y = yStart; y <= topRight.y; y += gridSpacing)
+            {
+                drawLine(bottomLeft.x, y, topRight.x, y, gridColor, 1.0f);
+            }
+            float xStart = std::floor(bottomLeft.x / gridSpacing) * gridSpacing;
+            for (float x = xStart; x <= topRight.x; x += gridSpacing)
+            {
+                drawLine(x, bottomLeft.y, x, topRight.y, gridColor, 1.0f);
+            }
+        }
+        // 渲染坐标轴
+        drawArrow(bottomLeft.x, 0, topRight.x, 0, axisColor, thickness);
+        drawArrow(0, bottomLeft.y, 0, topRight.y, axisColor, thickness);
+    }
+
+    // 二次贝塞尔曲线
+    void Graphics2D::drawBezier(float x0, float y0, float cx, float cy, float x1,
+                                float y1, OxyColor color, float thickness, int segments)
+    {
+        if (segments < 1)
+            segments = 1;
+        glm::vec2 prev(x0, y0);
+
+        for (int i = 1; i <= segments; ++i)
+        {
+            float t = static_cast<float>(i) / static_cast<float>(segments);
+            float u = 1.0f - t;
+            glm::vec2 pt = u * u * glm::vec2(x0, y0) + 2.0f * u * t * glm::vec2(cx, cy) + t * t * glm::vec2(x1, y1);
+
+            drawLine(prev.x, prev.y, pt.x, pt.y, color, thickness);
+            prev = pt;
+        }
+    }
+
+    // 三次贝塞尔曲线
+    void Graphics2D::drawBezier(float x0, float y0, float c1x, float c1y, float c2x, float c2y,
+                                float x1, float y1, OxyColor color, float thickness, int segments)
+    {
+        if (segments < 1)
+            segments = 1;
+        glm::vec2 prev(x0, y0);
+
+        for (int i = 1; i <= segments; ++i)
+        {
+            float t = static_cast<float>(i) / static_cast<float>(segments);
+            float u = 1.0f - t;
+
+            // B(t) = u^3 P0 + 3 u^2 t P1 + 3 u t^2 P2 + t^3 P3
+            glm::vec2 pt = (u * u * u) * glm::vec2(x0, y0) + 3.0f * (u * u) * t * glm::vec2(c1x, c1y) + 3.0f * u * (t * t) * glm::vec2(c2x, c2y) + (t * t * t) * glm::vec2(x1, y1);
+
+            drawLine(prev.x, prev.y, pt.x, pt.y, color, thickness);
+            prev = pt;
+        }
+    }
+    void Graphics2D::drawFunction(const float &xStart, const float &xEnd,
+                                  const std::function<float(float)> &func,
+                                  const OxyColor &color,
+                                  const float &dx,
+                                  const float &thickness)
+    {
+        for (float x = xStart; x < xEnd; x += dx)
+        {
+            drawLine(x, func(x), x + dx, func(x + dx), color, thickness);
+        }
+    }
+
+    void Graphics2D::flush()
+    {
+        if (m_triIndexCount == 0 && m_lineBatches.empty())
+            return;
+
+        m_renderer.setCapability(RenderCapability::Multisample, true);
+        m_renderer.setCapability(RenderCapability::Blend, true);
+        m_renderer.setCapability(RenderCapability::DepthTest, false);
+        m_renderer.setCapability(RenderCapability::StencilTest, false);
+
+        m_shader.use();
+
+        // MVP变换
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
+        glm::mat4 projection = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+
+        m_shader.setUniformData("model", &model, sizeof(glm::mat4));
+        m_shader.setUniformData("view", &view, sizeof(glm::mat4));
+        m_shader.setUniformData("projection", &projection, sizeof(glm::mat4));
+
+        m_vao.bind();
+
+        // 线绘制
+        for (auto &batch : m_lineBatches)
+        {
+            if (batch.indexCount == 0)
+                continue;
+
+            m_vbo.setData(batch.vertices.data(), batch.vertices.size() * sizeof(Vertex));
+            m_ebo.setData(batch.indices.data(), batch.indices.size() * sizeof(unsigned int));
+            m_renderer.drawLines(m_vao, batch.indexCount, batch.thickness);
+        }
+
+        // 三角形绘制
+        if (m_triIndexCount > 0)
+        {
+            m_vbo.setData(m_triVertices.data(), m_triVertices.size() * sizeof(Vertex));
+            m_ebo.setData(m_triIndices.data(), m_triIndices.size() * sizeof(unsigned int));
+            m_renderer.drawTriangles(m_vao, m_triIndexCount);
+        }
+
+        // 点绘制
+        if (!m_pointBatches.empty())
+        {
+            m_renderer.setCapability(RenderCapability::ProgramPointSize, true);
+
+            for (auto &pb : m_pointBatches)
+            {
+                if (pb.vertices.empty())
+                    continue;
+
+                m_vbo.setData(pb.vertices.data(), pb.vertices.size() * sizeof(Vertex));
+
+                float size = pb.size;
+                m_shader.setUniformData("uPointSize", &size, sizeof(float));
+                m_renderer.drawPoints(m_vao, static_cast<uint32_t>(pb.vertices.size()));
+            }
+
+            m_renderer.setCapability(RenderCapability::ProgramPointSize, false);
+        }
+        m_vao.unbind();
+
+        m_triIndexCount = 0;
+        m_lineBatches.clear();
+        m_pointBatches.clear();
+
+        // 刷新纹理批次
+        flushTextureBatches();
     }
 
     void Graphics2D::flushTextureBatches()

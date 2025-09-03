@@ -3,3 +3,4 @@ build
 .vscode
 bin/resource/objects/test
 bin/resource/objects
+bin/*.dll
