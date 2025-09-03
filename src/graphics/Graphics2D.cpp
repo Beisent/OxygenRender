@@ -387,6 +387,17 @@ namespace OxyRender
             prev = pt;
         }
     }
+    void Graphics2D::drawFunction(const float &xStart, const float &xEnd,
+                                  const std::function<float(float)> &func,
+                                  const OxyColor &color,
+                                  const float &dx,
+                                  const float &thickness)
+    {
+        for (float x = xStart; x < xEnd; x += dx)
+        {
+            drawLine(x, func(x), x + dx, func(x + dx), color, thickness);
+        }
+    }
 
     void Graphics2D::flush()
     {
@@ -582,7 +593,7 @@ namespace OxyRender
         // 添加第一个点作为闭合
         batch->vertices.push_back({{points[0].x, points[0].y, 0.0f}, tintColor, {1.0f, 0.0f}});
 
-        // 添加索引（扇形三角形）
+        // 添加索引
         for (size_t i = 0; i < points.size(); ++i)
         {
             batch->indices.push_back(startIndex); // 中心点
@@ -625,7 +636,7 @@ namespace OxyRender
             float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
             float x = cx + cos(angle) * radius;
             float y = cy + sin(angle) * radius;
-            // 将角度映射到纹理坐标 [0,1]
+            // 将角度映射到纹理坐标
             float u = 0.5f + 0.5f * cos(angle);
             float v = 0.5f + 0.5f * sin(angle);
             batch->vertices.push_back({{x, y, 0.0f}, tintColor, {u, v}});
@@ -674,7 +685,7 @@ namespace OxyRender
             float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
             float x = cx + cos(angle) * radiusX;
             float y = cy + sin(angle) * radiusY;
-            // 将角度映射到纹理坐标 [0,1]
+            // 将角度映射到纹理坐标
             float u = 0.5f + 0.5f * cos(angle);
             float v = 0.5f + 0.5f * sin(angle);
             batch->vertices.push_back({{x, y, 0.0f}, tintColor, {u, v}});

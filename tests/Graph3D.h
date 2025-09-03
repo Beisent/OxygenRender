@@ -95,7 +95,7 @@ namespace OxyRender
                 graphics3D.drawSphere({0.0f, 1.5f, 0.0f}, 0.5f);
                 graphics3D.drawBox({2.0f, 0.0f, 0.0f}, {1.0f, 2.0f, 1.0f}, {0.2f, 0.2f, 0.8f, 1.0f});
 
-                graphics3D.drawFunctionSurface({-5.0f, 5.0f}, {-5.0f, 5.0f}, [](float x, float z)
+                graphics3D.drawFunction({-5.0f, 5.0f}, {-5.0f, 5.0f}, [](float x, float z)
                                                { return std::sin(std::sqrt(x * x + z * z)) + 5; }, {0.2f, 0.6f, 0.9f, 0.8f}, 0.2f, 0.2f);
                 graphics3D.flush();
 

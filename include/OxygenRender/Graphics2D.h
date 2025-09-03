@@ -8,6 +8,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <cmath>
+#include <functional>
 
 namespace OxyRender
 {
@@ -61,6 +62,11 @@ namespace OxyRender
                         OxyColor color,
                         float thickness = 1.0f,
                         int segments = 32);
+        void drawFunction(const float &xStart, const float &xEnd,
+                          const std::function<float(float)> &func,
+                          const OxyColor &color,
+                          const float &dx = 0.01f,
+                          const float &thickness = 1.0f);
 
         void drawRect(float x, float y, float width, float height, const Texture2D &texture,
                       OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});

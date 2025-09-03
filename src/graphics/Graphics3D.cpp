@@ -289,13 +289,13 @@ namespace OxyRender
             }
         }
     }
-    void Graphics3D::drawFunctionSurface(
+    void Graphics3D::drawFunction(
         const glm::vec2 &xDomain,
         const glm::vec2 &zDomain,
-        const FunctionExp &func,
+        const std::function<float(float, float)> &func,
         const OxyColor &color,
-        float dx,
-        float dz)
+        const float &dx,
+        const float &dz)
     {
         glm::vec2 xRange = xDomain;
         glm::vec2 zRange = zDomain;
