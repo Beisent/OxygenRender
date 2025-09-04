@@ -41,8 +41,8 @@ namespace OxyRender
             });
 
             
-            Texture2D containerTexture("resource/container.jpg");
-            Texture2D faceTexture("resource/awesomeface.png");
+            Texture2D containerTexture("../resources/container.jpg");
+            Texture2D faceTexture("../resources/awesomeface.png");
 
             while (!window.shouldClose())
             {

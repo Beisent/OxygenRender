@@ -24,14 +24,14 @@ namespace OxyRender
             Window window(800, 600, "OxygenRender");
             Renderer renderer(window);
 
-            Shader modelProgram("model_shader", "shaders/model_vertex.vert", "shaders/model_fragment.frag");
+            Shader modelProgram("model_shader", "../shaders/model_vertex.vert", "../shaders/model_fragment.frag");
 
             Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
             window.setCursorMode(CursorMode::Disabled);
             bool mouseCaptured = true;
 
-            Model backpackModel(renderer, "resource/objects/backpack/backpack.obj");
+            Model backpackModel(renderer, "../resources/objects/backpack/backpack.obj");
             EventSystem &eventSystem = eventSystem.getInstance();
            
             // 注册键盘按下事件

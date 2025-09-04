@@ -21,8 +21,8 @@ namespace OxyRender
         {
             Window window(800, 600, "OxygenRender");
             Renderer renderer(window);
-            Shader shader("program", "shaders/vertex.vert", "shaders/fragment.frag");
-            Shader light_shader("light", "shaders/vertex.vert", "shaders/light.frag");
+            Shader shader("program", "../shaders/vertex.vert", "../shaders/fragment.frag");
+            Shader light_shader("light", "../shaders/vertex.vert", "../shaders/light.frag");
             float vertices[] = {
                 // positions          // normals           // texture coords
                 -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,

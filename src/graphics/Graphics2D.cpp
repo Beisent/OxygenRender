@@ -5,8 +5,8 @@ namespace OxyRender
         : m_window(window),
           m_renderer(renderer),
           m_camera(glm::vec3(0, 0, 10.0f)),
-          m_shader("default", "shaders/graphics2d/vertex.vert", "shaders/graphics2d/fragment.frag"),
-          m_textureShader("texture", "shaders/graphics2d/texture_vertex.vert", "shaders/graphics2d/texture_fragment.frag"),
+          m_shader("default", "../shaders/graphics2d/vertex.vert", "../shaders/graphics2d/fragment.frag"),
+          m_textureShader("texture", "../shaders/graphics2d/texture_vertex.vert", "../shaders/graphics2d/texture_fragment.frag"),
           m_vbo(BufferType::Vertex, BufferUsage::DynamicDraw),
           m_ebo(BufferType::Index, BufferUsage::DynamicDraw)
     {

@@ -10,9 +10,9 @@ int main()
 {
     // Backpack::execute();
     // LightBox::execute();
-    Graph2D::execute();
-    // Graph3D::execute();
-    // Texture2DTest::execute();
+    // Graph2D::execute();
+    //Graph3D::execute();
+     Texture2DTest::execute();
     // Simple2D::execute();
     return 0;
 }

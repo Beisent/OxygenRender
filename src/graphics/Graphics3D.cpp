@@ -6,7 +6,7 @@ namespace OxyRender
         : m_window(window),
           m_renderer(renderer),
           m_camera(glm::vec3(0.0f, 1.5f, 5.0f)),
-          m_shader("default3D", "shaders/graphics3d/vertex.vert", "shaders/graphics3d/fragment.frag"),
+          m_shader("default3D", "../shaders/graphics3d/vertex.vert", "../shaders/graphics3d/fragment.frag"),
           m_vbo(BufferType::Vertex, BufferUsage::DynamicDraw),
           m_ebo(BufferType::Index, BufferUsage::DynamicDraw)
     {
