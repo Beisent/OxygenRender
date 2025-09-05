@@ -5,6 +5,7 @@
 #include "OxygenRender/Shader.h"
 #include "OxygenRender/Texture.h"
 #include "OxygenRender/EventSystem.h"
+#include "OxygenRender/ResourcesManager.h"
 #include "OxygenRender/Camera.h"
 #include "OxygenRender/Model.h"
 #include "OxygenRender/Timer.h"
@@ -24,16 +25,17 @@ namespace OxyRender
             Window window(800, 600, "OxygenRender");
             Renderer renderer(window);
 
-            Shader modelProgram("model_shader", "../shaders/model_vertex.vert", "../shaders/model_fragment.frag");
+            auto& res = ResourcesManager::getInstance();
+            
+            Shader modelProgram("model_shader", res.resolve("model_vertex.vert"), res.resolve("model_fragment.frag"));
 
             Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
             window.setCursorMode(CursorMode::Disabled);
             bool mouseCaptured = true;
-
             Model backpackModel(renderer, "../resources/objects/backpack/backpack.obj");
             EventSystem &eventSystem = eventSystem.getInstance();
-           
+
             // 注册键盘按下事件
             eventSystem.registerCallback(EventType::KeyPressed, [&window, &mouseCaptured](const Event &e)
                                          {
@@ -80,7 +82,7 @@ namespace OxyRender
                 double dt = Timer::getInstance().deltaTime();
 
                 eventSystem.handleEvent();
-                
+
                 if (eventSystem.isKeyDown(KeyCode::W))
                     camera.processKeyboard(CameraMovement::FORWARD, dt);
                 if (eventSystem.isKeyDown(KeyCode::S))

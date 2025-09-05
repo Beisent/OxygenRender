@@ -4,6 +4,7 @@
 #include "OxygenRender/Renderer.h"
 #include "OxygenRender/Graphics2D.h"
 #include "OxygenRender/EventSystem.h"
+#include "OxygenRender/ResourcesManager.h"
 #include "OxygenRender/Timer.h"
 #include "OxygenRender/Texture.h"
 
@@ -40,9 +41,9 @@ namespace OxyRender
                 camera.processMouseScroll(scrollEvent.yoffset);
             });
 
-            
-            Texture2D containerTexture("../resources/container.jpg");
-            Texture2D faceTexture("../resources/awesomeface.png");
+            auto &res = ResourcesManager::getInstance();
+            Texture2D containerTexture(res.resolve("container.jpg"));
+            Texture2D faceTexture(res.resolve("awesomeface.png"));
 
             while (!window.shouldClose())
             {

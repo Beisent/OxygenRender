@@ -37,13 +37,13 @@ OxygenRender/
 ├── include/OxygenRender/     # 公共头文件
 ├── src/                      # 源码
 │   ├── core/                 # 核心类（事件、日志、应用）
-│   └── graphics/             # 图形模块（渲染器、着色器、模型等）
-│   └── utils/                # 工具类（时间等）
+│   ├── graphics/             # 图形模块（渲染器、着色器、模型等）
+│   ├── utils/                # 工具类（时间等）
 │   └── vendor/               # 第三方库
 ├── tests/                    # 示例程序
+├── shaders/                  # GLSL 着色器脚本
+├── resources/                # 模型、纹理等资源
 ├── bin/
-│   ├── shaders/              # GLSL 着色器脚本
-│   └── resources/            # 模型、纹理等资源
 ├── CMakeLists.txt
 └── build.bat / build.sh      # 跨平台构建脚本
 ```
