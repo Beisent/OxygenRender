@@ -151,5 +151,10 @@ namespace OxyRender
         // 辅助方法
         void addTextureVertex(float x, float y, float u, float v, OxyColor color);
         void flushTextureBatches();
+
+        static const char* m_vertexShaderSrc;
+        static const char* m_fragmentShaderSrc;
+        static const char* m_textureVertexShaderSrc;
+        static const char* m_textureFragmentShaderSrc;
     };
 }

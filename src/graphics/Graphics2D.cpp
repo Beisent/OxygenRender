@@ -1,12 +1,92 @@
 #include "OxygenRender/Graphics2D.h"
 namespace OxyRender
 {
+    // 硬编码的着色器源码
+    const char *Graphics2D::m_vertexShaderSrc = R"(
+#version 330 core
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec4 aColor;
+
+out vec4 vColor;
+out vec2 vLocalPos;   
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+uniform float uPointSize;
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+
+    vColor = aColor;
+    vLocalPos = aPos.xy;   
+    gl_PointSize = uPointSize;
+}
+)";
+
+    const char *Graphics2D::m_fragmentShaderSrc = R"(
+#version 330 core
+in vec4 vColor;
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vColor;
+}
+)";
+
+    const char *Graphics2D::m_textureVertexShaderSrc = R"(
+#version 330 core
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec4 aColor;
+layout(location = 2) in vec2 aTexCoord;
+
+out vec4 vColor;
+out vec2 vTexCoord;
+out vec2 vLocalPos;   
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+
+    vColor = aColor;
+    vTexCoord = aTexCoord;
+    vLocalPos = aPos.xy;   
+}
+)";
+
+    const char *Graphics2D::m_textureFragmentShaderSrc = R"(
+#version 330 core
+in vec4 vColor;
+in vec2 vTexCoord;
+out vec4 FragColor;
+
+uniform sampler2D uTexture;
+uniform bool uUseTexture;
+
+void main()
+{
+    if (uUseTexture)
+    {
+        FragColor = texture(uTexture, vTexCoord) * vColor;
+    }
+    else
+    {
+        FragColor = vColor;
+    }
+}
+)";
     Graphics2D::Graphics2D(Window &window, Renderer &renderer)
         : m_window(window),
           m_renderer(renderer),
           m_camera(glm::vec3(0, 0, 10.0f)),
-          m_shader("default", "../shaders/graphics2d/vertex.vert", "../shaders/graphics2d/fragment.frag"),
-          m_textureShader("texture", "../shaders/graphics2d/texture_vertex.vert", "../shaders/graphics2d/texture_fragment.frag"),
+          m_shader("default", m_vertexShaderSrc, m_fragmentShaderSrc),
+          m_textureShader("texture", m_textureVertexShaderSrc, m_textureFragmentShaderSrc),
           m_vbo(BufferType::Vertex, BufferUsage::DynamicDraw),
           m_ebo(BufferType::Index, BufferUsage::DynamicDraw)
     {

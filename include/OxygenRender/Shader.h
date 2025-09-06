@@ -16,9 +16,13 @@ namespace OxyRender
         std::string m_name;
         std::string m_path_vertex;
         std::string m_path_fragment;
+        std::string m_vertex_source;
+        std::string m_fragment_source;
+        bool m_use_source_code;
 
     public:
         IShader(std::string name, std::string path_vertex, std::string path_fragment);
+        IShader(std::string name, std::string vertex_source, std::string fragment_source, bool from_source);
         virtual void use() = 0;
         virtual void setUniformData(const std::string &name, const void *data, size_t size) = 0;
         virtual GLuint getID() = 0;
@@ -35,6 +39,7 @@ namespace OxyRender
 
     public:
         OpenGLShader(std::string name, std::string path_vertex, std::string path_fragment);
+        OpenGLShader(std::string name, std::string vertex_source, std::string fragment_source, bool from_source);
         virtual ~OpenGLShader() override;
         virtual void use() override;
         inline virtual GLuint getID() override { return m_program_id; }
@@ -47,6 +52,7 @@ namespace OxyRender
     {
     public:
         static std::unique_ptr<IShader> create(std::string name, std::string path_vertex, std::string path_fragment);
+        static std::unique_ptr<IShader> createFromSource(std::string name, std::string vertex_source, std::string fragment_source);
     };
 
     // Shader类对外接口
@@ -56,9 +62,15 @@ namespace OxyRender
         std::unique_ptr<IShader> m_Shader;
 
     public:
+        // 从文件加载着色器
         Shader(std::string name, std::string path_vertex, std::string path_fragment)
         {
             m_Shader = ShaderFactory::create(name, path_vertex, path_fragment);
+        }
+        // 从源码编译着色器
+        Shader(std::string name, const char* vertex_source, const char* fragment_source)
+        {
+            m_Shader = ShaderFactory::createFromSource(name, std::string(vertex_source), std::string(fragment_source));
         }
         ~Shader() = default;
 

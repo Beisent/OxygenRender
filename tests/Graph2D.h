@@ -86,7 +86,7 @@ namespace OxyRender
                 graphics2D.flush();
                 // graphics2D.begin();
 
-                // int gridSize = 50;
+                // int gridSize = 150;
                 // float spacing = 10.0f;
                 // float radius = 4.0f;
 
@@ -96,11 +96,11 @@ namespace OxyRender
                 //     {
                 //         float x = i * spacing - (gridSize * spacing) / 2.0f;
                 //         float y = j * spacing - (gridSize * spacing) / 2.0f;
-                //         graphics2D.drawCircle(x, y, radius, {0.5f, 0.2f, 0.8f, 1.0f});
+                //         graphics2D.drawCircleOutline(x, y, radius, {0.5f, 0.2f, 0.8f, 1.0f});
                 //     }
                 // }
 
-                // int gridSize = 100;
+                // int gridSize = 500;
                 // float spacing = 10.0f;
                 // float width = 20.0f;
                 // float height = 20.0f;
@@ -121,7 +121,7 @@ namespace OxyRender
                 //         }
                 //     }
                 // }
-                // graphics2D.flush();
+                graphics2D.flush();
 
                 window.swapBuffers();
                 window.pollEvents();

@@ -1,3 +1,5 @@
+
+
 cmake_minimum_required(VERSION 3.16)
 project(OxygenRender LANGUAGES C CXX)
 
@@ -5,6 +7,11 @@ project(OxygenRender LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the build type" FORCE)
+endif()
 
 # 添加 Assimp 子目录
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)

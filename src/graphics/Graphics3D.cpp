@@ -2,11 +2,73 @@
 
 namespace OxyRender
 {
+    // 硬编码的着色器源码
+    const char* Graphics3D::m_vertexShaderSrc = R"(
+#version 330 core
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec4 aColor;
+layout(location = 2) in vec3 aNormal;
+
+out vec3 vFragPos;
+out vec3 vNormal;
+out vec4 vColor;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main()
+{
+    vec4 worldPos = model * vec4(aPos, 1.0);
+    vFragPos = worldPos.xyz;
+    
+    vNormal = mat3(transpose(inverse(model))) * aNormal;
+    
+    vColor = aColor;
+    
+    gl_Position = projection * view * worldPos;
+}
+)";
+
+    const char* Graphics3D::m_fragmentShaderSrc = R"(
+#version 330 core
+in vec3 vFragPos;
+in vec3 vNormal;
+in vec4 vColor;
+
+out vec4 FragColor;
+
+uniform vec3 lightPos = vec3(5.0, 5.0, 5.0);
+uniform vec3 viewPos;
+uniform vec3 lightColor = vec3(1.0, 1.0, 1.0);
+
+void main()
+{
+    // 环境光
+    float ambientStrength = 0.2;
+    vec3 ambient = ambientStrength * lightColor;
+
+    // 漫反射
+    vec3 norm = normalize(vNormal);
+    vec3 lightDir = normalize(lightPos - vFragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+
+    // 镜面反射
+    vec3 viewDir = normalize(viewPos - vFragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), 32.0);
+    vec3 specular = spec * lightColor;
+
+    vec3 result = (ambient + diffuse + specular) * vColor.rgb;
+    FragColor = vec4(result, vColor.a);
+}
+)";
     Graphics3D::Graphics3D(Window &window, Renderer &renderer)
         : m_window(window),
           m_renderer(renderer),
           m_camera(glm::vec3(0.0f, 1.5f, 5.0f)),
-          m_shader("default3D", "../shaders/graphics3d/vertex.vert", "../shaders/graphics3d/fragment.frag"),
+          m_shader("default3D", m_vertexShaderSrc, m_fragmentShaderSrc),
           m_vbo(BufferType::Vertex, BufferUsage::DynamicDraw),
           m_ebo(BufferType::Index, BufferUsage::DynamicDraw)
     {

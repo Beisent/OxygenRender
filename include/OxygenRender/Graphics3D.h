@@ -101,5 +101,9 @@ namespace OxyRender
 
         // 点批次
         std::vector<PointBatch> m_pointBatches;
+
+        // 硬编码的着色器源码
+        static const char* m_vertexShaderSrc;
+        static const char* m_fragmentShaderSrc;
     };
 }
