@@ -4,3 +4,4 @@ build
 bin/resource/objects/test
 bin/resource/objects
 bin/*.dll
+bin/*.a
