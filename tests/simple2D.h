@@ -1,4 +1,4 @@
-﻿#include "OxygenRender/Graphics2D.h"
+﻿#include "OxygenRender/OxygenRender.h"
 using namespace OxyRender;
 
 class Simple2D

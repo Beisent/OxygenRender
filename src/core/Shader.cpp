@@ -73,13 +73,72 @@ namespace OxyRender
 
     std::string OpenGLShader::loadFile(const std::string &path)
     {
-        std::ifstream file(path);
+      
+        std::ifstream file(path, std::ios::binary);
         if (!file.is_open())
             throw std::runtime_error("Failed to open shader file: " + path);
 
         std::stringstream buffer;
         buffer << file.rdbuf();
-        return buffer.str();
+        std::string contents = buffer.str();
+
+       
+        if (contents.size() >= 3 &&
+            static_cast<unsigned char>(contents[0]) == 0xEF &&
+            static_cast<unsigned char>(contents[1]) == 0xBB &&
+            static_cast<unsigned char>(contents[2]) == 0xBF)
+        {
+            contents.erase(0, 3);
+        }
+
+        {
+            std::string normalized;
+            normalized.reserve(contents.size());
+            for (size_t i = 0; i < contents.size(); ++i)
+            {
+                unsigned char c = static_cast<unsigned char>(contents[i]);
+                if (c == '\r')
+                {
+                    if (i + 1 < contents.size() && contents[i + 1] == '\n')
+                    {
+                      
+                        continue;
+                    }
+                    normalized.push_back('\n');
+                }
+                else
+                {
+                    normalized.push_back(static_cast<char>(c));
+                }
+            }
+            contents.swap(normalized);
+        }
+
+        auto firstNonSpace = contents.find_first_not_of("\n\t \f\v");
+        if (firstNonSpace != std::string::npos && firstNonSpace > 0)
+        {
+            contents.erase(0, firstNonSpace);
+        }
+
+        auto firstNewline = contents.find('\n');
+        if (firstNewline != std::string::npos)
+        {
+        }
+
+        {
+            std::string cleaned;
+            cleaned.reserve(contents.size());
+            for (unsigned char c : contents)
+            {
+                if (c == '\n' || c == '\t' || (c >= 0x20))
+                {
+                    cleaned.push_back(static_cast<char>(c));
+                }
+            }
+            contents.swap(cleaned);
+        }
+
+        return contents;
     }
 
     GLuint OpenGLShader::compileShader(GLenum type, const std::string &source)
@@ -93,10 +152,16 @@ namespace OxyRender
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
-            char log[512];
-            glGetShaderInfoLog(shader, 512, nullptr, log);
+            char log[1024] = {0};
+            glGetShaderInfoLog(shader, 1024, nullptr, log);
             glDeleteShader(shader);
-            throw std::runtime_error(std::string("Shader compilation failed: ") + log);
+
+          
+            std::string prefix = source.substr(0, 120);
+            for (char &ch : prefix) { if (ch == '\n') ch = ' '; }
+
+            std::string message = std::string("Shader compilation failed: ") + log + " | Source prefix: " + prefix;
+            throw std::runtime_error(message);
         }
         return shader;
     }

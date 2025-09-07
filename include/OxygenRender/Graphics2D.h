@@ -25,17 +25,20 @@ namespace OxyRender
 
         void drawRect(float x, float y, float width, float height, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
         void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
+       
         void drawLine(float x1, float y1, float x2, float y2, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
         void drawLines(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
         void drawCircle(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
         void drawCircleOutline(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
+        
         void drawEllipse(float cx, float cy, float radiusX, float radiusY,
                          OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
         void drawEllipseOutline(float cx, float cy, float radiusX, float radiusY,
                                 OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
 
         void drawPoints(const std::vector<glm::vec2> &points, float size, const OxyColor &color);
+
         void drawPolygon(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
         void drawPolygonOutline(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 

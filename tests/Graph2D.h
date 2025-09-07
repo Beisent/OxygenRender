@@ -1,10 +1,5 @@
 #pragma once
-#include "OxygenRender/Window.h"
-#include "OxygenRender/Shader.h"
-#include "OxygenRender/Renderer.h"
-#include "OxygenRender/Graphics2D.h"
-#include "OxygenRender/EventSystem.h"
-#include "OxygenRender/Timer.h"
+#include "OxygenRender/OxygenRender.h"
 
 namespace OxyRender
 {

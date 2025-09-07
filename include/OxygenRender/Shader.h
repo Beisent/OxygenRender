@@ -67,10 +67,36 @@ namespace OxyRender
         {
             m_Shader = ShaderFactory::create(name, path_vertex, path_fragment);
         }
-        // 从源码编译着色器
-        Shader(std::string name, const char* vertex_source, const char* fragment_source)
+        // 从源码或文件自动判别加载（两参数重载）
+        Shader(std::string name, const char* v, const char* f)
         {
-            m_Shader = ShaderFactory::createFromSource(name, std::string(vertex_source), std::string(fragment_source));
+            auto looks_like_source = [](const char* s) -> bool {
+                if (s == nullptr) return false;
+                // 跳过前导空白
+                const char* p = s;
+                while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == '\f' || *p == '\v') ++p;
+                // 典型GLSL开头
+                if (p[0] == '#' && p[1] == 'v') return true; // #version
+                // 在前64字符内出现GLSL特征
+                int scanned = 0;
+                for (const char* q = p; *q && scanned < 256; ++q, ++scanned) {
+                    if (*q == '\n' || *q == '\r') return true; // 多行，即源码
+                    if ((q[0] == 'l' && q[1] == 'a' && q[2] == 'y' && q[3] == 'o' && q[4] == 'u' && q[5] == 't') ||
+                        (q[0] == 'u' && q[1] == 'n' && q[2] == 'i' && q[3] == 'f' && q[4] == 'o' && q[5] == 'r' && q[6] == 'm') ||
+                        (q[0] == 'v' && q[1] == 'o' && q[2] == 'i' && q[3] == 'd' && (q[4] == ' ' || q[4] == '\t')))
+                        return true;
+                }
+                return false;
+            };
+
+            const bool v_is_src = looks_like_source(v);
+            const bool f_is_src = looks_like_source(f);
+
+            if (v_is_src || f_is_src) {
+                m_Shader = ShaderFactory::createFromSource(name, std::string(v ? v : ""), std::string(f ? f : ""));
+            } else {
+                m_Shader = ShaderFactory::create(name, std::string(v ? v : ""), std::string(f ? f : ""));
+            }
         }
         ~Shader() = default;
 

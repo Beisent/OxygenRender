@@ -1,12 +1,5 @@
 #pragma once
-#include "OxygenRender/Window.h"
-#include "OxygenRender/Renderer.h"
-#include "OxygenRender/Buffer.h"
-#include "OxygenRender/Shader.h"
-#include "OxygenRender/Texture.h"
-#include "OxygenRender/EventSystem.h"
-#include "OxygenRender/Camera.h"
-#include "OxygenRender/Model.h"
+#include "OxygenRender/OxygenRender.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

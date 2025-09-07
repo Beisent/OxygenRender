@@ -9,10 +9,10 @@ using namespace OxyRender;
 
 int main()
 {
-    //Backpack::execute();
+   // Backpack::execute();
     // LightBox::execute();
-   // Graph2D::execute();
-    Graph3D::execute();
+    Graph2D::execute();
+    //Graph3D::execute();
     // Texture2DTest::execute();
     // Simple2D::execute();
     return 0;
