@@ -19,6 +19,7 @@ namespace OxyRender
         void update(Window &window);
 
         double deltaTime();
+        double FPS();
         double now(Window &window);
     };
 }

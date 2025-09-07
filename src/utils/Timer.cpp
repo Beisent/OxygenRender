@@ -23,7 +23,10 @@ namespace OxyRender
     {
         return m_deltaTime;
     }
-
+    double Timer::FPS()
+    {
+        return 1.0 / m_deltaTime;
+    }
     double Timer::now(Window &window)
     {
         return window.getTime();
