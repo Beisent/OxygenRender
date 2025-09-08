@@ -32,6 +32,9 @@ namespace OxyRender
         Model(Renderer& renderer,const std::string &path, bool gamma = false);
         void Draw(Shader &shader);
 
+        // 使用内置源码创建默认模型着色器
+        static Shader CreateDefaultShader();
+
     private:
         Renderer &m_Renderer;
         void loadModel(const std::string &path);
@@ -39,6 +42,10 @@ namespace OxyRender
         Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 
         std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, const std::string &typeName);
+
+        // 硬编码的模型着色器源码
+        static const char* s_vertexShaderSrc;
+        static const char* s_fragmentShaderSrc;
     };
 
     std::shared_ptr<Texture2D> TextureFromFile(const char *path, const std::string &directory, bool gamma = false);

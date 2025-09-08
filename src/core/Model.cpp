@@ -3,6 +3,98 @@
 namespace OxyRender
 {
 
+    // 硬编码的模型着色器源码
+    const char* Model::s_vertexShaderSrc = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec2 aTexCoords;
+layout (location = 3) in vec3 aTangent;
+layout (location = 4) in vec3 aBitangent;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+out vec3 FragPos;
+out vec2 TexCoords;
+out mat3 TBN;
+
+void main()
+{
+    FragPos = vec3(model * vec4(aPos, 1.0));
+    TexCoords = aTexCoords;
+
+    vec3 T = normalize(mat3(model) * aTangent);
+    vec3 B = normalize(mat3(model) * aBitangent);
+    vec3 N = normalize(mat3(transpose(inverse(model))) * aNormal);
+
+    TBN = mat3(T, B, N);
+
+    gl_Position = projection * view * vec4(FragPos, 1.0);
+}
+)";
+
+    const char* Model::s_fragmentShaderSrc = R"(
+#version 330 core
+out vec4 FragColor;
+
+in vec3 FragPos;
+in vec2 TexCoords;
+in mat3 TBN;
+
+struct Light {
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+uniform Light light;
+uniform vec3 viewPos;
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_specular1;
+uniform sampler2D texture_normal1;
+
+void main()
+{
+    vec3 color = texture(texture_diffuse1, TexCoords).rgb;
+    vec3 specularColor = texture(texture_specular1, TexCoords).rgb;
+
+    // 法线贴图
+    vec3 tangentNormal = texture(texture_normal1, TexCoords).rgb;
+    tangentNormal = tangentNormal * 2.0 - 1.0;
+    vec3 norm = normalize(TBN * tangentNormal);
+
+    // 光照方向
+    vec3 lightDir = normalize(light.position - FragPos);
+    vec3 viewDir  = normalize(viewPos - FragPos);
+
+    // Blinn-Phong 高光
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float diff = max(dot(norm, lightDir), 0.0);
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), 64.0);
+
+    // 光照计算
+    vec3 ambient = light.ambient * color;
+    vec3 diffuse = light.diffuse * diff * color;
+    vec3 specular = light.specular * spec * specularColor;
+
+    vec3 result = ambient + diffuse + specular;
+
+    // Gamma 校正
+    result = pow(result, vec3(1.0/2.2));
+
+    FragColor = vec4(result, 1.0);
+}
+)";
+
+    Shader Model::CreateDefaultShader()
+    {
+        // 使用内置源码创建默认模型着色器
+        return Shader("model_shader_builtin", s_vertexShaderSrc, s_fragmentShaderSrc);
+    }
+
     Model::Model(Renderer &renderer, const std::string &path, bool gamma)
         : m_Renderer(renderer), gammaCorrection(gamma)
     {
