@@ -16,6 +16,8 @@ namespace OxyRender
             Window window(800, 600, "OxygenRender");
             Renderer renderer(window);
 
+            auto &res = ResourcesManager::getInstance();
+
             Shader modelProgram = Model::CreateDefaultShader();
 
             Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));

@@ -98,6 +98,11 @@ namespace OxyRender
                 m_Shader = ShaderFactory::create(name, std::string(v ? v : ""), std::string(f ? f : ""));
             }
         }
+        // 禁用拷贝，启用移动
+        Shader(const Shader&) = delete;
+        Shader& operator=(const Shader&) = delete;
+        Shader(Shader&&) noexcept = default;
+        Shader& operator=(Shader&&) noexcept = default;
         ~Shader() = default;
 
         inline GLuint getID() { return m_Shader->getID(); }

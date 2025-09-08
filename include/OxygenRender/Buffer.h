@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
-
 #include <glad/glad.h>
 
 namespace OxyRender

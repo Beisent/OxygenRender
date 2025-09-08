@@ -2,12 +2,11 @@
 
 namespace OxyRender
 {
-    // std::queue<Event> EventSystem::m_events;
-    // std::unordered_map<int, bool> EventSystem::m_keyStates;
-    // std::unordered_map<int, bool> EventSystem::m_mouseButtonStates;
-    // bool EventSystem::m_firstMouse = true;
-    // float EventSystem::m_mouseLastX = 0.0f;
-    // float EventSystem::m_mouseLastY = 0.0f;
+    EventSystem &EventSystem::getInstance()
+    {
+        static EventSystem instance;
+        return instance;
+    }
 
     EventSystem::EventSystem()
     {

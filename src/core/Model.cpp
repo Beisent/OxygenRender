@@ -1,10 +1,26 @@
+
 #include "OxygenRender/Model.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace OxyRender
 {
 
-    // 硬编码的模型着色器源码
-    const char* Model::s_vertexShaderSrc = R"(
+    struct Model::Impl
+    {
+
+        void loadModel(Model *self, const std::string &path);
+        void processNode(Model *self, aiNode *node, const aiScene *scene);
+        Mesh processMesh(Model *self, aiMesh *mesh, const aiScene *scene);
+        std::vector<Texture> loadMaterialTextures(Model *self, aiMaterial *mat, aiTextureType type, const std::string &typeName);
+    };
+
+    const char *Model::s_vertexShaderSrc = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -35,7 +51,7 @@ void main()
 }
 )";
 
-    const char* Model::s_fragmentShaderSrc = R"(
+    const char *Model::s_fragmentShaderSrc = R"(
 #version 330 core
 out vec4 FragColor;
 
@@ -61,28 +77,22 @@ void main()
     vec3 color = texture(texture_diffuse1, TexCoords).rgb;
     vec3 specularColor = texture(texture_specular1, TexCoords).rgb;
 
-    // 法线贴图
     vec3 tangentNormal = texture(texture_normal1, TexCoords).rgb;
     tangentNormal = tangentNormal * 2.0 - 1.0;
     vec3 norm = normalize(TBN * tangentNormal);
 
-    // 光照方向
     vec3 lightDir = normalize(light.position - FragPos);
     vec3 viewDir  = normalize(viewPos - FragPos);
 
-    // Blinn-Phong 高光
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float diff = max(dot(norm, lightDir), 0.0);
     float spec = pow(max(dot(norm, halfwayDir), 0.0), 64.0);
 
-    // 光照计算
     vec3 ambient = light.ambient * color;
     vec3 diffuse = light.diffuse * diff * color;
     vec3 specular = light.specular * spec * specularColor;
 
     vec3 result = ambient + diffuse + specular;
-
-    // Gamma 校正
     result = pow(result, vec3(1.0/2.2));
 
     FragColor = vec4(result, 1.0);
@@ -91,16 +101,19 @@ void main()
 
     Shader Model::CreateDefaultShader()
     {
-        // 使用内置源码创建默认模型着色器
         return Shader("model_shader_builtin", s_vertexShaderSrc, s_fragmentShaderSrc);
     }
 
+    // 👇 构造函数：创建 pImpl
     Model::Model(Renderer &renderer, const std::string &path, bool gamma)
-        : m_Renderer(renderer), gammaCorrection(gamma)
+        : m_Renderer(renderer), gammaCorrection(gamma), pImpl(std::make_unique<Impl>())
     {
-        stbi_set_flip_vertically_on_load(1); // flip image on the y-axis
-        loadModel(path);
+        stbi_set_flip_vertically_on_load(1);
+        pImpl->loadModel(this, path);
     }
+
+    // 👇 析构函数（必须在 .cpp 中定义，因为 unique_ptr 需要知道 Impl 的完整定义）
+    Model::~Model() = default;
 
     void Model::Draw(Shader &shader)
     {
@@ -108,9 +121,9 @@ void main()
             meshes[i].Draw(shader);
     }
 
-    void Model::loadModel(const std::string &path)
+    // 👇 实现细节全部移到 Impl 中
+    void Model::Impl::loadModel(Model *self, const std::string &path)
     {
-
         Assimp::Importer importer;
         const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
@@ -120,30 +133,26 @@ void main()
             return;
         }
 
-        directory = path.substr(0, path.find_last_of('/'));
-
-        processNode(scene->mRootNode, scene);
+        self->directory = path.substr(0, path.find_last_of('/'));
+        processNode(self, scene->mRootNode, scene);
     }
 
-    void Model::processNode(aiNode *node, const aiScene *scene)
+    void Model::Impl::processNode(Model *self, aiNode *node, const aiScene *scene)
     {
-
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
-
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push_back(processMesh(mesh, scene));
+            self->meshes.push_back(processMesh(self, mesh, scene));
         }
 
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
-            processNode(node->mChildren[i], scene);
+            processNode(self, node->mChildren[i], scene);
         }
     }
 
-    Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
+    Mesh Model::Impl::processMesh(Model *self, aiMesh *mesh, const aiScene *scene)
     {
-
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
@@ -169,7 +178,6 @@ void main()
             if (mesh->mTextureCoords[0])
             {
                 glm::vec2 vec;
-
                 vec.x = mesh->mTextureCoords[0][i].x;
                 vec.y = mesh->mTextureCoords[0][i].y;
                 vertex.TexCoords = vec;
@@ -185,7 +193,9 @@ void main()
                 vertex.Bitangent = vector;
             }
             else
+            {
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+            }
 
             vertices.push_back(vertex);
         }
@@ -193,29 +203,28 @@ void main()
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace face = mesh->mFaces[i];
-
             for (unsigned int j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }
 
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        std::vector<Texture> diffuseMaps = loadMaterialTextures(self, material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        std::vector<Texture> specularMaps = loadMaterialTextures(self, material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+        std::vector<Texture> normalMaps = loadMaterialTextures(self, material, aiTextureType_HEIGHT, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+        std::vector<Texture> heightMaps = loadMaterialTextures(self, material, aiTextureType_AMBIENT, "texture_height");
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-        return Mesh(m_Renderer, vertices, indices, textures);
+        return Mesh(self->m_Renderer, vertices, indices, textures);
     }
 
-    std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, const std::string &typeName)
+    std::vector<Texture> Model::Impl::loadMaterialTextures(Model *self, aiMaterial *mat, aiTextureType type, const std::string &typeName)
     {
         std::vector<Texture> textures;
         for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
@@ -224,11 +233,11 @@ void main()
             mat->GetTexture(type, i, &str);
 
             bool skip = false;
-            for (unsigned int j = 0; j < textures_loaded.size(); j++)
+            for (unsigned int j = 0; j < self->textures_loaded.size(); j++)
             {
-                if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
+                if (std::strcmp(self->textures_loaded[j].path.data(), str.C_Str()) == 0)
                 {
-                    textures.push_back(textures_loaded[j]);
+                    textures.push_back(self->textures_loaded[j]);
                     skip = true;
                     break;
                 }
@@ -236,11 +245,11 @@ void main()
             if (!skip)
             {
                 Texture texture;
-                texture.tex = TextureFromFile(str.C_Str(), this->directory);
+                texture.tex = TextureFromFile(str.C_Str(), self->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
-                textures_loaded.push_back(texture);
+                self->textures_loaded.push_back(texture);
             }
         }
         return textures;
@@ -251,7 +260,6 @@ void main()
         std::string filename = directory + '/' + std::string(path);
         try
         {
-
             auto texture = std::make_shared<Texture2D>(filename);
             return texture;
         }

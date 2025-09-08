@@ -170,11 +170,7 @@ namespace OxyRender
         EventSystem &operator=(const EventSystem &) = delete;
 
     public:
-        static EventSystem &getInstance()
-        {
-            static EventSystem instance;
-            return instance;
-        }
+        static EventSystem &getInstance();
         void registerCallback(EventType type, std::function<void(const Event &)> callback);
         void handleEvent();
         void pushEvent(const Event &e);
