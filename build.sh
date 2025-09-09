@@ -1,7 +1,7 @@
 ﻿#!/bin/bash
 
 # 设置目标目录和下载链接
-TARGET_DIR="bin/resource/objects/backpack"
+TARGET_DIR="resource/objects/backpack"
 ZIP_URL="https://learnopengl-cn.github.io/data/backpack.zip"
 ZIP_FILE="backpack.zip"
 

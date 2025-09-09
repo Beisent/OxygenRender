@@ -2,7 +2,7 @@
 setlocal
 
 REM Set target directory
-set TARGET_DIR=bin\resource\objects\backpack
+set TARGET_DIR=resource\objects\backpack
 set ZIP_URL=https://learnopengl-cn.github.io/data/backpack.zip
 set ZIP_FILE=backpack.zip
 

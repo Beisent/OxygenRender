@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.16)
 project(OxygenRender LANGUAGES C CXX)
 
@@ -7,6 +6,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+# 确保输出目录存在
+add_custom_target(EnsureDirectoriesExist ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    COMMENT "Ensuring output directories exist"
+)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the build type" FORCE)
@@ -37,14 +45,16 @@ include_directories(
 
 # 添加GLM和GLFW子目录
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/glm)
+add_dependencies(glm EnsureDirectoriesExist)
 
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/glfw)
+add_dependencies(glfw EnsureDirectoriesExist)
 
-# 4. 源文件收集
+# 源文件收集
 file(GLOB_RECURSE OXYGEN_SRC
     ${CMAKE_SOURCE_DIR}/src/core/*.cpp
     ${CMAKE_SOURCE_DIR}/src/graphics/*.cpp
@@ -54,6 +64,7 @@ file(GLOB_RECURSE OXYGEN_SRC
 )
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/assimp)
+add_dependencies(assimp EnsureDirectoriesExist)
 set_target_properties(assimp PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
@@ -91,7 +102,6 @@ if(MINGW)
     target_link_options(TestApp PRIVATE -static-libgcc -static-libstdc++)
     target_link_options(OxygenRender PRIVATE -Wl,--exclude-symbols,_Unwind_Resume)
 endif()
-
 
 include(GNUInstallDirs)
 
