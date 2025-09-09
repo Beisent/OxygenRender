@@ -12,7 +12,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the build type" FORCE)
 endif()
 
-# Windows: auto-export all symbols for shared library to avoid needing __declspec(dllexport)
 if(WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
@@ -30,20 +29,20 @@ set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
 # 包含路径
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include/GLAD
-    ${CMAKE_SOURCE_DIR}/include/glm
-    ${CMAKE_SOURCE_DIR}/include/stb
+    ${CMAKE_SOURCE_DIR}/vendor/GLAD
+    ${CMAKE_SOURCE_DIR}/vendor/glm
+    ${CMAKE_SOURCE_DIR}/vendor/stb
     ${CMAKE_SOURCE_DIR}/tests
 )
 
 # 添加GLM和GLFW子目录
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/vendor/glm)
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/glm)
 
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/vendor/glfw)
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/glfw)
 
 # 4. 源文件收集
 file(GLOB_RECURSE OXYGEN_SRC
@@ -51,28 +50,27 @@ file(GLOB_RECURSE OXYGEN_SRC
     ${CMAKE_SOURCE_DIR}/src/graphics/*.cpp
     ${CMAKE_SOURCE_DIR}/src/scene/*.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/*.cpp
-    ${CMAKE_SOURCE_DIR}/src/vendor/GLAD/*.c
+    ${CMAKE_SOURCE_DIR}/vendor/GLAD/*.c
 )
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/vendor/assimp)
-set_target_properties(assimp PROPERTIES 
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/assimp)
+set_target_properties(assimp PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 add_library(OxygenRender SHARED ${OXYGEN_SRC})
 
-# Prefer modern target include dirs; keep global includes for existing code, but ensure PUBLIC install interface
 target_include_directories(OxygenRender
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
     PRIVATE
-        ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_link_libraries(OxygenRender
     PUBLIC glm::glm
     PUBLIC glfw
-    PUBLIC   assimp
+    PUBLIC assimp
 )
 
 # 根据平台链接OpenGL
