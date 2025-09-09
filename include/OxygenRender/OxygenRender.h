@@ -1,6 +1,5 @@
 ﻿// TODO:应该避免在头文件中包含依赖项
 #pragma once 
-#include <glm/glm.hpp>
 #include "./Graphics2D.h"
 #include "./Graphics3D.h"
 #include "./Window.h"

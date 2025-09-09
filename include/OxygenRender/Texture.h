@@ -3,7 +3,6 @@
 #include <memory>
 #include <stdexcept>
 #include "OxygenRender/GraphicsTypes.h"
-#include <stb_image.h>
 #include <glad/glad.h>
 
 namespace OxyRender
