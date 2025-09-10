@@ -1,7 +1,4 @@
-bin/*.exe
+bin
 build
 .vscode
-resources/objects/test
-resources/objects
-bin/*.dll
-bin/*.a
+resources
