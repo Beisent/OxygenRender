@@ -148,6 +148,11 @@ namespace OxyRender
         return glfwGetTime();
     }
 
+    void GLFWWindow::waitEventsTimeout(double timeout)
+    {
+        glfwWaitEventsTimeout(timeout);
+    }
+
     Window::Window(int width, int height, std::string title)
     {
         m_window = WindowFactory::createWindow(width, height, std::move(title));
@@ -200,6 +205,10 @@ namespace OxyRender
     double Window::getTime()
     {
         return m_window->getTime();
+    }
+    void Window::waitEventsTimeout(double timeout)
+    {
+        m_window->waitEventsTimeout(timeout);
     }
 
     void Window::update()

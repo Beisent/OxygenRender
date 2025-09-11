@@ -40,6 +40,7 @@ namespace OxyRender
         virtual void setCursorMode(CursorMode mode) = 0;
 
         virtual double getTime() = 0;
+        virtual void waitEventsTimeout(double timeout) = 0;
     };
     // GLFW实现Window
     class GLFWWindow : public IWindow
@@ -60,6 +61,7 @@ namespace OxyRender
         void setCursorMode(CursorMode mode) override;
 
         double getTime() override;
+        void waitEventsTimeout(double timeout) override;
     };
     // Window工厂类
     class WindowFactory
@@ -85,11 +87,12 @@ namespace OxyRender
         void pollEvents();
         int getWidth() const;
         int getHeight() const;
-        void update() ;
+        void update();
 
         void setCursorPos(float x, float y);
         void setCursorMode(CursorMode mode);
 
         double getTime();
+        void waitEventsTimeout(double timeout);
     };
 } // namespace OxyRender

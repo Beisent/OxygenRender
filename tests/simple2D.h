@@ -11,8 +11,15 @@ public:
 
         Graphics2D graphics2D(window, renderer);
 
+        auto &timer = Timer::getInstance();
+        timer.setTargetFPS(120);
+
         while (!window.shouldClose())
         {
+            timer.update(window);
+            double dt = timer.deltaTime();
+
+            std::cout<<"delta time: "<<dt<<std::endl;
             graphics2D.clear();
             graphics2D.begin();
 
