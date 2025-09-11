@@ -63,9 +63,11 @@ namespace OxyRender
                 camera.processMouseMovement(offset.x, offset.y);
             } });
 
+            auto &timer = OxyRender::Timer::getInstance();
+            timer.setTargetFPS(60); // 锁定 60 FPS
             while (!window.shouldClose())
             {
-                Timer::getInstance().update(window);
+                timer.update(window);
                 double dt = Timer::getInstance().deltaTime();
 
                 eventSystem.handleEvent();
@@ -91,7 +93,7 @@ namespace OxyRender
                 graphics3D.drawBox({2.0f, 0.0f, 0.0f}, {1.0f, 2.0f, 1.0f}, {0.2f, 0.2f, 0.8f, 1.0f});
 
                 graphics3D.drawFunction({-5.0f, 5.0f}, {-5.0f, 5.0f}, [](float x, float z)
-                                               { return std::sin(std::sqrt(x * x + z * z)) + 5; }, {0.2f, 0.6f, 0.9f, 0.8f}, 0.2f, 0.2f);
+                                        { return std::sin(std::sqrt(x * x + z * z)) + 5; }, {0.2f, 0.6f, 0.9f, 0.8f}, 0.2f, 0.2f);
                 graphics3D.flush();
 
                 window.swapBuffers();

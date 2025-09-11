@@ -32,11 +32,13 @@ namespace OxyRender
             const MouseScrollEvent& scrollEvent = std::get<MouseScrollEvent>(e.data);
             camera.processMouseScroll(scrollEvent.yoffset); });
 
+            auto &timer = OxyRender::Timer::getInstance();
+            timer.setTargetFPS(60); // 锁定 60 FPS
             while (!window.shouldClose())
             {
-                Timer::getInstance().update(window);
+                timer.update(window);
                 double dt = Timer::getInstance().deltaTime();
-
+                
                 eventSystem.handleEvent();
 
                 if (eventSystem.isKeyDown(KeyCode::A))
@@ -76,7 +78,7 @@ namespace OxyRender
                 auto func = [](float x)
                 { return 0.01f * x * x; };
                 graphics2D.drawFunction(-300, 300, [](float x)
-                                        { return 100*sin(200 / x); }, {0, 0, 1, 1}, 0.1f, 2.0f);
+                                        { return 100 * sin(200 / x); }, {0, 0, 1, 1}, 0.1f, 2.0f);
 
                 graphics2D.flush();
                 // graphics2D.begin();

@@ -67,9 +67,11 @@ namespace OxyRender
                 camera.processMouseMovement(offset.x, offset.y);
             } });
 
+            auto &timer = OxyRender::Timer::getInstance();
+            timer.setTargetFPS(60);//锁定 60 FPS
             while (!window.shouldClose())
             {
-                Timer::getInstance().update(window);
+                timer.update(window);
                 double dt = Timer::getInstance().deltaTime();
 
                 eventSystem.handleEvent();
