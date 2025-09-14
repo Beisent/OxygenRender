@@ -71,21 +71,21 @@ namespace OxyRender
         auto it = m_mouseButtonStates.find(mouseCodeToGLFW(button));
         return it != m_mouseButtonStates.end() && it->second;
     }
-    glm::vec2 EventSystem::handleMouseMoved(const MouseMoveEvent &mouse)
+    EventSystem::MouseDelta EventSystem::handleMouseMoved(const MouseMoveEvent &mouse)
     {
         if (m_firstMouse)
         {
-            m_mouseLastX = mouse.position.x;
-            m_mouseLastY = mouse.position.y;
+            m_mouseLastX = mouse.position_x;
+            m_mouseLastY = mouse.position_y;
             m_firstMouse = false;
             return {0.0f, 0.0f};
         }
 
-        float xoffset = mouse.position.x - m_mouseLastX;
-        float yoffset = m_mouseLastY - mouse.position.y;
+        float xoffset = mouse.position_x - m_mouseLastX;
+        float yoffset = m_mouseLastY - mouse.position_y;
 
-        m_mouseLastX = mouse.position.x;
-        m_mouseLastY = mouse.position.y;
+        m_mouseLastX = mouse.position_x;
+        m_mouseLastY = mouse.position_y;
 
         return {xoffset, yoffset};
     }

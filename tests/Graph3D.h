@@ -61,7 +61,7 @@ namespace OxyRender
             {
                 const MouseMoveEvent& mouse = std::get<MouseMoveEvent>(e.data);
                 auto offset = eventSystem.handleMouseMoved(mouse);
-                camera.processMouseMovement(offset.x, offset.y);
+                camera.processMouseMovement(offset.dx, offset.dy);
             } });
 
             auto &timer = OxyRender::Timer::getInstance();

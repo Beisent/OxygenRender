@@ -48,7 +48,7 @@ namespace OxyRender
     {
         Event e;
         e.type = EventType::MouseMoved;
-        e.data = MouseMoveEvent{{(float)xpos, (float)ypos}};
+        e.data = MouseMoveEvent{(float)xpos, (float)ypos};
         EventSystem::getInstance().pushEvent(e);
     }
 

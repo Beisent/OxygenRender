@@ -35,7 +35,6 @@ namespace OxyRender
         case RenderBlendFunc::OneMinusConstantAlpha:
             return GL_ONE_MINUS_CONSTANT_ALPHA;
         default:
-            // 添加默认分支，提高代码健壮性
             return GL_ONE;
         }
     }
