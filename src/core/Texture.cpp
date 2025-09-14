@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "OxygenRender/Texture.h"
  #include <stb_image.h>
+ #include <glad/glad.h>
 namespace OxyRender
 {
     OpenGLTexture2D::OpenGLTexture2D(const std::string &path,

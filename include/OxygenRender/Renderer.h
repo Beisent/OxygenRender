@@ -2,7 +2,6 @@
 #include "OxygenRender/GraphicsTypes.h"
 #include "OxygenRender/Window.h"
 #include "OxygenRender/Buffer.h"
-#include <glm/glm.hpp>
 #include <memory>
 
 namespace OxyRender

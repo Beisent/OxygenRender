@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 #include "OxygenRender/GraphicsTypes.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <memory>
+
+struct GLFWwindow;
 namespace OxyRender
 {
     // 鼠标光标模式

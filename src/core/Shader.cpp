@@ -1,4 +1,5 @@
 #include "OxygenRender/Shader.h"
+#include <glad/glad.h>
 namespace OxyRender
 {
 
@@ -141,7 +142,7 @@ namespace OxyRender
         return contents;
     }
 
-    GLuint OpenGLShader::compileShader(GLenum type, const std::string &source)
+    GLuint OpenGLShader::compileShader(unsigned int type, const std::string &source)
     {
         GLuint shader = glCreateShader(type);
         const char *src = source.c_str();

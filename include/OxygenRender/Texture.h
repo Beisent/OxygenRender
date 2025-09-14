@@ -3,7 +3,6 @@
 #include <memory>
 #include <stdexcept>
 #include "OxygenRender/GraphicsTypes.h"
-#include <glad/glad.h>
 
 namespace OxyRender
 {
@@ -57,12 +56,12 @@ namespace OxyRender
         inline uint32_t getHeight() const noexcept override { return m_height; }
 
     private:
-        GLuint m_rendererID;
+        uint32_t m_rendererID;
         uint32_t m_width, m_height;
-        GLenum m_format;
-        GLenum m_internalFormat;
-        GLenum m_filter;
-        GLenum m_wrap;
+        uint32_t m_format;
+        uint32_t m_internalFormat;
+        uint32_t m_filter;
+        uint32_t m_wrap;
     };
     // Texture工厂类
     class TextureFactory
