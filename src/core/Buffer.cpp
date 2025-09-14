@@ -1,4 +1,5 @@
 ﻿#include "OxygenRender/Buffer.h"
+#include <stdexcept>
 namespace OxyRender
 {
     // 根据类型获取大小

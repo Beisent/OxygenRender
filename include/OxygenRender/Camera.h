@@ -1,6 +1,5 @@
 // 来自LearnOpenGL教程
 #pragma once
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 namespace OxyRender
@@ -41,7 +40,7 @@ namespace OxyRender
         glm::mat4 getPerspectiveProjectionMatrix(int screenWidth, int screenHeight) const;
 
         void processKeyboard(CameraMovement direction, float deltaTime);
-        void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
+        void processMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
         void processMouseScroll(float yoffset);
         inline glm::vec3 getPosition() const { return m_Position; }
         inline glm::vec3 getFront() const { return m_Front; }

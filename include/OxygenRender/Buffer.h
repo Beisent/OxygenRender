@@ -1,11 +1,10 @@
 #pragma once
 #include <cstdint>
-#include "OxygenRender/GraphicsTypes.h"
 #include <string>
 #include <vector>
 #include <memory>
-#include <stdexcept>
 #include <glad/glad.h>
+#include "OxygenRender/GraphicsTypes.h"
 
 namespace OxyRender
 {

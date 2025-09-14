@@ -38,7 +38,7 @@ namespace OxyRender
             m_Position -= m_Up * velocity;
     }
 
-    void Camera::processMouseMovement(float xoffset, float yoffset, GLboolean constrainm_Pitch)
+    void Camera::processMouseMovement(float xoffset, float yoffset, bool constrainm_Pitch)
     {
         xoffset *= m_MouseSensitivity;
         yoffset *= m_MouseSensitivity;
