@@ -45,7 +45,7 @@ namespace OxyRender
         inline virtual GLuint getID() override { return m_program_id; }
 
         virtual void setUniformData(const std::string &name, const void *data, size_t size) override;
-        void setMat4(const std::string &name, const glm::mat4 &mat);
+        // void setMat4(const std::string &name, const glm::mat4 &mat);
     };
     // 渲染器工厂类
     class ShaderFactory

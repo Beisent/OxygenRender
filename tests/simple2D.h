@@ -19,7 +19,6 @@ public:
             timer.update(window);
             double dt = timer.deltaTime();
 
-            std::cout<<"delta time: "<<dt<<std::endl;
             graphics2D.clear();
             graphics2D.begin();
 

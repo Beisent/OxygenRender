@@ -1,4 +1,4 @@
-#include "OxygenRender/Buffer.h"
+﻿#include "OxygenRender/Buffer.h"
 namespace OxyRender
 {
     // 根据类型获取大小
@@ -23,6 +23,7 @@ namespace OxyRender
         case VertexAttribType::Int4:
             return sizeof(int) * 4;
         default:
+            // 添加默认分支注释，提高代码可读性
             return 0;
         }
     }

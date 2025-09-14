@@ -10,6 +10,7 @@ namespace OxyRender
         {
             Window window(1280, 720, "OxygenRender");
             Renderer renderer(window);
+            // renderer.setPolygonMode(RenderPolygonMode::Line,true);
             Graphics3D graphics3D(window, renderer);
 
             graphics3D.setClearColor({0.9f, 0.9f, 0.9f, 1.0f});

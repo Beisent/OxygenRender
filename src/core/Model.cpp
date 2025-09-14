@@ -1,4 +1,4 @@
-
+﻿
 #include "OxygenRender/Model.h"
 
 #include <assimp/Importer.hpp>
@@ -103,8 +103,6 @@ void main()
     {
         return Shader("model_shader_builtin", s_vertexShaderSrc, s_fragmentShaderSrc);
     }
-
-    // 👇 构造函数：创建 pImpl
     Model::Model(Renderer &renderer, const std::string &path, bool gamma)
         : m_Renderer(renderer), gammaCorrection(gamma), pImpl(std::make_unique<Impl>())
     {
@@ -112,7 +110,6 @@ void main()
         pImpl->loadModel(this, path);
     }
 
-    // 👇 析构函数（必须在 .cpp 中定义，因为 unique_ptr 需要知道 Impl 的完整定义）
     Model::~Model() = default;
 
     void Model::Draw(Shader &shader)
@@ -121,7 +118,6 @@ void main()
             meshes[i].Draw(shader);
     }
 
-    // 👇 实现细节全部移到 Impl 中
     void Model::Impl::loadModel(Model *self, const std::string &path)
     {
         Assimp::Importer importer;

@@ -25,7 +25,7 @@ namespace OxyRender
             window.setCursorMode(CursorMode::Disabled);
             bool mouseCaptured = true;
             Model backpackModel(renderer, "../resources/objects/backpack/backpack.obj");
-            EventSystem &eventSystem = eventSystem.getInstance();
+            EventSystem &eventSystem = EventSystem::getInstance();
 
             // 注册键盘按下事件
             eventSystem.registerCallback(EventType::KeyPressed, [&window, &mouseCaptured](const Event &e)
@@ -67,12 +67,13 @@ namespace OxyRender
                 camera.processMouseMovement(offset.x, offset.y);
             } });
 
-            auto &timer = OxyRender::Timer::getInstance();
-            timer.setTargetFPS(60);//锁定 60 FPS
+            auto &timer = Timer::getInstance();
+            timer.setTargetFPS(120);
+
             while (!window.shouldClose())
             {
                 timer.update(window);
-                double dt = Timer::getInstance().deltaTime();
+                double dt = timer.deltaTime();
 
                 eventSystem.handleEvent();
 

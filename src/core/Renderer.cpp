@@ -1,4 +1,4 @@
-#include "OxygenRender/Renderer.h"
+﻿#include "OxygenRender/Renderer.h"
 #include <glad/glad.h>
 namespace OxyRender
 {
@@ -34,8 +34,10 @@ namespace OxyRender
             return GL_CONSTANT_ALPHA;
         case RenderBlendFunc::OneMinusConstantAlpha:
             return GL_ONE_MINUS_CONSTANT_ALPHA;
+        default:
+            // 添加默认分支，提高代码健壮性
+            return GL_ONE;
         }
-        return GL_ONE;
     }
     OpenGLRenderer::OpenGLRenderer()
     {

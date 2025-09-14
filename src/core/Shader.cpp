@@ -174,15 +174,15 @@ namespace OxyRender
     {
         glDeleteProgram(m_program_id);
     }
-    void OpenGLShader::setMat4(const std::string &name, const glm::mat4 &mat)
-    {
-        use();
-        GLint location = glGetUniformLocation(m_program_id, name.c_str());
-        if (location != -1)
-        {
-            glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
-        }
-    }
+    // void OpenGLShader::setMat4(const std::string &name, const glm::mat4 &mat)
+    // {
+    //     use();
+    //     GLint location = glGetUniformLocation(m_program_id, name.c_str());
+    //     if (location != -1)
+    //     {
+    //         glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
+    //     }
+    // }
     void OpenGLShader::setUniformData(const std::string &name, const void *data, size_t size)
     {
         GLint location = glGetUniformLocation(m_program_id, name.c_str());

@@ -1,4 +1,4 @@
-#include "OxygenRender/Window.h"
+﻿#include "OxygenRender/Window.h"
 #include "OxygenRender/EventSystem.h"
 #include <iostream>
 
@@ -181,7 +181,7 @@ namespace OxyRender
     }
     void Window::pollEvents()
     {
-        return m_window->pollEvents();
+        m_window->pollEvents();
     }
 
     int Window::getWidth() const

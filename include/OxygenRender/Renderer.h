@@ -4,10 +4,10 @@
 #include "OxygenRender/Buffer.h"
 #include <glm/glm.hpp>
 #include <memory>
+
 namespace OxyRender
 {
-
-    // Renderer Capability
+    // ================= 渲染状态相关 =================
     enum class RenderCapability
     {
         DepthTest,
@@ -18,7 +18,8 @@ namespace OxyRender
         ColorMask,
         ProgramPointSize
     };
-    // Blend Function
+
+    // ================= 混合相关 =================
     enum class RenderBlendFunc
     {
         Zero,
@@ -37,14 +38,15 @@ namespace OxyRender
         OneMinusConstantAlpha
     };
 
-    // 多边形渲染模式
+    // ================= 多边形模式 =================
     enum class RenderPolygonMode
     {
         Fill,
         Line,
         Point
     };
-    // 模板测试函数
+
+    // ================= 模板测试相关 =================
     enum class StencilFunc
     {
         Always,
@@ -56,7 +58,7 @@ namespace OxyRender
         Gequal,
         Never
     };
-    // 模板操作
+
     enum class StencilOp
     {
         Keep,
@@ -68,58 +70,67 @@ namespace OxyRender
         DecrWrap,
         Invert
     };
-    // 渲染器抽象接口类
+
+    // ================= 渲染器抽象接口类 =================
     class IRenderer
     {
     public:
         IRenderer() = default;
         virtual ~IRenderer() = default;
+
+        // 渲染状态
         virtual void setCapability(RenderCapability cap, bool enable) = 0;
         virtual void setPolygonMode(RenderPolygonMode mod, bool enable) = 0;
+
+        // 绘制
         virtual void drawTriangles(const VertexArray &vao, size_t indexCount) = 0;
         virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) = 0;
         virtual void drawPoints(const VertexArray &vao, size_t vertexCount) = 0;
+
+        // 清除
         virtual void clear() = 0;
+        inline void setClearColor(const OxyColor &color) { m_clear_color = color; }
+
+        // 混合
         virtual void setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor) = 0;
 
+        // // 模板测试
         // virtual void setStencilFunc(StencilFunc func, GLint ref, GLuint mask) = 0;
         // virtual void setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass) = 0;
-
         // virtual void setStencilMask(GLuint mask) = 0;
         // virtual void clearStencil() = 0;
-        inline void setClearColor(const OxyColor &color) { m_clear_color = color; }
 
     protected:
         OxyColor m_clear_color = {0.8f, 0.8f, 0.8f, 1.0f};
     };
 
-    // OpenGL渲染器实现类
+    // ================= OpenGL渲染器实现类 =================
     class OpenGLRenderer : public IRenderer
     {
     public:
         OpenGLRenderer();
         ~OpenGLRenderer() override = default;
-        void setCapability(RenderCapability cap, bool enable) override;
-        virtual void setPolygonMode(RenderPolygonMode mod, bool enable) override;
-        virtual void drawTriangles(const VertexArray &vao, size_t indexCount) override;
-        virtual void drawLines(const VertexArray &vao, size_t indexCount, float thickness) override;
-        virtual void drawPoints(const VertexArray &vao, size_t vertexCount) override;
-        void setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor);
 
+        void setCapability(RenderCapability cap, bool enable) override;
+        void setPolygonMode(RenderPolygonMode mod, bool enable) override;
+        
+        void drawTriangles(const VertexArray &vao, size_t indexCount) override;
+        void drawLines(const VertexArray &vao, size_t indexCount, float thickness) override;
+        void drawPoints(const VertexArray &vao, size_t vertexCount) override;
+        void setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor) override;
         void clear() override;
 
         // void setStencilFunc(StencilFunc func, GLint ref, GLuint mask) override;
         // void setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass) override;
+        // void setStencilMask(GLuint mask) override;
+        // void clearStencil() override;
 
-        // virtual void setStencilMask(GLuint mask) override;
-        // virtual void clearStencil() override;
-
-    private:
-        GLenum convertStencilFunc(StencilFunc func);
-        GLenum convertStencilOp(StencilOp op);
+    // private:
+    //     GLenum convertStencilFunc(StencilFunc func);
+    //     GLenum convertStencilOp(StencilOp op);
     };
 
-    // 渲染器工厂类
+    // ================= 渲染器工厂类 =================
     class RendererFactory
     {
     public:
@@ -135,7 +146,7 @@ namespace OxyRender
         }
     };
 
-    // 渲染器类，封装渲染器接口
+    // ================= 渲染器封装类 =================
     class Renderer
     {
     private:
@@ -144,15 +155,24 @@ namespace OxyRender
 
     public:
         explicit Renderer(Window &window);
+
+        // 渲染状态
         void setCapability(RenderCapability cap, bool enable);
         void setPolygonMode(RenderPolygonMode mod, bool enable);
+
+        // 混合
         void setBlendFunc(RenderBlendFunc sfactor, RenderBlendFunc dfactor);
+
+        // 绘制
         void drawTriangles(const VertexArray &vao, size_t indexCount);
         void drawLines(const VertexArray &vao, size_t indexCount, float thickness);
         void drawPoints(const VertexArray &vao, size_t vertexCount);
+
+        // 清除
         void setClearColor(const OxyColor &color);
         void clear();
 
+        // // 模板测试
         // void setStencilFunc(StencilFunc func, GLint ref, GLuint mask);
         // void setStencilOp(StencilOp sfail, StencilOp dpfail, StencilOp dppass);
         // void setStencilMask(GLuint mask);

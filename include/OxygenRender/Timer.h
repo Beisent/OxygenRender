@@ -30,6 +30,6 @@ namespace OxyRender
         double averageFPS(int samples);
 
         void setTargetFPS(int fps) { m_targetFPS = fps; }
-        int targetFPS() const { return m_targetFPS; }
+        int getTargetFPS() const { return m_targetFPS; }
     };
 }
