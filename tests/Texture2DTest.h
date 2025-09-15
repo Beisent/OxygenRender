@@ -40,37 +40,24 @@ namespace OxyRender
             auto &timer = Timer::getInstance();
             timer.setTargetFPS(90); 
 
-            double lastPrint = 0.0;
-            int frameCount = 0;
-            double accumTime = 0.0;
 
             while (!window.shouldClose())
             {
                 timer.update(window);
                 double dt = timer.deltaTime();
 
-                frameCount++;
-                accumTime += dt;
-                if (timer.now(window) - lastPrint >= 1.0)
-                {
-                    double avgFPS = frameCount / accumTime;
-                    std::cout << "FPS: " << avgFPS << std::endl;
-                    frameCount = 0;
-                    accumTime = 0.0;
-                    lastPrint = timer.now(window);
-                }
 
                 eventSystem.handleEvent();
 
                 // 相机移动
                 if (eventSystem.isKeyDown(KeyCode::A))
-                    camera.processKeyboard(CameraMovement::LEFT, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Left, dt * camera.getZoom());
                 if (eventSystem.isKeyDown(KeyCode::D))
-                    camera.processKeyboard(CameraMovement::RIGHT, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Right, dt * camera.getZoom());
                 if (eventSystem.isKeyDown(KeyCode::W))
-                    camera.processKeyboard(CameraMovement::UP, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Up, dt * camera.getZoom());
                 if (eventSystem.isKeyDown(KeyCode::S))
-                    camera.processKeyboard(CameraMovement::DOWN, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Down, dt * camera.getZoom());
 
                 graphics2D.clear();
                 graphics2D.begin();

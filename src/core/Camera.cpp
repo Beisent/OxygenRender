@@ -2,7 +2,7 @@
 namespace OxyRender
 {
     Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-        : m_Front(glm::vec3(0.0f, 0.0f, -1.0f)), m_MovementSpeed(CameraConstants::SPEED), m_MouseSensitivity(CameraConstants::SENSITIVITY), m_Zoom(CameraConstants::ZOOM)
+        : m_Front(glm::vec3(0.0f, 0.0f, -1.0f)), m_MovementSpeed(CameraConstants::DEFAULT_SPEED), m_MouseSensitivity(CameraConstants::DEFAULT_SENSITIVITY), m_Zoom(CameraConstants::DEFAULT_ZOOM)
     {
         m_Position = position;
         m_WorldUp = up;
@@ -12,7 +12,7 @@ namespace OxyRender
     }
 
     Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
-        : m_Front(glm::vec3(0.0f, 0.0f, -1.0f)), m_MovementSpeed(CameraConstants::SPEED), m_MouseSensitivity(CameraConstants::SENSITIVITY), m_Zoom(CameraConstants::ZOOM)
+        : m_Front(glm::vec3(0.0f, 0.0f, -1.0f)), m_MovementSpeed(CameraConstants::DEFAULT_SPEED), m_MouseSensitivity(CameraConstants::DEFAULT_SENSITIVITY), m_Zoom(CameraConstants::DEFAULT_ZOOM)
     {
         m_Position = glm::vec3(posX, posY, posZ);
         m_WorldUp = glm::vec3(upX, upY, upZ);
@@ -24,17 +24,17 @@ namespace OxyRender
     void Camera::processKeyboard(CameraMovement direction, float deltaTime)
     {
         float velocity = m_MovementSpeed * deltaTime;
-        if (direction == CameraMovement::FORWARD)
+        if (direction == CameraMovement::Forward)
             m_Position += m_Front * velocity;
-        if (direction == CameraMovement::BACKWARD)
+        if (direction == CameraMovement::Backward)
             m_Position -= m_Front * velocity;
-        if (direction == CameraMovement::LEFT)
+        if (direction == CameraMovement::Left)
             m_Position -= m_Right * velocity;
-        if (direction == CameraMovement::RIGHT)
+        if (direction == CameraMovement::Right)
             m_Position += m_Right * velocity;
-        if (direction == CameraMovement::UP)
+        if (direction == CameraMovement::Up)
             m_Position += m_Up * velocity;
-        if (direction == CameraMovement::DOWN)
+        if (direction == CameraMovement::Down)
             m_Position -= m_Up * velocity;
     }
 
@@ -78,13 +78,13 @@ namespace OxyRender
         m_Up = glm::normalize(glm::cross(m_Right, m_Front));
     }
 
-    glm::mat4 Camera::get2DOrthoViewMatrix() const
+    glm::mat4 Camera::getOrthoViewMatrix2D() const
     {
 
         return glm::lookAt(glm::vec3(m_Position.x, m_Position.y, 1), glm::vec3(m_Position.x, m_Position.y, 0), glm::vec3(0, 1, 0));
     }
 
-    glm::mat4 Camera::get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const
+    glm::mat4 Camera::getOrthoProjectionMatrix2D(int screenWidth, int screenHeight) const
     {
         float halfWidth = (screenWidth / 2.0f) * m_Zoom;
         float halfHeight = (screenHeight / 2.0f) * m_Zoom;

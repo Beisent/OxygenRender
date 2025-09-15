@@ -1,50 +1,58 @@
-// 来自LearnOpenGL教程
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 namespace OxyRender
 {
-    // 定义相机移动的可能选项。用作processKeyboard的参数
+    // 相机移动方向
     enum class CameraMovement
     {
-        FORWARD,
-        BACKWARD,
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN
+        Forward,
+        Backward,
+        Left,
+        Right,
+        Up,
+        Down
     };
-    // 默认相机值
+
+    // 默认相机参数
     namespace CameraConstants
     {
-        const float YAW = -90.0f;
-        const float PITCH = 0.0f;
-        const float SPEED = 2.5f;
-        const float SENSITIVITY = 0.1f;
-        const float ZOOM = 45.0f;
-
+        constexpr float DEFAULT_YAW = -90.0f;
+        constexpr float DEFAULT_PITCH = 0.0f;
+        constexpr float DEFAULT_SPEED = 2.5f;
+        constexpr float DEFAULT_SENSITIVITY = 0.1f;
+        constexpr float DEFAULT_ZOOM = 45.0f;
     }
-    // 相机类，处理视图和投影矩阵，并响应输入以移动相机位置
+
+    // 相机类
     class Camera
     {
     public:
-        Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = CameraConstants::YAW, float pitch = CameraConstants::PITCH);
+        Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+               glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
+               float yaw = CameraConstants::DEFAULT_YAW,
+               float pitch = CameraConstants::DEFAULT_PITCH);
 
-        Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
+        Camera(float posX, float posY, float posZ,
+               float upX, float upY, float upZ,
+               float yaw, float pitch);
 
-        glm::mat4 get2DOrthoViewMatrix() const;
-        glm::mat4 get2DOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
+        glm::mat4 getOrthoViewMatrix2D() const;
+        glm::mat4 getOrthoProjectionMatrix2D(int screenWidth, int screenHeight) const;
 
         glm::mat4 getViewMatrix() const;
         glm::mat4 getOrthoProjectionMatrix(int screenWidth, int screenHeight) const;
         glm::mat4 getPerspectiveProjectionMatrix(int screenWidth, int screenHeight) const;
 
         void processKeyboard(CameraMovement direction, float deltaTime);
-        void processMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
-        void processMouseScroll(float yoffset);
+        void processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
+        void processMouseScroll(float yOffset);
+
         inline glm::vec3 getPosition() const { return m_Position; }
         inline glm::vec3 getFront() const { return m_Front; }
         inline float getZoom() const { return m_Zoom; }
+
         inline void setPosition(glm::vec3 position) { m_Position = position; }
         inline void setYaw(float yaw) { m_Yaw = yaw; }
         inline void setPitch(float pitch) { m_Pitch = pitch; }

@@ -24,7 +24,6 @@ namespace OxyRender
         case VertexAttribType::Int4:
             return sizeof(int) * 4;
         default:
-            // 添加默认分支注释，提高代码可读性
             return 0;
         }
     }

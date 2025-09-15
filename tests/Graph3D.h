@@ -74,17 +74,17 @@ namespace OxyRender
                 eventSystem.handleEvent();
 
                 if (eventSystem.isKeyDown(KeyCode::W))
-                    camera.processKeyboard(CameraMovement::FORWARD, dt);
+                    camera.processKeyboard(CameraMovement::Forward, dt);
                 if (eventSystem.isKeyDown(KeyCode::S))
-                    camera.processKeyboard(CameraMovement::BACKWARD, dt);
+                    camera.processKeyboard(CameraMovement::Backward, dt);
                 if (eventSystem.isKeyDown(KeyCode::A))
-                    camera.processKeyboard(CameraMovement::LEFT, dt);
+                    camera.processKeyboard(CameraMovement::Left, dt);
                 if (eventSystem.isKeyDown(KeyCode::D))
-                    camera.processKeyboard(CameraMovement::RIGHT, dt);
+                    camera.processKeyboard(CameraMovement::Right, dt);
                 if (eventSystem.isKeyDown(KeyCode::Space))
-                    camera.processKeyboard(CameraMovement::UP, dt);
+                    camera.processKeyboard(CameraMovement::Up, dt);
                 if (eventSystem.isKeyDown(KeyCode::LeftShift))
-                    camera.processKeyboard(CameraMovement::DOWN, dt);
+                    camera.processKeyboard(CameraMovement::Down, dt);
 
                 graphics3D.clear();
                 graphics3D.begin();

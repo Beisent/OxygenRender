@@ -223,50 +223,12 @@ void main()
 
     void Graphics2D::drawCircle(float cx, float cy, float radius, OxyColor color, int segments)
     {
-        if (segments < 3)
-            segments = 3;
-
-        unsigned int startIndex = (unsigned int)m_triVertices.size();
-
-        m_triVertices.push_back({{cx, cy, 0.0f}, color, {0.5f, 0.5f}});
-
-        for (int i = 0; i <= segments; i++)
-        {
-            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
-            float x = cx + cos(angle) * radius;
-            float y = cy + sin(angle) * radius;
-            float u = 0.5f + 0.5f * cos(angle);
-            float v = 0.5f + 0.5f * sin(angle);
-            m_triVertices.push_back({{x, y, 0.0f}, color, {u, v}});
-        }
-
-        for (int i = 1; i <= segments; i++)
-        {
-            m_triIndices.push_back(startIndex);
-            m_triIndices.push_back(startIndex + i);
-            m_triIndices.push_back(startIndex + i + 1);
-            m_triIndexCount += 3;
-        }
+        drawEllipse(cx, cy, radius, radius, color, segments);
     }
 
     void Graphics2D::drawCircleOutline(float cx, float cy, float radius, OxyColor color, int segments, float thickness)
     {
-        if (segments < 3)
-            segments = 3;
-
-        float prevX = cx + radius;
-        float prevY = cy;
-        for (int i = 1; i <= segments; i++)
-        {
-            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
-            float x = cx + cos(angle) * radius;
-            float y = cy + sin(angle) * radius;
-
-            drawLine(prevX, prevY, x, y, color, thickness);
-
-            prevX = x;
-            prevY = y;
-        }
+       drawEllipseOutline(cx, cy, radius, radius, color, segments, thickness);
     }
 
     void Graphics2D::drawEllipse(float cx, float cy, float radiusX, float radiusY,
@@ -518,55 +480,6 @@ void main()
         }
     }
 
-    void Graphics2D::drawCircle(float cx, float cy, float radius, const Texture2D &texture,
-                                OxyColor tintColor, int segments)
-    {
-        if (segments < 3)
-            segments = 3;
-
-        // 查找或创建对应的纹理批次
-        TextureBatch *batch = nullptr;
-        for (auto &b : m_textureBatches)
-        {
-            if (b.texture == &texture)
-            {
-                batch = &b;
-                break;
-            }
-        }
-
-        if (!batch)
-        {
-            m_textureBatches.push_back(TextureBatch{&texture});
-            batch = &m_textureBatches.back();
-        }
-
-        // 添加中心顶点
-        unsigned int startIndex = static_cast<unsigned int>(batch->vertices.size());
-        batch->vertices.push_back({{cx, cy, 0.0f}, tintColor, {0.5f, 0.5f}});
-
-        // 添加边界顶点
-        for (int i = 0; i <= segments; i++)
-        {
-            float angle = (float)i / segments * 2.0f * 3.14159265358979323846f;
-            float x = cx + cos(angle) * radius;
-            float y = cy + sin(angle) * radius;
-            // 将角度映射到纹理坐标
-            float u = 0.5f + 0.5f * cos(angle);
-            float v = 0.5f + 0.5f * sin(angle);
-            batch->vertices.push_back({{x, y, 0.0f}, tintColor, {u, v}});
-        }
-
-        // 添加索引
-        for (int i = 1; i <= segments; i++)
-        {
-            batch->indices.push_back(startIndex); // 中心点
-            batch->indices.push_back(startIndex + i);
-            batch->indices.push_back(startIndex + i + 1);
-            batch->indexCount += 3;
-        }
-    }
-
     void Graphics2D::drawEllipse(float cx, float cy, float radiusX, float radiusY,
                                  const Texture2D &texture, OxyColor tintColor, int segments)
     {
@@ -616,6 +529,11 @@ void main()
         }
     }
 
+    void Graphics2D::drawCircle(float cx, float cy, float radius, const Texture2D &texture,
+                                OxyColor tintColor, int segments)
+    {
+        drawEllipse(cx, cy, radius, radius, texture, tintColor, segments);
+    }
     void Graphics2D::drawAxis(OxyColor axisColor,
                               OxyColor gridColor,
                               float thickness,
@@ -623,8 +541,8 @@ void main()
                               bool drawGrid)
     {
         // 投影和视图矩阵
-        glm::mat4 proj = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
-        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
+        glm::mat4 proj = m_camera.getOrthoProjectionMatrix2D(m_window.getWidth(), m_window.getHeight());
+        glm::mat4 view = m_camera.getOrthoViewMatrix2D();
         glm::mat4 vp = proj * view;
         glm::mat4 invVP = glm::inverse(vp);
 
@@ -723,8 +641,8 @@ void main()
 
         // MVP变换
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
-        glm::mat4 projection = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+        glm::mat4 view = m_camera.getOrthoViewMatrix2D();
+        glm::mat4 projection = m_camera.getOrthoProjectionMatrix2D(m_window.getWidth(), m_window.getHeight());
 
         m_shader.setUniformData("model", &model, sizeof(glm::mat4));
         m_shader.setUniformData("view", &view, sizeof(glm::mat4));
@@ -789,8 +707,8 @@ void main()
 
         // MVP变换
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = m_camera.get2DOrthoViewMatrix();
-        glm::mat4 projection = m_camera.get2DOrthoProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+        glm::mat4 view = m_camera.getOrthoViewMatrix2D();
+        glm::mat4 projection = m_camera.getOrthoProjectionMatrix2D(m_window.getWidth(), m_window.getHeight());
 
         m_textureShader.setUniformData("model", &model, sizeof(glm::mat4));
         m_textureShader.setUniformData("view", &view, sizeof(glm::mat4));

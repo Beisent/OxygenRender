@@ -38,17 +38,17 @@ namespace OxyRender
             {
                 timer.update(window);
                 double dt = Timer::getInstance().deltaTime();
-                
+
                 eventSystem.handleEvent();
 
                 if (eventSystem.isKeyDown(KeyCode::A))
-                    camera.processKeyboard(CameraMovement::LEFT, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Left, dt * camera.getZoom());
                 if (eventSystem.isKeyDown(KeyCode::D))
-                    camera.processKeyboard(CameraMovement::RIGHT, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Right, dt * camera.getZoom());
                 if (eventSystem.isKeyDown(KeyCode::W))
-                    camera.processKeyboard(CameraMovement::UP, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Up, dt * camera.getZoom());
                 if (eventSystem.isKeyDown(KeyCode::S))
-                    camera.processKeyboard(CameraMovement::DOWN, dt * camera.getZoom());
+                    camera.processKeyboard(CameraMovement::Down, dt * camera.getZoom());
 
                 graphics2D.clear();
                 graphics2D.begin();
