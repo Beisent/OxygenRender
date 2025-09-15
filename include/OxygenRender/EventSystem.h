@@ -124,14 +124,14 @@ namespace OxyRender
     // MouseScroll事件数据结构体
     struct MouseScrollEvent
     {
-        float xoffset;
-        float yoffset;
+        float xOffset;
+        float yOffset;
     };
     // MouseMove事件数据结构体
     struct MouseMoveEvent
     {
-        float position_x;
-        float position_y;
+        float positionX;
+        float positionY;
     };
 
     // WindowResize事件数据结构体

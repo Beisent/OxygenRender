@@ -5,41 +5,41 @@ namespace OxyRender
 
     IShader::IShader(std::string name, std::string path_vertex, std::string path_fragment)
         : m_name(std::move(name)),
-          m_path_vertex(std::move(path_vertex)),
-          m_path_fragment(std::move(path_fragment)),
-          m_use_source_code(false)
+          m_pathVertex(std::move(path_vertex)),
+          m_pathFragment(std::move(path_fragment)),
+          m_useSourceCode(false)
     {
     }
 
     IShader::IShader(std::string name, std::string vertex_source, std::string fragment_source, bool from_source)
         : m_name(std::move(name)),
-          m_vertex_source(std::move(vertex_source)),
-          m_fragment_source(std::move(fragment_source)),
-          m_use_source_code(from_source)
+          m_vertexSource(std::move(vertex_source)),
+          m_fragmentSource(std::move(fragment_source)),
+          m_useSourceCode(from_source)
     {
     }
 
     OpenGLShader::OpenGLShader(std::string name, std::string path_vertex, std::string path_fragment)
         : IShader(std::move(name), std::move(path_vertex), std::move(path_fragment))
     {
-        std::string vertexCode = loadFile(m_path_vertex);
-        std::string fragmentCode = loadFile(m_path_fragment);
+        std::string vertexCode = loadFile(m_pathVertex);
+        std::string fragmentCode = loadFile(m_pathFragment);
 
         GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexCode);
         GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentCode);
 
-        m_program_id = glCreateProgram();
-        glAttachShader(m_program_id, vertexShader);
-        glAttachShader(m_program_id, fragmentShader);
-        glLinkProgram(m_program_id);
+        m_programId = glCreateProgram();
+        glAttachShader(m_programId, vertexShader);
+        glAttachShader(m_programId, fragmentShader);
+        glLinkProgram(m_programId);
 
         GLint success;
-        glGetProgramiv(m_program_id, GL_LINK_STATUS, &success);
+        glGetProgramiv(m_programId, GL_LINK_STATUS, &success);
         if (!success)
         {
             char log[512];
-            glGetProgramInfoLog(m_program_id, 512, nullptr, log);
-            glDeleteProgram(m_program_id);
+            glGetProgramInfoLog(m_programId, 512, nullptr, log);
+            glDeleteProgram(m_programId);
             throw std::runtime_error(std::string("Program linking failed: ") + log);
         }
 
@@ -50,21 +50,21 @@ namespace OxyRender
     OpenGLShader::OpenGLShader(std::string name, std::string vertex_source, std::string fragment_source, bool from_source)
         : IShader(std::move(name), std::move(vertex_source), std::move(fragment_source), from_source)
     {
-        GLuint vertexShader = compileShader(GL_VERTEX_SHADER, m_vertex_source);
-        GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, m_fragment_source);
+        GLuint vertexShader = compileShader(GL_VERTEX_SHADER, m_vertexSource);
+        GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, m_fragmentSource);
 
-        m_program_id = glCreateProgram();
-        glAttachShader(m_program_id, vertexShader);
-        glAttachShader(m_program_id, fragmentShader);
-        glLinkProgram(m_program_id);
+        m_programId = glCreateProgram();
+        glAttachShader(m_programId, vertexShader);
+        glAttachShader(m_programId, fragmentShader);
+        glLinkProgram(m_programId);
 
         GLint success;
-        glGetProgramiv(m_program_id, GL_LINK_STATUS, &success);
+        glGetProgramiv(m_programId, GL_LINK_STATUS, &success);
         if (!success)
         {
             char log[512];
-            glGetProgramInfoLog(m_program_id, 512, nullptr, log);
-            glDeleteProgram(m_program_id);
+            glGetProgramInfoLog(m_programId, 512, nullptr, log);
+            glDeleteProgram(m_programId);
             throw std::runtime_error(std::string("Program linking failed: ") + log);
         }
 
@@ -168,17 +168,17 @@ namespace OxyRender
     }
     void OpenGLShader::use()
     {
-        glUseProgram(m_program_id);
+        glUseProgram(m_programId);
     }
 
     OpenGLShader::~OpenGLShader()
     {
-        glDeleteProgram(m_program_id);
+        glDeleteProgram(m_programId);
     }
     // void OpenGLShader::setMat4(const std::string &name, const glm::mat4 &mat)
     // {
     //     use();
-    //     GLint location = glGetUniformLocation(m_program_id, name.c_str());
+    //     GLint location = glGetUniformLocation(m_programId, name.c_str());
     //     if (location != -1)
     //     {
     //         glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
@@ -186,7 +186,7 @@ namespace OxyRender
     // }
     void OpenGLShader::setUniformData(const std::string &name, const void *data, size_t size)
     {
-        GLint location = glGetUniformLocation(m_program_id, name.c_str());
+        GLint location = glGetUniformLocation(m_programId, name.c_str());
         if (location == -1)
             throw std::runtime_error("Uniform not found: " + name);
 

@@ -185,7 +185,7 @@ namespace OxyRender
     // {
     //     glClear(GL_STENCIL_BUFFER_BIT);
     // }
-    Renderer::Renderer(Window &window) : m_Window(window)
+    Renderer::Renderer(Window &window) : m_window(window)
     {
         switch (Backends::OXYG_CurrentBackend)
         {
@@ -196,7 +196,7 @@ namespace OxyRender
             break;
         }
         setCapability(RenderCapability::DepthTest, true);
-        m_Window.setViewport(0, 0, m_Window.getWidth(), m_Window.getHeight());
+        m_window.setViewport(0, 0, m_window.getWidth(), m_window.getHeight());
     }
     void Renderer::clear()
     {

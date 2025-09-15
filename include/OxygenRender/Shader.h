@@ -12,11 +12,11 @@ namespace OxyRender
     {
     protected:
         std::string m_name;
-        std::string m_path_vertex;
-        std::string m_path_fragment;
-        std::string m_vertex_source;
-        std::string m_fragment_source;
-        bool m_use_source_code;
+        std::string m_pathVertex;
+        std::string m_pathFragment;
+        std::string m_vertexSource;
+        std::string m_fragmentSource;
+        bool m_useSourceCode;
 
     public:
         IShader(std::string name, std::string path_vertex, std::string path_fragment);
@@ -30,7 +30,7 @@ namespace OxyRender
     class OpenGLShader : public IShader
     {
     private:
-        unsigned int m_program_id;
+        unsigned int m_programId;
 
         static std::string loadFile(const std::string &path);
         static unsigned int compileShader(unsigned int type, const std::string &source);
@@ -40,7 +40,7 @@ namespace OxyRender
         OpenGLShader(std::string name, std::string vertex_source, std::string fragment_source, bool from_source);
         virtual ~OpenGLShader() override;
         virtual void use() override;
-        inline virtual unsigned int getID() override { return m_program_id; }
+        inline virtual unsigned int getID() override { return m_programId; }
 
         virtual void setUniformData(const std::string &name, const void *data, size_t size) override;
 

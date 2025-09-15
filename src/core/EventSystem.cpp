@@ -75,17 +75,17 @@ namespace OxyRender
     {
         if (m_firstMouse)
         {
-            m_mouseLastX = mouse.position_x;
-            m_mouseLastY = mouse.position_y;
+            m_mouseLastX = mouse.positionX;
+            m_mouseLastY = mouse.positionY;
             m_firstMouse = false;
             return {0.0f, 0.0f};
         }
 
-        float xoffset = mouse.position_x - m_mouseLastX;
-        float yoffset = m_mouseLastY - mouse.position_y;
+        float xoffset = mouse.positionX - m_mouseLastX;
+        float yoffset = m_mouseLastY - mouse.positionY;
 
-        m_mouseLastX = mouse.position_x;
-        m_mouseLastY = mouse.position_y;
+        m_mouseLastX = mouse.positionX;
+        m_mouseLastY = mouse.positionY;
 
         return {xoffset, yoffset};
     }

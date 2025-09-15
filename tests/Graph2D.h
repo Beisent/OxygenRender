@@ -30,7 +30,7 @@ namespace OxyRender
                                          [&camera](const Event &e)
                                          {
             const MouseScrollEvent& scrollEvent = std::get<MouseScrollEvent>(e.data);
-            camera.processMouseScroll(scrollEvent.yoffset); });
+            camera.processMouseScroll(scrollEvent.yOffset); });
 
             auto &timer = OxyRender::Timer::getInstance();
             timer.setTargetFPS(60); // 锁定 60 FPS

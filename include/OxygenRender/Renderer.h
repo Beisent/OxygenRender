@@ -150,7 +150,7 @@ namespace OxyRender
     {
     private:
         std::unique_ptr<IRenderer> renderer;
-        Window &m_Window;
+        Window &m_window;
 
     public:
         explicit Renderer(Window &window);

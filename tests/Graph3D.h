@@ -52,7 +52,7 @@ namespace OxyRender
             eventSystem.registerCallback(EventType::MouseScrolled, [&camera](const Event &e)
                                          {
             const MouseScrollEvent& scrollEvent = std::get<MouseScrollEvent>(e.data);
-            camera.processMouseScroll(scrollEvent.yoffset); });
+            camera.processMouseScroll(scrollEvent.yOffset); });
 
             // 注册鼠标移动事件
             eventSystem.registerCallback(EventType::MouseMoved, [&camera, &eventSystem, &mouseCaptured](const Event &e)
