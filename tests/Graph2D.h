@@ -75,8 +75,6 @@ namespace OxyRender
                 graphics2D.drawBezier(10, 10, 150, 10, 200, 200, {1, 0, 0, 1}, 2.0f, 48);
                 graphics2D.drawBezier(10, 10, 100, 200, 200, -50, 300, 100, {0, 1, 0, 1}, 2.0f, 64);
 
-                auto func = [](float x)
-                { return 0.01f * x * x; };
                 graphics2D.drawFunction(-300, 300, [](float x)
                                         { return 100 * sin(200 / x); }, {0, 0, 1, 1}, 0.1f, 2.0f);
 

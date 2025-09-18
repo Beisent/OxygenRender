@@ -3,7 +3,7 @@
 namespace OxyRender
 {
     // 硬编码的着色器源码
-    const char* Graphics3D::m_vertexShaderSrc = R"(
+    const char *Graphics3D::m_vertexShaderSrc = R"(
 #version 330 core
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec4 aColor;
@@ -30,7 +30,7 @@ void main()
 }
 )";
 
-    const char* Graphics3D::m_fragmentShaderSrc = R"(
+    const char *Graphics3D::m_fragmentShaderSrc = R"(
 #version 330 core
 in vec3 vFragPos;
 in vec3 vNormal;
@@ -351,6 +351,116 @@ void main()
             }
         }
     }
+
+    void Graphics3D::drawCylinder(const glm::vec3 &center,
+                                  float radius,
+                                  float height,
+                                  int slices,
+                                  const OxyColor &color,
+                                  bool capped)
+    {
+        if (radius <= 0.0f || height <= 0.0f)
+            return;
+        if (slices < 3)
+            slices = 3;
+
+        float halfH = 0.5f * height;
+        float yTop = center.y + halfH;
+        float yBottom = center.y - halfH;
+
+       
+        for (int j = 0; j < slices; ++j)
+        {
+            float theta1 = glm::two_pi<float>() * float(j) / float(slices);
+            float theta2 = glm::two_pi<float>() * float(j + 1) / float(slices);
+
+            glm::vec3 p1(center.x + radius * std::cos(theta1), yBottom, center.z + radius * std::sin(theta1));
+            glm::vec3 p2(center.x + radius * std::cos(theta2), yBottom, center.z + radius * std::sin(theta2));
+            glm::vec3 p3(center.x + radius * std::cos(theta2), yTop, center.z + radius * std::sin(theta2));
+            glm::vec3 p4(center.x + radius * std::cos(theta1), yTop, center.z + radius * std::sin(theta1));
+
+           
+            glm::vec3 n1 = glm::normalize(glm::vec3(p1.x - center.x, 0.0f, p1.z - center.z));
+            glm::vec3 n2 = glm::normalize(glm::vec3(p2.x - center.x, 0.0f, p2.z - center.z));
+            glm::vec3 n3 = glm::normalize(glm::vec3(p3.x - center.x, 0.0f, p3.z - center.z));
+            glm::vec3 n4 = glm::normalize(glm::vec3(p4.x - center.x, 0.0f, p4.z - center.z));
+
+            unsigned int base = (unsigned int)m_triVertices.size();
+          
+            m_triVertices.push_back({p1, color, n1});
+            m_triVertices.push_back({p2, color, n2});
+            m_triVertices.push_back({p3, color, n3});
+            m_triIndices.push_back(base + 0);
+            m_triIndices.push_back(base + 1);
+            m_triIndices.push_back(base + 2);
+            m_triIndexCount += 3;
+
+           
+            m_triVertices.push_back({p3, color, n3});
+            m_triVertices.push_back({p4, color, n4});
+            m_triVertices.push_back({p1, color, n1});
+            m_triIndices.push_back(base + 3);
+            m_triIndices.push_back(base + 4);
+            m_triIndices.push_back(base + 5);
+            m_triIndexCount += 3;
+        }
+
+        if (capped)
+        {
+            
+            {
+                glm::vec3 nTop(0.0f, 1.0f, 0.0f);
+                unsigned int centerBase = (unsigned int)m_triVertices.size();
+               
+                m_triVertices.push_back({glm::vec3(center.x, yTop, center.z), color, nTop});
+        
+                for (int j = 0; j < slices; ++j)
+                {
+                    float theta = glm::two_pi<float>() * float(j) / float(slices);
+                    glm::vec3 p(center.x + radius * std::cos(theta), yTop, center.z + radius * std::sin(theta));
+                    m_triVertices.push_back({p, color, nTop});
+                }
+               
+                for (int j = 0; j < slices; ++j)
+                {
+                    unsigned int i0 = centerBase + 0;                      
+                    unsigned int i1 = centerBase + 1 + j;                  
+                    unsigned int i2 = centerBase + 1 + ((j + 1) % slices); 
+                    m_triIndices.push_back(i0);
+                    m_triIndices.push_back(i1);
+                    m_triIndices.push_back(i2);
+                    m_triIndexCount += 3;
+                }
+            }
+
+            
+            {
+                glm::vec3 nBot(0.0f, -1.0f, 0.0f);
+                unsigned int centerBase = (unsigned int)m_triVertices.size();
+                
+                m_triVertices.push_back({glm::vec3(center.x, yBottom, center.z), color, nBot});
+                
+                for (int j = 0; j < slices; ++j)
+                {
+                    float theta = glm::two_pi<float>() * float(j) / float(slices);
+                    glm::vec3 p(center.x + radius * std::cos(theta), yBottom, center.z + radius * std::sin(theta));
+                    m_triVertices.push_back({p, color, nBot});
+                }
+               
+                for (int j = 0; j < slices; ++j)
+                {
+                    unsigned int i0 = centerBase + 0;                     
+                    unsigned int i1 = centerBase + 1 + ((j + 1) % slices); 
+                    unsigned int i2 = centerBase + 1 + j;                 
+                    m_triIndices.push_back(i0);
+                    m_triIndices.push_back(i1);
+                    m_triIndices.push_back(i2);
+                    m_triIndexCount += 3;
+                }
+            }
+        }
+    }
+
     void Graphics3D::drawFunction(
         const glm::vec2 &xDomain,
         const glm::vec2 &zDomain,
