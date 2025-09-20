@@ -64,8 +64,7 @@ namespace OxyRender
                 graphics2D.drawEllipse(100, 200, 80, 50, {0.5f, 0, 0.5f, 0.5f});
                 graphics2D.drawEllipseOutline(250, 200, 80, 50, {0, 0.5f, 0.5f, 1}, 64, 2);
 
-       
-                graphics2D.drawPolygon({{-200, 200}, {-150, 300}, {-100, 200}}, {0, 0, 1, 1});
+                graphics2D.drawPolygon({{-100, -100}, {-100, 100}, {100, 100}, {100, -100}}, {0, 1, 1, 1});
                 graphics2D.drawPolygonOutline({{-100, 200}, {-50, 300}, {0, 200}}, {1, 1, 0, 1}, 2);
 
                 graphics2D.drawArrow(100, 300, 200, 200, {1, 0, 0, 1}, 2.0f, 10.0f, 10.0f);
