@@ -1,7 +1,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "OxygenRender/Texture.h"
- #include <stb_image.h>
- #include <glad/glad.h>
+#include <stb_image.h>
+#include <glad/glad.h>
+
 namespace OxyRender
 {
     OpenGLTexture2D::OpenGLTexture2D(const std::string &path,
@@ -96,6 +97,65 @@ namespace OxyRender
         {
             throw std::runtime_error("Unsupported backend for Texture2D");
         }
+    }
+
+    OpenGLCubemap::OpenGLCubemap(const std::vector<std::string> &faces)
+    {
+        glGenTextures(1, &m_rendererID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_rendererID);
+        stbi_set_flip_vertically_on_load(false);
+        int width, height, nrChannels;
+        for (unsigned int i = 0; i < faces.size(); i++)
+        {
+            unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+            if (data)
+            {
+                GLenum format = GL_RGB;
+                if (nrChannels == 4)
+                    format = GL_RGBA;
+
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                             0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+                stbi_image_free(data);
+            }
+            else
+            {
+                std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+                stbi_image_free(data);
+            }
+        }
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
+
+    OpenGLCubemap::~OpenGLCubemap()
+    {
+        glDeleteTextures(1, &m_rendererID);
+    }
+
+    void OpenGLCubemap::bind(uint32_t slot) const noexcept
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_rendererID);
+    }
+
+    void OpenGLCubemap::unbind() const noexcept
+    {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    }
+
+    std::unique_ptr<ICubemap> TextureFactory::createCubemap(const std::vector<std::string> &faces)
+    {
+        return std::make_unique<OpenGLCubemap>(faces);
+    }
+
+    Cubemap::Cubemap(const std::vector<std::string> &faces)
+    {
+        m_cubemap = TextureFactory::createCubemap(faces);
     }
 
 }

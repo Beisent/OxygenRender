@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
 REM ============ Part 1: Download backpack (if not exists) ============
 set TARGET_DIR=resources\objects\backpack
@@ -41,6 +41,28 @@ if exist "%AWESOME_FILE%" (
 ) else (
     echo Downloading awesomeface.png...
     powershell -Command "Invoke-WebRequest -Uri '%AWESOME_URL%' -OutFile '%AWESOME_FILE%'"
+)
+
+REM ============ Part 3: Download skybox images ============
+set SKYBOX_DIR=resources\skybox
+mkdir "%SKYBOX_DIR%" 2>nul
+
+set SKYBOX_UP=https://github.com/pengfeiw/skybox-image/raw/main/elyvisions/arch3_up.png
+set SKYBOX_DN=https://github.com/pengfeiw/skybox-image/raw/main/elyvisions/arch3_dn.png
+set SKYBOX_LF=https://github.com/pengfeiw/skybox-image/raw/main/elyvisions/arch3_lf.png
+set SKYBOX_RT=https://github.com/pengfeiw/skybox-image/raw/main/elyvisions/arch3_rt.png
+set SKYBOX_FT=https://github.com/pengfeiw/skybox-image/raw/main/elyvisions/arch3_ft.png
+set SKYBOX_BK=https://github.com/pengfeiw/skybox-image/raw/main/elyvisions/arch3_bk.png
+
+for %%i in (up dn lf rt ft bk) do (
+    set "URL=!SKYBOX_%%i!"
+    set "FILE=%SKYBOX_DIR%\arch3_%%i.png"
+    if exist "!FILE!" (
+        echo "!FILE!" already exists. Skipping download.
+    ) else (
+        echo Downloading "!FILE!"...
+        powershell -Command "Invoke-WebRequest -Uri '!URL!' -OutFile '!FILE!'"
+    )
 )
 
 echo All downloads completed.

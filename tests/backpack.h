@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include "OxygenRender/Skybox.h"
 #include <cmath>
 
 namespace OxyRender
@@ -24,6 +25,8 @@ namespace OxyRender
 
             window.setCursorMode(CursorMode::Disabled);
             bool mouseCaptured = true;
+
+            // 检查模型路径是否正确
             Model backpackModel(renderer, "../resources/objects/backpack/backpack.obj");
             EventSystem &eventSystem = EventSystem::getInstance();
 
@@ -67,6 +70,16 @@ namespace OxyRender
                 camera.processMouseMovement(offset.dx, offset.dy);
             } });
 
+            std::vector<std::string> faces = {"../resources/skybox/arch3_ft.png",
+                                              "../resources/skybox/arch3_bk.png",
+                                              "../resources/skybox/arch3_up.png",
+                                              "../resources/skybox/arch3_dn.png",
+                                              "../resources/skybox/arch3_rt.png",
+                                              "../resources/skybox/arch3_lf.png"};
+
+            Skybox skybox(renderer, faces);
+            Shader skyboxShader = Skybox::createDefaultShader();
+
             auto &timer = Timer::getInstance();
             timer.setTargetFPS(120);
 
@@ -94,7 +107,7 @@ namespace OxyRender
                 glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
 
                 renderer.clear();
-
+                skybox.draw(skyboxShader, view, projection);
                 // 添加光照参数
                 glm::vec3 lightPos = camera.getPosition();
                 glm::vec3 lightAmbient(0.1f, 0.1f, 0.1f);
@@ -122,5 +135,4 @@ namespace OxyRender
             }
         }
     };
-
 }
