@@ -15,14 +15,13 @@ namespace OxyRender
         double currentTime = window.getTime();
         double frameTime = currentTime - m_lastTime;
         m_lastTime = currentTime;
-
+        m_totalTime += frameTime;
         m_accumulator += frameTime;
 
         if (m_targetFPS > 0)
         {
             double targetFrameTime = 1.0 / m_targetFPS;
 
-           
             if (m_accumulator < targetFrameTime)
             {
                 double sleepTime = targetFrameTime - m_accumulator;
@@ -32,7 +31,6 @@ namespace OxyRender
                     window.waitEventsTimeout(sleepTime - 0.001);
                 }
 
-               
                 while ((window.getTime() - currentTime) < sleepTime)
                 {
                 }
@@ -40,7 +38,7 @@ namespace OxyRender
                 double afterWait = window.getTime();
                 frameTime = afterWait - m_lastTime + m_accumulator;
                 m_lastTime = afterWait;
-                m_accumulator = targetFrameTime; 
+                m_accumulator = targetFrameTime;
             }
 
             m_deltaTime = targetFrameTime;

@@ -368,7 +368,6 @@ void main()
         float yTop = center.y + halfH;
         float yBottom = center.y - halfH;
 
-       
         for (int j = 0; j < slices; ++j)
         {
             float theta1 = glm::two_pi<float>() * float(j) / float(slices);
@@ -379,14 +378,13 @@ void main()
             glm::vec3 p3(center.x + radius * std::cos(theta2), yTop, center.z + radius * std::sin(theta2));
             glm::vec3 p4(center.x + radius * std::cos(theta1), yTop, center.z + radius * std::sin(theta1));
 
-           
             glm::vec3 n1 = glm::normalize(glm::vec3(p1.x - center.x, 0.0f, p1.z - center.z));
             glm::vec3 n2 = glm::normalize(glm::vec3(p2.x - center.x, 0.0f, p2.z - center.z));
             glm::vec3 n3 = glm::normalize(glm::vec3(p3.x - center.x, 0.0f, p3.z - center.z));
             glm::vec3 n4 = glm::normalize(glm::vec3(p4.x - center.x, 0.0f, p4.z - center.z));
 
             unsigned int base = (unsigned int)m_triVertices.size();
-          
+
             m_triVertices.push_back({p1, color, n1});
             m_triVertices.push_back({p2, color, n2});
             m_triVertices.push_back({p3, color, n3});
@@ -395,7 +393,6 @@ void main()
             m_triIndices.push_back(base + 2);
             m_triIndexCount += 3;
 
-           
             m_triVertices.push_back({p3, color, n3});
             m_triVertices.push_back({p4, color, n4});
             m_triVertices.push_back({p1, color, n1});
@@ -407,25 +404,25 @@ void main()
 
         if (capped)
         {
-            
+
             {
                 glm::vec3 nTop(0.0f, 1.0f, 0.0f);
                 unsigned int centerBase = (unsigned int)m_triVertices.size();
-               
+
                 m_triVertices.push_back({glm::vec3(center.x, yTop, center.z), color, nTop});
-        
+
                 for (int j = 0; j < slices; ++j)
                 {
                     float theta = glm::two_pi<float>() * float(j) / float(slices);
                     glm::vec3 p(center.x + radius * std::cos(theta), yTop, center.z + radius * std::sin(theta));
                     m_triVertices.push_back({p, color, nTop});
                 }
-               
+
                 for (int j = 0; j < slices; ++j)
                 {
-                    unsigned int i0 = centerBase + 0;                      
-                    unsigned int i1 = centerBase + 1 + j;                  
-                    unsigned int i2 = centerBase + 1 + ((j + 1) % slices); 
+                    unsigned int i0 = centerBase + 0;
+                    unsigned int i1 = centerBase + 1 + j;
+                    unsigned int i2 = centerBase + 1 + ((j + 1) % slices);
                     m_triIndices.push_back(i0);
                     m_triIndices.push_back(i1);
                     m_triIndices.push_back(i2);
@@ -433,25 +430,24 @@ void main()
                 }
             }
 
-            
             {
                 glm::vec3 nBot(0.0f, -1.0f, 0.0f);
                 unsigned int centerBase = (unsigned int)m_triVertices.size();
-                
+
                 m_triVertices.push_back({glm::vec3(center.x, yBottom, center.z), color, nBot});
-                
+
                 for (int j = 0; j < slices; ++j)
                 {
                     float theta = glm::two_pi<float>() * float(j) / float(slices);
                     glm::vec3 p(center.x + radius * std::cos(theta), yBottom, center.z + radius * std::sin(theta));
                     m_triVertices.push_back({p, color, nBot});
                 }
-               
+
                 for (int j = 0; j < slices; ++j)
                 {
-                    unsigned int i0 = centerBase + 0;                     
-                    unsigned int i1 = centerBase + 1 + ((j + 1) % slices); 
-                    unsigned int i2 = centerBase + 1 + j;                 
+                    unsigned int i0 = centerBase + 0;
+                    unsigned int i1 = centerBase + 1 + ((j + 1) % slices);
+                    unsigned int i2 = centerBase + 1 + j;
                     m_triIndices.push_back(i0);
                     m_triIndices.push_back(i1);
                     m_triIndices.push_back(i2);
@@ -508,22 +504,23 @@ void main()
         m_renderer.setCapability(RenderCapability::DepthTest, true);
         m_renderer.setCapability(RenderCapability::StencilTest, false);
 
-        m_shader.use();
+        Shader *shaderToUse = m_customShader ? m_customShader : &m_shader;
+        shaderToUse->use();
 
         // 3D MVP
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = m_camera.getViewMatrix();
         glm::mat4 projection = m_camera.getPerspectiveProjectionMatrix(m_window.getWidth(), m_window.getHeight());
 
-        m_shader.setUniformData("model", &model, sizeof(glm::mat4));
-        m_shader.setUniformData("view", &view, sizeof(glm::mat4));
-        m_shader.setUniformData("projection", &projection, sizeof(glm::mat4));
+        shaderToUse->setUniformData("model", &model, sizeof(glm::mat4));
+        shaderToUse->setUniformData("view", &view, sizeof(glm::mat4));
+        shaderToUse->setUniformData("projection", &projection, sizeof(glm::mat4));
 
         // 设置光照和相机位置
         glm::vec3 lightPos(5.0f, 5.0f, 5.0f);
         glm::vec3 camPos = m_camera.getPosition();
-        m_shader.setUniformData("lightPos", &lightPos, sizeof(glm::vec3));
-        m_shader.setUniformData("viewPos", &camPos, sizeof(glm::vec3));
+        shaderToUse->setUniformData("lightPos", &lightPos, sizeof(glm::vec3));
+        shaderToUse->setUniformData("viewPos", &camPos, sizeof(glm::vec3));
 
         m_vao.bind();
 
@@ -555,7 +552,7 @@ void main()
                     continue;
                 m_vbo.setData(pb.vertices.data(), pb.vertices.size() * sizeof(Vertex));
                 float size = pb.size;
-                m_shader.setUniformData("uPointSize", &size, sizeof(float));
+                shaderToUse->setUniformData("uPointSize", &size, sizeof(float));
                 m_renderer.drawPoints(m_vao, static_cast<uint32_t>(pb.vertices.size()));
             }
             m_renderer.setCapability(RenderCapability::ProgramPointSize, false);

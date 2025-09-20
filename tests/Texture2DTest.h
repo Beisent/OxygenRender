@@ -82,7 +82,7 @@ namespace OxyRender
                 graphics2D.drawTriangle(100, -250, 150, -200, 200, -250, {0,0,1,0.6f});
 
                 graphics2D.drawLine(-400, -100, -300, -100, {1,1,0,1}, 3.0f);
-                graphics2D.drawPoints({{-350,-50}, {-300,-50}, {-250,-50}}, 8.0f, {1,0.5f,0,1});
+               
 
                 graphics2D.flush(); 
                 window.swapBuffers();

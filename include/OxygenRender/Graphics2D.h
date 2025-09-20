@@ -21,23 +21,23 @@ namespace OxyRender
         Camera &getCamera();
         void clear();
         void setClearColor(const OxyColor &color);
+        void setShader(Shader *shader) { m_customShader = shader; }
+        void setTextureShader(Shader *shader) { m_customTextureShader = shader; }
         void begin();
 
         void drawRect(float x, float y, float width, float height, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
         void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
-       
+
         void drawLine(float x1, float y1, float x2, float y2, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
         void drawLines(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
         void drawCircle(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
         void drawCircleOutline(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
-        
+
         void drawEllipse(float cx, float cy, float radiusX, float radiusY,
                          OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
         void drawEllipseOutline(float cx, float cy, float radiusX, float radiusY,
                                 OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
-
-        void drawPoints(const std::vector<glm::vec2> &points, float size, const OxyColor &color);
 
         void drawPolygon(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
         void drawPolygonOutline(const std::vector<glm::vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
@@ -107,14 +107,6 @@ namespace OxyRender
             std::vector<unsigned int> indices;
             size_t indexCount = 0;
         };
-        // 点批次
-        struct PointBatch
-        {
-            float size;
-            OxyColor color;
-            std::vector<Vertex> vertices;
-        };
-
         // 纹理批次
         struct TextureBatch
         {
@@ -129,6 +121,8 @@ namespace OxyRender
         Camera m_camera;
         Shader m_shader;
         Shader m_textureShader;
+        Shader *m_customShader = nullptr;       
+        Shader *m_customTextureShader = nullptr;
 
         VertexArray m_vao;
         Buffer m_vbo;
@@ -142,8 +136,6 @@ namespace OxyRender
         // 线段批次
         std::vector<LineBatch> m_lineBatches;
 
-        // 点批次
-        std::vector<PointBatch> m_pointBatches;
 
         // 纹理批次
         std::vector<TextureBatch> m_textureBatches;
@@ -155,9 +147,9 @@ namespace OxyRender
         void addTextureVertex(float x, float y, float u, float v, OxyColor color);
         void flushTextureBatches();
 
-        static const char* m_vertexShaderSrc;
-        static const char* m_fragmentShaderSrc;
-        static const char* m_textureVertexShaderSrc;
-        static const char* m_textureFragmentShaderSrc;
+        static const char *m_vertexShaderSrc;
+        static const char *m_fragmentShaderSrc;
+        static const char *m_textureVertexShaderSrc;
+        static const char *m_textureFragmentShaderSrc;
     };
 }

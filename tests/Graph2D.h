@@ -64,9 +64,7 @@ namespace OxyRender
                 graphics2D.drawEllipse(100, 200, 80, 50, {0.5f, 0, 0.5f, 0.5f});
                 graphics2D.drawEllipseOutline(250, 200, 80, 50, {0, 0.5f, 0.5f, 1}, 64, 2);
 
-                std::vector<glm::vec2> pts = {
-                    {0.0f, 0.0f}, {100.0f, 50.0f}, {-80.0f, 30.0f}};
-                graphics2D.drawPoints(pts, 8.0f, {1, 0.2f, 0.2f, 1});
+       
                 graphics2D.drawPolygon({{-200, 200}, {-150, 300}, {-100, 200}}, {0, 0, 1, 1});
                 graphics2D.drawPolygonOutline({{-100, 200}, {-50, 300}, {0, 200}}, {1, 1, 0, 1}, 2);
 

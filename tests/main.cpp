@@ -8,8 +8,8 @@ using namespace OxyRender;
 
 int main()
 {
-  Backpack::execute();
-  //Graph2D::execute();
+  //Backpack::execute();
+  Graph2D::execute();
    // Graph3D::execute();
    //Texture2DTest::execute();
   // Simple2D::execute();

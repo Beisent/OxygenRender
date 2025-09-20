@@ -22,6 +22,7 @@ namespace OxyRender
         Camera &getCamera();
         void clear();
         void setClearColor(const OxyColor &color);
+        void setShader(Shader *shader) { m_customShader = shader; }
         void begin();
 
         void drawTriangle(const glm::vec3 &p1,
@@ -57,11 +58,11 @@ namespace OxyRender
             const float &dx = 0.1f,
             const float &dy = 0.1f);
         void drawCylinder(const glm::vec3 &center,
-                                      float radius,
-                                      float height,
-                                      int slices,
-                                      const OxyColor &color,
-                                      bool capped);
+                          float radius,
+                          float height,
+                          int slices,
+                          const OxyColor &color,
+                          bool capped);
 
         void flush();
 
@@ -92,6 +93,7 @@ namespace OxyRender
         Renderer &m_renderer;
         Camera m_camera;
         Shader m_shader;
+        Shader *m_customShader = nullptr;
 
         VertexArray m_vao;
         Buffer m_vbo;

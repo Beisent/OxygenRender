@@ -127,7 +127,6 @@ void main()
         m_triIndexCount = 0;
 
         m_lineBatches.clear();
-        m_pointBatches.clear();
         m_textureBatches.clear();
     }
 
@@ -228,7 +227,7 @@ void main()
 
     void Graphics2D::drawCircleOutline(float cx, float cy, float radius, OxyColor color, int segments, float thickness)
     {
-       drawEllipseOutline(cx, cy, radius, radius, color, segments, thickness);
+        drawEllipseOutline(cx, cy, radius, radius, color, segments, thickness);
     }
 
     void Graphics2D::drawEllipse(float cx, float cy, float radiusX, float radiusY,
@@ -280,35 +279,7 @@ void main()
         }
     }
 
-    void Graphics2D::drawPoints(const std::vector<glm::vec2> &points, float size, const OxyColor &color)
-    {
-        if (points.empty())
-            return;
-
-        PointBatch *batch = nullptr;
-        for (auto &b : m_pointBatches)
-        {
-            if (std::fabs(b.size - size) < 0.001f &&
-                b.color.r == color.r && b.color.g == color.g &&
-                b.color.b == color.b && b.color.a == color.a)
-            {
-                batch = &b;
-                break;
-            }
-        }
-        if (!batch)
-        {
-            m_pointBatches.push_back(PointBatch{size, color});
-            batch = &m_pointBatches.back();
-        }
-
-        batch->vertices.reserve(batch->vertices.size() + points.size());
-        for (const auto &p : points)
-        {
-            batch->vertices.push_back({glm::vec3(p.x, p.y, 0.0f), color, {0.5f, 0.5f}});
-        }
-    }
-
+   
     void Graphics2D::drawPolygon(const std::vector<glm::vec2> &points, OxyColor color)
     {
         if (points.size() < 3)
@@ -637,16 +608,17 @@ void main()
         m_renderer.setCapability(RenderCapability::DepthTest, false);
         m_renderer.setCapability(RenderCapability::StencilTest, false);
 
-        m_shader.use();
+        Shader *shaderToUse = m_customShader ? m_customShader : &m_shader;
+        shaderToUse->use();
 
         // MVP变换
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = m_camera.getOrthoViewMatrix2D();
         glm::mat4 projection = m_camera.getOrthoProjectionMatrix2D(m_window.getWidth(), m_window.getHeight());
 
-        m_shader.setUniformData("model", &model, sizeof(glm::mat4));
-        m_shader.setUniformData("view", &view, sizeof(glm::mat4));
-        m_shader.setUniformData("projection", &projection, sizeof(glm::mat4));
+        shaderToUse->setUniformData("model", &model, sizeof(glm::mat4));
+        shaderToUse->setUniformData("view", &view, sizeof(glm::mat4));
+        shaderToUse->setUniformData("projection", &projection, sizeof(glm::mat4));
 
         m_vao.bind();
 
@@ -669,30 +641,12 @@ void main()
             m_renderer.drawTriangles(m_vao, m_triIndexCount);
         }
 
-        // 点绘制
-        if (!m_pointBatches.empty())
-        {
-            m_renderer.setCapability(RenderCapability::ProgramPointSize, true);
-
-            for (auto &pb : m_pointBatches)
-            {
-                if (pb.vertices.empty())
-                    continue;
-
-                m_vbo.setData(pb.vertices.data(), pb.vertices.size() * sizeof(Vertex));
-
-                float size = pb.size;
-                m_shader.setUniformData("uPointSize", &size, sizeof(float));
-                m_renderer.drawPoints(m_vao, static_cast<uint32_t>(pb.vertices.size()));
-            }
-
-            m_renderer.setCapability(RenderCapability::ProgramPointSize, false);
-        }
+        
         m_vao.unbind();
 
         m_triIndexCount = 0;
         m_lineBatches.clear();
-        m_pointBatches.clear();
+    
 
         // 刷新纹理批次
         flushTextureBatches();
@@ -702,17 +656,17 @@ void main()
     {
         if (m_textureBatches.empty())
             return;
-
-        m_textureShader.use();
+        Shader *shaderToUse = m_customTextureShader ? m_customTextureShader : &m_textureShader;
+        shaderToUse->use();
 
         // MVP变换
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = m_camera.getOrthoViewMatrix2D();
         glm::mat4 projection = m_camera.getOrthoProjectionMatrix2D(m_window.getWidth(), m_window.getHeight());
 
-        m_textureShader.setUniformData("model", &model, sizeof(glm::mat4));
-        m_textureShader.setUniformData("view", &view, sizeof(glm::mat4));
-        m_textureShader.setUniformData("projection", &projection, sizeof(glm::mat4));
+        shaderToUse->setUniformData("model", &model, sizeof(glm::mat4));
+        shaderToUse->setUniformData("view", &view, sizeof(glm::mat4));
+        shaderToUse->setUniformData("projection", &projection, sizeof(glm::mat4));
 
         m_vao.bind();
 
@@ -724,7 +678,7 @@ void main()
             // 绑定纹理
             batch.texture->bind(0);
             int useTexture = 1;
-            m_textureShader.setUniformData("uUseTexture", &useTexture, sizeof(int));
+            shaderToUse->setUniformData("uUseTexture", &useTexture, sizeof(int));
 
             // 设置顶点数据
             m_vbo.setData(batch.vertices.data(), batch.vertices.size() * sizeof(Vertex));
