@@ -109,4 +109,30 @@ namespace OxyRender
                                 0.1f, 2000.0f);
     }
 
+    glm::vec2 Camera::windowToWorld(float x, float y,float windowWidth,float windowHeight) const
+    {
+       
+        int screenWidth = windowWidth;
+        int screenHeight = windowHeight;
+
+
+        float ndcX = (2.0f * x) / screenWidth - 1.0f;
+        float ndcY = 1.0f - (2.0f * y) / screenHeight; 
+
+        glm::vec4 clipCoords(ndcX, ndcY, -1.0f, 1.0f);
+
+
+        glm::mat4 proj = getOrthoProjectionMatrix2D(screenWidth, screenHeight);
+        glm::mat4 view = getOrthoViewMatrix2D();
+        glm::mat4 invVP = glm::inverse(proj * view);
+
+        glm::vec4 worldPos = invVP * clipCoords;
+
+     
+        if (worldPos.w != 0.0f)
+            worldPos /= worldPos.w;
+
+        return glm::vec2(worldPos.x, worldPos.y);
+    }
+
 }

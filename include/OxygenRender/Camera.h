@@ -49,6 +49,8 @@ namespace OxyRender
         void processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
         void processMouseScroll(float yOffset);
 
+        glm::vec2 windowToWorld(float x, float y,float windowWidth,float windowHeight) const;
+
         inline glm::vec3 getPosition() const { return m_Position; }
         inline glm::vec3 getFront() const { return m_Front; }
         inline float getZoom() const { return m_Zoom; }
