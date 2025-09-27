@@ -9,12 +9,12 @@ using namespace OxyRender;
 
 int main()
 {
-  //Backpack::execute();
- // Graph2D::execute();
-   // Graph3D::execute();
-   //Texture2DTest::execute();
+  // Backpack::execute();
+  // Graph2D::execute();
+  Graph3D::execute();
+  // Texture2DTest::execute();
   // Simple2D::execute();
-  CustomShader2d::execute();
- 
+  // CustomShader2d::execute();
+
   return 0;
 }

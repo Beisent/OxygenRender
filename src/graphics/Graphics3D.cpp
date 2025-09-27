@@ -1,7 +1,11 @@
 #include "OxygenRender/Graphics3D.h"
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/constants.hpp>
+using namespace OxygenMathLite;
 namespace OxyRender
 {
+
     // 硬编码的着色器源码
     const char *Graphics3D::m_vertexShaderSrc = R"(
 #version 330 core
@@ -116,13 +120,13 @@ void main()
         m_pointBatches.clear();
     }
 
-    void Graphics3D::drawTriangle(const glm::vec3 &p1,
-                                  const glm::vec3 &p2,
-                                  const glm::vec3 &p3,
+    void Graphics3D::drawTriangle(const Vec3 &p1,
+                                  const Vec3 &p2,
+                                  const Vec3 &p3,
                                   OxyColor color)
     {
-
-        glm::vec3 n = glm::normalize(glm::cross(p2 - p1, p3 - p1));
+        auto n = (p2 - p1).cross(p3 - p1).normalize();
+        // glm::vec3 n = glm::normalize(glm::cross(p2 - p1, p3 - p1));
         unsigned int start = (unsigned int)m_triVertices.size();
         m_triVertices.push_back({p1, color, n});
         m_triVertices.push_back({p2, color, n});
@@ -134,8 +138,8 @@ void main()
         m_triIndexCount += 3;
     }
 
-    void Graphics3D::drawLine(const glm::vec3 &p1,
-                              const glm::vec3 &p2,
+    void Graphics3D::drawLine(const Vec3 &p1,
+                              const Vec3 &p2,
                               OxyColor color,
                               float thickness)
     {
@@ -156,14 +160,14 @@ void main()
 
         unsigned int start = (unsigned int)batch->vertices.size();
 
-        batch->vertices.push_back({p1, color, glm::vec3(0.0f)});
-        batch->vertices.push_back({p2, color, glm::vec3(0.0f)});
+        batch->vertices.push_back({p1, color, Vec3::Zero()});
+        batch->vertices.push_back({p2, color, Vec3::Zero()});
         batch->indices.push_back(start + 0);
         batch->indices.push_back(start + 1);
         batch->indexCount += 2;
     }
 
-    void Graphics3D::drawPoints(const std::vector<glm::vec3> &points,
+    void Graphics3D::drawPoints(const std::vector<Vec3> &points,
                                 float size,
                                 const OxyColor &color)
     {
@@ -190,43 +194,51 @@ void main()
         batch->vertices.reserve(batch->vertices.size() + points.size());
         for (const auto &p : points)
         {
-            batch->vertices.push_back({p, color, glm::vec3(0.0f)});
+            batch->vertices.push_back({p, color, Vec3::Zero()});
         }
     }
 
-    void Graphics3D::drawPlane(const glm::vec3 &center,
-                               const glm::vec3 &inNormal,
-                               const glm::vec2 &size,
+    void Graphics3D::drawPlane(const Vec3 &center,
+                               const Vec3 &inNormal,
+                               const Vec2 &size,
                                const OxyColor &color)
     {
-        glm::vec3 N = inNormal;
-        float nlen = glm::length(N);
+        Vec3 N = inNormal;
+        float nlen = N.length();
         if (nlen < 1e-6f)
         {
-            N = glm::vec3(0, 1, 0);
+            N = Vec3::Up();
         }
         else
         {
             N /= nlen;
         }
 
-        glm::vec3 ref = (std::fabs(N.y) < 0.9f) ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
-        glm::vec3 T = glm::normalize(glm::cross(ref, N));
+        // glm::vec3 ref = (std::fabs(N.y) < 0.9f) ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
+        Vec3 ref = (std::fabs(N.y) < 0.9f) ? Vec3::Up() : Vec3::Right();
+        // glm::vec3 T = glm::normalize(glm::cross(ref, N));
+        Vec3 T = (ref.cross(N)).normalize();
 
-        if (glm::dot(T, T) < 1e-12f)
+        // if (glm::dot(T, T) < 1e-12f)
+        // {
+        //     ref = glm::vec3(0, 0, 1);
+        //     T = glm::normalize(glm::cross(ref, N));
+        // }
+        if (T.dot(T) < 1e-12f)
         {
-            ref = glm::vec3(0, 0, 1);
-            T = glm::normalize(glm::cross(ref, N));
+            ref = Vec3::Forward();
+            T = (ref.cross(N)).normalize();
         }
-        glm::vec3 B = glm::normalize(glm::cross(N, T));
+        Vec3 B = (N.cross(T)).normalize();
+        // glm::vec3 B = glm::normalize(glm::cross(N, T));
 
         float hx = size.x * 0.5f;
         float hy = size.y * 0.5f;
 
-        glm::vec3 p0 = center - T * hx - B * hy; // 左下
-        glm::vec3 p1 = center + T * hx - B * hy; // 右下
-        glm::vec3 p2 = center + T * hx + B * hy; // 右上
-        glm::vec3 p3 = center - T * hx + B * hy; // 左上
+        Vec3 p0 = center - T * hx - B * hy; // 左下
+        Vec3 p1 = center + T * hx - B * hy; // 右下
+        Vec3 p2 = center + T * hx + B * hy; // 右上
+        Vec3 p3 = center - T * hx + B * hy; // 左上
 
         unsigned base = (unsigned)m_triVertices.size();
         m_triVertices.push_back({p0, color, N});
@@ -246,22 +258,22 @@ void main()
         m_triIndexCount += 6;
     }
 
-    void Graphics3D::drawBox(const glm::vec3 &center, const glm::vec3 &size, const OxyColor &color)
+    void Graphics3D::drawBox(const Vec3 &center, const Vec3 &size, const OxyColor &color)
     {
-        glm::vec3 half = size * 0.5f;
+        Vec3 half = size * 0.5f;
 
-        glm::vec3 p[8] = {
-            center + glm::vec3(-half.x, -half.y, -half.z),
-            center + glm::vec3(half.x, -half.y, -half.z),
-            center + glm::vec3(half.x, half.y, -half.z),
-            center + glm::vec3(-half.x, half.y, -half.z),
-            center + glm::vec3(-half.x, -half.y, half.z),
-            center + glm::vec3(half.x, -half.y, half.z),
-            center + glm::vec3(half.x, half.y, half.z),
-            center + glm::vec3(-half.x, half.y, half.z)};
+        Vec3 p[8] = {
+            center + Vec3(-half.x, -half.y, -half.z),
+            center + Vec3(half.x, -half.y, -half.z),
+            center + Vec3(half.x, half.y, -half.z),
+            center + Vec3(-half.x, half.y, -half.z),
+            center + Vec3(-half.x, -half.y, half.z),
+            center + Vec3(half.x, -half.y, half.z),
+            center + Vec3(half.x, half.y, half.z),
+            center + Vec3(-half.x, half.y, half.z)};
 
         // 每个面 push 顶点并按当前顶点基址写索引
-        auto pushFace = [&](int i0, int i1, int i2, int i3, const glm::vec3 &normal)
+        auto pushFace = [&](int i0, int i1, int i2, int i3, const Vec3 &normal)
         {
             unsigned int base = (unsigned int)m_triVertices.size();
             m_triVertices.push_back({p[i0], color, normal});
@@ -290,7 +302,7 @@ void main()
         pushFace(0, 1, 5, 4, {0, -1, 0}); //  -Y
     }
 
-    void Graphics3D::drawSphere(const glm::vec3 &center, float radius,
+    void Graphics3D::drawSphere(const Vec3 &center, float radius,
                                 int stacks, int slices, const OxyColor &color)
     {
         if (stacks < 2)
@@ -308,27 +320,27 @@ void main()
                 float theta1 = glm::two_pi<float>() * float(j) / float(slices);
                 float theta2 = glm::two_pi<float>() * float(j + 1) / float(slices);
 
-                glm::vec3 p1 = center + radius * glm::vec3(
-                                                     std::sin(phi1) * std::cos(theta1),
-                                                     std::cos(phi1),
-                                                     std::sin(phi1) * std::sin(theta1));
-                glm::vec3 p2 = center + radius * glm::vec3(
-                                                     std::sin(phi2) * std::cos(theta1),
-                                                     std::cos(phi2),
-                                                     std::sin(phi2) * std::sin(theta1));
-                glm::vec3 p3 = center + radius * glm::vec3(
-                                                     std::sin(phi2) * std::cos(theta2),
-                                                     std::cos(phi2),
-                                                     std::sin(phi2) * std::sin(theta2));
-                glm::vec3 p4 = center + radius * glm::vec3(
-                                                     std::sin(phi1) * std::cos(theta2),
-                                                     std::cos(phi1),
-                                                     std::sin(phi1) * std::sin(theta2));
+                Vec3 p1 = center + radius * Vec3(
+                                                std::sin(phi1) * std::cos(theta1),
+                                                std::cos(phi1),
+                                                std::sin(phi1) * std::sin(theta1));
+                Vec3 p2 = center + radius * Vec3(
+                                                std::sin(phi2) * std::cos(theta1),
+                                                std::cos(phi2),
+                                                std::sin(phi2) * std::sin(theta1));
+                Vec3 p3 = center + radius * Vec3(
+                                                std::sin(phi2) * std::cos(theta2),
+                                                std::cos(phi2),
+                                                std::sin(phi2) * std::sin(theta2));
+                Vec3 p4 = center + radius * Vec3(
+                                                std::sin(phi1) * std::cos(theta2),
+                                                std::cos(phi1),
+                                                std::sin(phi1) * std::sin(theta2));
 
-                glm::vec3 n1 = glm::normalize(p1 - center);
-                glm::vec3 n2 = glm::normalize(p2 - center);
-                glm::vec3 n3 = glm::normalize(p3 - center);
-                glm::vec3 n4 = glm::normalize(p4 - center);
+                Vec3 n1 = (p1 - center).normalize();
+                Vec3 n2 = (p2 - center).normalize();
+                Vec3 n3 = (p3 - center).normalize();
+                Vec3 n4 = (p4 - center).normalize();
 
                 unsigned int base = (unsigned int)m_triVertices.size();
                 // 第一个三角形
@@ -352,7 +364,7 @@ void main()
         }
     }
 
-    void Graphics3D::drawCylinder(const glm::vec3 &center,
+    void Graphics3D::drawCylinder(const Vec3 &center,
                                   float radius,
                                   float height,
                                   int slices,
@@ -373,15 +385,20 @@ void main()
             float theta1 = glm::two_pi<float>() * float(j) / float(slices);
             float theta2 = glm::two_pi<float>() * float(j + 1) / float(slices);
 
-            glm::vec3 p1(center.x + radius * std::cos(theta1), yBottom, center.z + radius * std::sin(theta1));
-            glm::vec3 p2(center.x + radius * std::cos(theta2), yBottom, center.z + radius * std::sin(theta2));
-            glm::vec3 p3(center.x + radius * std::cos(theta2), yTop, center.z + radius * std::sin(theta2));
-            glm::vec3 p4(center.x + radius * std::cos(theta1), yTop, center.z + radius * std::sin(theta1));
+            Vec3 p1(center.x + radius * std::cos(theta1), yBottom, center.z + radius * std::sin(theta1));
+            Vec3 p2(center.x + radius * std::cos(theta2), yBottom, center.z + radius * std::sin(theta2));
+            Vec3 p3(center.x + radius * std::cos(theta2), yTop, center.z + radius * std::sin(theta2));
+            Vec3 p4(center.x + radius * std::cos(theta1), yTop, center.z + radius * std::sin(theta1));
 
-            glm::vec3 n1 = glm::normalize(glm::vec3(p1.x - center.x, 0.0f, p1.z - center.z));
-            glm::vec3 n2 = glm::normalize(glm::vec3(p2.x - center.x, 0.0f, p2.z - center.z));
-            glm::vec3 n3 = glm::normalize(glm::vec3(p3.x - center.x, 0.0f, p3.z - center.z));
-            glm::vec3 n4 = glm::normalize(glm::vec3(p4.x - center.x, 0.0f, p4.z - center.z));
+            // Vec3 n1 = glm::normalize(glm::vec3(p1.x - center.x, 0.0f, p1.z - center.z));
+            // Vec3 n2 = glm::normalize(glm::vec3(p2.x - center.x, 0.0f, p2.z - center.z));
+            // Vec3 n3 = glm::normalize(glm::vec3(p3.x - center.x, 0.0f, p3.z - center.z));
+            // Vec3 n4 = glm::normalize(glm::vec3(p4.x - center.x, 0.0f, p4.z - center.z));
+
+            Vec3 n1 = Vec3(p1.x - center.x, 0.0f, p1.z - center.z).normalize();
+            Vec3 n2 = Vec3(p2.x - center.x, 0.0f, p2.z - center.z).normalize();
+            Vec3 n3 = Vec3(p3.x - center.x, 0.0f, p3.z - center.z).normalize();
+            Vec3 n4 = Vec3(p4.x - center.x, 0.0f, p4.z - center.z).normalize();
 
             unsigned int base = (unsigned int)m_triVertices.size();
 
@@ -406,15 +423,15 @@ void main()
         {
 
             {
-                glm::vec3 nTop(0.0f, 1.0f, 0.0f);
+                Vec3 nTop(0.0f, 1.0f, 0.0f);
                 unsigned int centerBase = (unsigned int)m_triVertices.size();
 
-                m_triVertices.push_back({glm::vec3(center.x, yTop, center.z), color, nTop});
+                m_triVertices.push_back({Vec3(center.x, yTop, center.z), color, nTop});
 
                 for (int j = 0; j < slices; ++j)
                 {
                     float theta = glm::two_pi<float>() * float(j) / float(slices);
-                    glm::vec3 p(center.x + radius * std::cos(theta), yTop, center.z + radius * std::sin(theta));
+                    Vec3 p(center.x + radius * std::cos(theta), yTop, center.z + radius * std::sin(theta));
                     m_triVertices.push_back({p, color, nTop});
                 }
 
@@ -431,15 +448,15 @@ void main()
             }
 
             {
-                glm::vec3 nBot(0.0f, -1.0f, 0.0f);
+                Vec3 nBot(0.0f, -1.0f, 0.0f);
                 unsigned int centerBase = (unsigned int)m_triVertices.size();
 
-                m_triVertices.push_back({glm::vec3(center.x, yBottom, center.z), color, nBot});
+                m_triVertices.push_back({Vec3(center.x, yBottom, center.z), color, nBot});
 
                 for (int j = 0; j < slices; ++j)
                 {
                     float theta = glm::two_pi<float>() * float(j) / float(slices);
-                    glm::vec3 p(center.x + radius * std::cos(theta), yBottom, center.z + radius * std::sin(theta));
+                    Vec3 p(center.x + radius * std::cos(theta), yBottom, center.z + radius * std::sin(theta));
                     m_triVertices.push_back({p, color, nBot});
                 }
 
@@ -458,35 +475,35 @@ void main()
     }
 
     void Graphics3D::drawFunction(
-        const glm::vec2 &xDomain,
-        const glm::vec2 &zDomain,
+        const Vec2 &xDomain,
+        const Vec2 &zDomain,
         const std::function<float(float, float)> &func,
         const OxyColor &color,
         const float &dx,
         const float &dz)
     {
-        glm::vec2 xRange = xDomain;
-        glm::vec2 zRange = zDomain;
-        int nx = static_cast<int>((xRange[1] - xRange[0]) / dx);
-        int nz = static_cast<int>((zRange[1] - zRange[0]) / dz);
+        Vec2 xRange = xDomain;
+        Vec2 zRange = zDomain;
+        int nx = static_cast<int>((xRange.y - xRange.x) / dx);
+        int nz = static_cast<int>((zRange.y - zRange.x) / dz);
 
         // 调整 xMax，yMax 以确保整除避免边缘不完整
-        xRange[1] = xRange[0] + nx * dx;
-        zRange[1] = zRange[0] + nz * dz;
+        xRange.y = xRange.x + nx * dx;
+        zRange.y = zRange.x + nz * dz;
 
         for (int i = 0; i < nx; ++i)
         {
             for (int j = 0; j < nz; ++j)
             {
-                float x1 = xRange[0] + i * dx;
-                float x2 = xRange[0] + (i + 1) * dx;
-                float z1 = zRange[0] + j * dz;
-                float z2 = zRange[0] + (j + 1) * dz;
+                float x1 = xRange.x + i * dx;
+                float x2 = xRange.x + (i + 1) * dx;
+                float z1 = zRange.x + j * dz;
+                float z2 = zRange.x+ (j + 1) * dz;
 
-                glm::vec3 p1(x1, func(x1, z1), z1);
-                glm::vec3 p2(x2, func(x2, z1), z1);
-                glm::vec3 p3(x2, func(x2, z2), z2);
-                glm::vec3 p4(x1, func(x1, z2), z2);
+                Vec3 p1(x1, func(x1, z1), z1);
+                Vec3 p2(x2, func(x2, z1), z1);
+                Vec3 p3(x2, func(x2, z2), z2);
+                Vec3 p4(x1, func(x1, z2), z2);
 
                 drawTriangle(p1, p2, p4, color);
                 drawTriangle(p2, p3, p4, color);
