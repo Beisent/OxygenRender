@@ -21,6 +21,8 @@ namespace OxyRender
         void clear();
         void setClearColor(const OxyColor &color);
         void setShader(Shader *shader) { m_customShader = shader; }
+        // 启用/禁用视锥体裁剪
+        void setFrustumCullingEnabled(bool enabled) { m_frustumCullingEnabled = enabled; }
         void begin();
 
         void drawTriangle(const MathLite::Vec3 &p1,
@@ -63,6 +65,11 @@ namespace OxyRender
                           bool capped);
 
         void flush();
+        // 视锥面（Ax + By + Cz + D = 0）
+        struct Plane
+        {
+            float a = 0, b = 0, c = 0, d = 0;
+        };
 
     private:
         struct Vertex
@@ -111,5 +118,9 @@ namespace OxyRender
         // 硬编码的着色器源码
         static const char *m_vertexShaderSrc;
         static const char *m_fragmentShaderSrc;
+
+        // 视锥体裁剪
+        bool m_frustumCullingEnabled = true;
+        Plane m_frustumPlanes[6]{}; // L, R, B, T, N, F
     };
 }

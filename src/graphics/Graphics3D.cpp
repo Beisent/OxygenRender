@@ -1,10 +1,76 @@
 #include "OxygenRender/Graphics3D.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/constants.hpp>
 using namespace MathLite;
 namespace OxyRender
 {
+    namespace
+    {
+        inline glm::vec3 toGlm(const MathLite::Vec3 &v)
+        {
+            return glm::vec3(v.x, v.y, v.z);
+        }
+
+        // 从 VP 矩阵提取 6 个视锥平面，顺序：L, R, B, T, N, F
+        inline void extractFrustumPlanes(const glm::mat4 &vp, Graphics3D::Plane outPlanes[6])
+        {
+            // 使用行向量组合：rowW ± rowX/Y/Z
+            const glm::vec4 rowX = glm::row(vp, 0);
+            const glm::vec4 rowY = glm::row(vp, 1);
+            const glm::vec4 rowZ = glm::row(vp, 2);
+            const glm::vec4 rowW = glm::row(vp, 3);
+
+            glm::vec4 tmp[6];
+            tmp[0] = rowW + rowX; // Left
+            tmp[1] = rowW - rowX; // Right
+            tmp[2] = rowW + rowY; // Bottom
+            tmp[3] = rowW - rowY; // Top
+            tmp[4] = rowW + rowZ; // Near
+            tmp[5] = rowW - rowZ; // Far
+
+            // 归一化平面法向量（A,B,C）并写入 POD 平面
+            for (int i = 0; i < 6; ++i)
+            {
+                glm::vec3 n(tmp[i].x, tmp[i].y, tmp[i].z);
+                float invLen = 1.0f / glm::length(n);
+                outPlanes[i].a = tmp[i].x * invLen;
+                outPlanes[i].b = tmp[i].y * invLen;
+                outPlanes[i].c = tmp[i].z * invLen;
+                outPlanes[i].d = tmp[i].w * invLen;
+            }
+        }
+
+        // 球-视锥体相交检测
+        inline bool sphereInFrustum(const Graphics3D::Plane planes[6], const glm::vec3 &center, float radius)
+        {
+            for (int i = 0; i < 6; ++i)
+            {
+                const auto &p = planes[i];
+                float dist = p.a * center.x + p.b * center.y + p.c * center.z + p.d;
+                if (dist < -radius)
+                    return false;
+            }
+            return true;
+        }
+
+        // AABB-视锥体相交检测（center + halfExtents）
+        inline bool aabbInFrustum(const Graphics3D::Plane planes[6], const glm::vec3 &center, const glm::vec3 &half)
+        {
+            for (int i = 0; i < 6; ++i)
+            {
+                const glm::vec3 n(planes[i].a, planes[i].b, planes[i].c);
+                // 投影半径 = dot(|n|, half)
+                glm::vec3 an = glm::abs(n);
+                float r = glm::dot(an, half);
+                float dist = glm::dot(n, center) + planes[i].d;
+                if (dist < -r)
+                    return false;
+            }
+            return true;
+        }
+    }
 
     // 硬编码的着色器源码
     const char *Graphics3D::m_vertexShaderSrc = R"(
@@ -120,6 +186,15 @@ void main()
 
         m_lineBatches.clear();
         m_pointBatches.clear();
+
+        // 更新当前帧的视锥体平面
+        if (m_frustumCullingEnabled)
+        {
+            glm::mat4 view = m_camera.getViewMatrix();
+            glm::mat4 projection = m_camera.getPerspectiveProjectionMatrix(m_window.getWidth(), m_window.getHeight());
+            glm::mat4 vp = projection * view;
+            extractFrustumPlanes(vp, m_frustumPlanes);
+        }
     }
 
     void Graphics3D::drawTriangle(const Vec3 &p1,
@@ -127,6 +202,13 @@ void main()
                                   const Vec3 &p3,
                                   OxyColor color)
     {
+        if (m_frustumCullingEnabled)
+        {
+            glm::vec3 c = (toGlm(p1) + toGlm(p2) + toGlm(p3)) / 3.0f;
+            float r = glm::max(glm::length(c - toGlm(p1)), glm::max(glm::length(c - toGlm(p2)), glm::length(c - toGlm(p3))));
+            if (!sphereInFrustum(m_frustumPlanes, c, r))
+                return;
+        }
         auto n = (p2 - p1).cross(p3 - p1).normalize();
         // glm::vec3 n = glm::normalize(glm::cross(p2 - p1, p3 - p1));
         unsigned int start = (unsigned int)m_triVertices.size();
@@ -145,6 +227,13 @@ void main()
                               OxyColor color,
                               float thickness)
     {
+        if (m_frustumCullingEnabled)
+        {
+            glm::vec3 c = (toGlm(p1) + toGlm(p2)) * 0.5f;
+            float r = 0.5f * glm::length(toGlm(p2) - toGlm(p1));
+            if (!sphereInFrustum(m_frustumPlanes, c, r))
+                return;
+        }
         LineBatch *batch = nullptr;
         for (auto &b : m_lineBatches)
         {
@@ -194,9 +283,21 @@ void main()
         }
 
         batch->vertices.reserve(batch->vertices.size() + points.size());
-        for (const auto &p : points)
+        if (m_frustumCullingEnabled)
         {
-            batch->vertices.push_back({p, color, Vec3::Zero()});
+            for (const auto &p : points)
+            {
+                glm::vec3 c = toGlm(p);
+                if (sphereInFrustum(m_frustumPlanes, c, 0.0f))
+                    batch->vertices.push_back({p, color, Vec3::Zero()});
+            }
+        }
+        else
+        {
+            for (const auto &p : points)
+            {
+                batch->vertices.push_back({p, color, Vec3::Zero()});
+            }
         }
     }
 
@@ -205,6 +306,14 @@ void main()
                                const Vec2 &size,
                                const OxyColor &color)
     {
+        if (m_frustumCullingEnabled)
+        {
+            float hx = size.x * 0.5f;
+            float hy = size.y * 0.5f;
+            float r = std::sqrt(hx * hx + hy * hy);
+            if (!sphereInFrustum(m_frustumPlanes, toGlm(center), r))
+                return;
+        }
         Vec3 N = inNormal;
         float nlen = N.length();
         if (nlen < 1e-6f)
@@ -262,6 +371,13 @@ void main()
 
     void Graphics3D::drawBox(const Vec3 &center, const Vec3 &size, const OxyColor &color)
     {
+        if (m_frustumCullingEnabled)
+        {
+            glm::vec3 c = toGlm(center);
+            glm::vec3 half = toGlm(size * 0.5f);
+            if (!aabbInFrustum(m_frustumPlanes, c, half))
+                return;
+        }
         Vec3 half = size * 0.5f;
 
         Vec3 p[8] = {
@@ -307,6 +423,11 @@ void main()
     void Graphics3D::drawSphere(const Vec3 &center, float radius,
                                 int stacks, int slices, const OxyColor &color)
     {
+        if (m_frustumCullingEnabled)
+        {
+            if (!sphereInFrustum(m_frustumPlanes, toGlm(center), radius))
+                return;
+        }
         if (stacks < 2)
             stacks = 2;
         if (slices < 3)
@@ -373,6 +494,13 @@ void main()
                                   const OxyColor &color,
                                   bool capped)
     {
+        if (m_frustumCullingEnabled)
+        {
+            glm::vec3 c = toGlm(center);
+            glm::vec3 half(radius, height * 0.5f, radius);
+            if (!aabbInFrustum(m_frustumPlanes, c, half))
+                return;
+        }
         if (radius <= 0.0f || height <= 0.0f)
             return;
         if (slices < 3)
