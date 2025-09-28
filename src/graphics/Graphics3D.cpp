@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
-using namespace OxygenMathLite;
+using namespace MathLite;
 namespace OxyRender
 {
 
@@ -20,6 +20,7 @@ out vec4 vColor;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float uPointSize; // point size supplied from CPU when drawing points
 
 void main()
 {
@@ -31,6 +32,7 @@ void main()
     vColor = aColor;
     
     gl_Position = projection * view * worldPos;
+    gl_PointSize = uPointSize; // effective when rendering GL_POINTS
 }
 )";
 

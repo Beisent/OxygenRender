@@ -70,7 +70,7 @@ namespace OxyRender
 
                 graphics2D.drawTriangle(100, 200, 200, 200, 150, 300, faceTexture, {1.0f,1.0f,1.0f,1.0f});
 
-                std::vector<Vec2> polygonPoints = {
+                std::vector<MathLite::Vec2> polygonPoints = {
                     {250, 200}, {300, 250}, {250, 300}, {200, 250}};
                 graphics2D.drawPolygon(polygonPoints, containerTexture, {1.0f,1.0f,1.0f,0.8f});
 

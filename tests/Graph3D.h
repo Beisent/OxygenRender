@@ -22,7 +22,7 @@ namespace OxyRender
 
             window.setCursorMode(CursorMode::Disabled);
             bool mouseCaptured = true;
-            EventSystem &eventSystem = eventSystem.getInstance();
+            EventSystem &eventSystem = EventSystem::getInstance();
 
             // 注册键盘按下事件
             eventSystem.registerCallback(EventType::KeyPressed, [&window, &mouseCaptured](const Event &e)

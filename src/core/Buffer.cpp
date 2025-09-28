@@ -27,6 +27,43 @@ namespace OxyRender
             return 0;
         }
     }
+
+    // 组件数
+    constexpr GLint componentCount(VertexAttribType type) noexcept
+    {
+        switch (type)
+        {
+        case VertexAttribType::Float1:
+        case VertexAttribType::Int1:
+            return 1;
+        case VertexAttribType::Float2:
+        case VertexAttribType::Int2:
+            return 2;
+        case VertexAttribType::Float3:
+        case VertexAttribType::Int3:
+            return 3;
+        case VertexAttribType::Float4:
+        case VertexAttribType::Int4:
+            return 4;
+        default:
+            return 0;
+        }
+    }
+
+    // 是否为整型属性
+    constexpr bool isIntegerAttrib(VertexAttribType type) noexcept
+    {
+        switch (type)
+        {
+        case VertexAttribType::Int1:
+        case VertexAttribType::Int2:
+        case VertexAttribType::Int3:
+        case VertexAttribType::Int4:
+            return true;
+        default:
+            return false;
+        }
+    }
     // 添加属性布局
     void VertexLayout::addAttribute(const std::string &name, int location, VertexAttribType type)
     {
@@ -170,12 +207,20 @@ namespace OxyRender
         for (const auto &attr : attribs)
         {
             glEnableVertexAttribArray(attr.location);
-            glVertexAttribPointer(attr.location,
-                                  static_cast<GLint>(sizeOfAttribType(attr.type) / sizeof(float)),
-                                  GL_FLOAT,
-                                  GL_FALSE,
-                                  static_cast<GLsizei>(layout.getStride()),
-                                  reinterpret_cast<const void *>(attr.offset));
+            const GLint comps = componentCount(attr.type);
+            const GLsizei stride = static_cast<GLsizei>(layout.getStride());
+            const void *pointer = reinterpret_cast<const void *>(attr.offset);
+
+            if (isIntegerAttrib(attr.type))
+            {
+                // 整型属性使用 glVertexAttribIPointer，类型为 GL_INT
+                glVertexAttribIPointer(attr.location, comps, GL_INT, stride, pointer);
+            }
+            else
+            {
+                // 浮点属性使用 glVertexAttribPointer，类型为 GL_FLOAT，不归一化
+                glVertexAttribPointer(attr.location, comps, GL_FLOAT, GL_FALSE, stride, pointer);
+            }
         }
     }
 

@@ -11,7 +11,7 @@ using real = double;
 using real = float;
 #endif
 
-namespace OxygenMathLite
+namespace MathLite
 {
     struct Vec2;
     struct Vec3;

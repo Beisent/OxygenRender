@@ -39,9 +39,8 @@ namespace OxyRender
         glGenTextures(1, &m_rendererID);
         glBindTexture(GL_TEXTURE_2D, m_rendererID);
 
-        // 设置过滤器
+        // 设置过滤器（先设置 MAG，MIN 将在生成 mipmap 后设置为合适的模式）
         m_filter = (filter == TextureFilter::Linear) ? GL_LINEAR : GL_NEAREST;
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_filter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_filter);
 
         // 设置包装模式
@@ -51,6 +50,10 @@ namespace OxyRender
 
         // 上传数据
         glTexImage2D(GL_TEXTURE_2D, 0, m_internalFormat, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, data);
+        // 生成 mipmap 并配置 MIN 过滤
+        glGenerateMipmap(GL_TEXTURE_2D);
+        GLint minFilter = (filter == TextureFilter::Linear) ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 

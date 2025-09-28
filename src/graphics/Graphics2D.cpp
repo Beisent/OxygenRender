@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 namespace OxyRender
 {
-    glm::vec2 sVec2ToGlm(const OxygenMathLite::Vec2 &vec)
+    glm::vec2 sVec2ToGlm(const MathLite::Vec2 &vec)
     {
         return glm::vec2(vec.x, vec.y);
     }
@@ -215,7 +215,7 @@ namespace OxyRender
 
         batch->indexCount += 2;
     }
-    void Graphics2D::drawLines(const std::vector<OxygenMathLite::Vec2> &points, OxyColor color, float thickness)
+    void Graphics2D::drawLines(const std::vector<MathLite::Vec2> &points, OxyColor color, float thickness)
     {
         for (int i = 0; i < points.size() - 1; i++)
         {
@@ -282,7 +282,7 @@ namespace OxyRender
         }
     }
 
-    void Graphics2D::drawPolygon(const std::vector<OxygenMathLite::Vec2> &points, OxyColor color)
+    void Graphics2D::drawPolygon(const std::vector<MathLite::Vec2> &points, OxyColor color)
     {
         size_t n = points.size();
         if (n < 3)
@@ -304,7 +304,7 @@ namespace OxyRender
         }
     }
 
-    void Graphics2D::drawPolygonOutline(const std::vector<OxygenMathLite::Vec2> &points, OxyColor color, float thickness)
+    void Graphics2D::drawPolygonOutline(const std::vector<MathLite::Vec2> &points, OxyColor color, float thickness)
     {
         if (points.size() < 2)
             return;
@@ -404,7 +404,7 @@ namespace OxyRender
         batch->indexCount += 3;
     }
 
-    void Graphics2D::drawPolygon(const std::vector<OxygenMathLite::Vec2> &points, const Texture2D &texture, OxyColor tintColor)
+    void Graphics2D::drawPolygon(const std::vector<MathLite::Vec2> &points, const Texture2D &texture, OxyColor tintColor)
     {
         if (points.size() < 3)
             return;

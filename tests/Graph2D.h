@@ -16,7 +16,7 @@ namespace OxyRender
             auto &camera = graphics2D.getCamera();
             camera.setMovementSpeed(100.0f);
 
-            EventSystem &eventSystem = eventSystem.getInstance();
+            EventSystem &eventSystem = EventSystem::getInstance();
             eventSystem.registerCallback(EventType::KeyPressed,
                                          [&window](const Event &e)
                                          {

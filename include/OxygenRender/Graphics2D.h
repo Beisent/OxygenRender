@@ -10,7 +10,6 @@
 #include <cmath>
 #include <functional>
 
-using namespace OxygenMathLite;
 namespace OxyRender
 {
 
@@ -31,7 +30,7 @@ namespace OxyRender
         void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
 
         void drawLine(float x1, float y1, float x2, float y2, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
-        void drawLines(const std::vector<Vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
+        void drawLines(const std::vector<MathLite::Vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
         void drawCircle(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36);
         void drawCircleOutline(float cx, float cy, float radius, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
@@ -41,8 +40,8 @@ namespace OxyRender
         void drawEllipseOutline(float cx, float cy, float radiusX, float radiusY,
                                 OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, int segments = 36, float thickness = 1.0f);
 
-        void drawPolygon(const std::vector<Vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
-        void drawPolygonOutline(const std::vector<Vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
+        void drawPolygon(const std::vector<MathLite::Vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f});
+        void drawPolygonOutline(const std::vector<MathLite::Vec2> &points, OxyColor color = {1.0f, 0.0f, 0.0f, 1.0f}, float thickness = 1.0f);
 
         void drawArrow(float x1, float y1, float x2, float y2,
                        OxyColor color = {1.0f, 1.0f, 1.0f, 1.0f}, float thickness = 1.0, float headLength = 15.0f, float headWidth = 15.0f);
@@ -77,7 +76,7 @@ namespace OxyRender
                       OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3,
                           const Texture2D &texture, OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        void drawPolygon(const std::vector<Vec2> &points, const Texture2D &texture,
+        void drawPolygon(const std::vector<MathLite::Vec2> &points, const Texture2D &texture,
                          OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         void drawCircle(float cx, float cy, float radius, const Texture2D &texture,
                         OxyColor tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, int segments = 36);
@@ -97,9 +96,9 @@ namespace OxyRender
         // 顶点结构体
         struct Vertex
         {
-            Vec3 pos;
+            MathLite::Vec3 pos;
             OxyColor color;
-            Vec2 texCoord;
+            MathLite::Vec2 texCoord;
         };
         // 线段批次
         struct LineBatch

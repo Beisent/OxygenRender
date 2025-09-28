@@ -86,6 +86,8 @@ namespace OxyRender
             throw std::runtime_error("Failed to create GLFW window");
         }
         glfwMakeContextCurrent(m_window);
+        // // 默认开启垂直同步
+        // glfwSwapInterval(1);
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
             std::cerr << "GLAD 初始化失败\n";
