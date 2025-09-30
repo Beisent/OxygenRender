@@ -59,7 +59,7 @@ namespace OxyRender
 
                 graphics2D.begin();
                 graphics2D.drawCircle(-350, 250, 50, {1, 0, 0, 0.5f});
-                graphics2D.drawCircleOutline(-250, 250, 50, {0, 1, 0, 1}, 64, 2);
+                graphics2D.drawCircleOutline(-250, 250, 50, {0, 0, 0, 1}, 64, 2);
 
                 graphics2D.drawEllipse(100, 200, 80, 50, {0.5f, 0, 0.5f, 0.5f});
                 graphics2D.drawEllipseOutline(250, 200, 80, 50, {0, 0.5f, 0.5f, 1}, 64, 2);

@@ -37,14 +37,11 @@ OxygenRender 是一个基于 OpenGL 3.3+ 的轻量级 3D 图形渲染引擎，�
 OxygenRender/
 ├── include/OxygenRender/     # 公共头文件
 ├── src/                      # 源码
-│   ├── core/                 # 核心类（事件、日志、应用）
-│   ├── graphics/             # 图形模块（渲染器、着色器、模型等）
-│   ├── utils/                # 工具类（时间等）
-│   └── vendor/               # 第三方库
+│   ├── core/                 # 核心类（窗口、渲染器、事件等）
+│   ├── graphics/             # 图形模块（2D/3D绘图等）
+│   └── utils/                # 工具类（时间等）
 ├── tests/                    # 示例程序
-├── shaders/                  # GLSL 着色器脚本
-├── resources/                # 模型、纹理等资源
-├── bin/
+├── vendor/                   # 第三方库（GLFW、GLAD、GLM、Assimp、stb_image）
 ├── CMakeLists.txt
 └── build.bat / build.sh      # 跨平台构建脚本
 ```
@@ -60,12 +57,12 @@ OxygenRender/
 | `Texture2D`    | 2D 纹理封装，支持多种内部格式与过滤模式    |
 | `Shader`       | 着色器程序加载、编译与 uniform 设置        |
 | `Buffer`       | 顶点/索引缓冲区抽象                        |
-| `VertexArray`  | VAO 封装，管理顶点属性布局                 |
 | `Window`       | GLFW 窗口与 OpenGL 上下文管理              |
-| `EventSystem`  | 事件总线机制，支持订阅/发布模式            |
+| `EventSystem`  | 事件系统，基于 GLFW 实现输入事件监听       |
 | `Graphics2D`   | 高级 2D 绘图接口（形状、纹理、坐标系）     |
 | `Graphics3D`   | 基础 3D 形状绘制（立方体、球体等）         |
 | `Camera`       | 支持透视/正交投影，视角控制与变换          |
+| `Timer`        | 计时工具，用于帧率控制等                   |
 
 ---
 
@@ -114,10 +111,12 @@ cmake --build . --config Release
 
 | 示例            | 说明                                      |
 | --------------- | ----------------------------------------- |
-| `Backpack`      | 加载并渲染 3D 背包模型，展示材质与光照    |
-| `LightBox`      | 动态光源演示，支持 Phong 光照模型         |
+| `Backpack`      | 加载并渲染 3D 背包模型，展示材质与模型加载 |
 | `Graph2D`       | 2D 图形绘制：坐标系、网格、形状、纹理映射 |
+| `Graph3D`       | 3D 图形绘制：基础形状、相机控制           |
 | `Texture2DTest` | 纹理加载与应用测试，支持重复/边缘处理     |
+| `Simple2D`      | 简单的 2D 绘图演示                        |
+| `CustomShader2d`| 自定义着色器的 2D 绘图示例                |
 
 ---
 
@@ -129,11 +128,13 @@ cmake --build . --config Release
 
 ## 🚧 未来规划
 
-- ✅ 支持 Vulkan / DirectX 12 后端（抽象渲染接口）
-- ✅ 实现 PBR 材质与基于物理的渲染（PBR）
-- ✅ 添加阴影映射（Shadow Mapping）
-- ✅ 支持 2D 文本渲染（集成 FreeType）
-- ✅ 提供 Editor 原型（ImGui 集成）
+- 支持 Vulkan / DirectX 12 后端（抽象渲染接口）
+- 实现 PBR 材质与基于物理的渲染（PBR）
+- 添加阴影映射（Shadow Mapping）
+- 支持 2D 文本渲染（集成 FreeType）
+- 提供 Editor 原型（ImGui 集成）
+- 扩展场景图系统
+- 完善资源管理系统
 
 ---
 

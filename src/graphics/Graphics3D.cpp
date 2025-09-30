@@ -16,7 +16,6 @@ namespace OxyRender
         // 从 VP 矩阵提取 6 个视锥平面，顺序：L, R, B, T, N, F
         inline void extractFrustumPlanes(const glm::mat4 &vp, Graphics3D::Plane outPlanes[6])
         {
-            // 使用行向量组合：rowW ± rowX/Y/Z
             const glm::vec4 rowX = glm::row(vp, 0);
             const glm::vec4 rowY = glm::row(vp, 1);
             const glm::vec4 rowZ = glm::row(vp, 2);
